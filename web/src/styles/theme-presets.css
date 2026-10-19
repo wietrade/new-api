@@ -24,7 +24,7 @@ For commercial licensing, please contact support@quantumnous.com
  *
  * - `data-theme-preset` overrides the color palette defined in ./theme.css and
  *   ships a curated default `--radius` value to match the preset's mood
- *   (e.g. rose-garden uses 1rem, ocean-breeze uses 0.3rem).
+ *   (e.g. rose-garden uses 1rem, ocean-breeze uses 0.25rem).
  * - Each preset declares both light and dark color values; dark values use
  *   the `.dark` ancestor selector so they apply when html has the `.dark` class.
  * - `data-theme-radius` and `data-theme-scale` adjust visual density
@@ -234,7 +234,8 @@ For commercial licensing, please contact support@quantumnous.com
   --sidebar-accent: oklch(0.5461 0.2152 262.88);
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-ring: oklch(0.5461 0.2152 262.88);
-  --radius: 0.3rem;
+  /* [改造-仿bifrost] 0.3rem → 0.25rem(4px) */
+  --radius: 0.25rem;
 }
 .dark [data-theme-preset='ocean-breeze'] {
   --primary: oklch(0.623 0.188 259.81);
@@ -680,12 +681,20 @@ For commercial licensing, please contact support@quantumnous.com
   letter-spacing: -0.02em;
 }
 
+/* [改造-仿bifrost] 任意主题预设统一固定 4px(0.25rem)。
+ * 放在所有预设块之后、圆角档位之前：预设置无效，
+ * 但用户显式选择圆角档位（下方 [data-theme-radius] 规则）仍可覆盖。 */
+[data-theme-preset] {
+  --radius: 0.25rem;
+}
+
 /* ── Border radius ────────────────────────────────────────────────────── */
 [data-theme-radius='none'] {
   --radius: 0rem;
 }
 [data-theme-radius='sm'] {
-  --radius: 0.3rem;
+  /* [改造-仿bifrost] 0.3rem → 0.25rem(4px) */
+  --radius: 0.25rem;
 }
 [data-theme-radius='md'] {
   --radius: 0.5rem;

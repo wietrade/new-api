@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { useStatus } from '@/hooks/use-status'
 
 import { AuthLayout } from '../auth-layout'
+import { AuthFooterLinks } from '../components/auth-footer-links'
 import { TermsFooter } from '../components/terms-footer'
 import { SignUpForm } from './components/sign-up-form'
 
@@ -31,31 +32,32 @@ export function SignUp() {
 
   return (
     <AuthLayout>
-      <div className='w-full space-y-8'>
-        <div className='space-y-2'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
-            {t('Create an account')}
-          </h2>
-          <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t('Already have an account?')}{' '}
-            <Link
-              to='/sign-in'
-              className='hover:text-primary font-medium underline underline-offset-4'
-            >
-              {t('Sign in')}
-            </Link>
-            .
-          </p>
-        </div>
-
-        <SignUpForm />
-
-        <TermsFooter
-          variant='sign-up'
-          status={status}
-          className='text-center'
-        />
+      {/* [改造-仿bifrost] 与登录页一致：居中标题 + 13.2px 副标题 */}
+      <div className='space-y-2 text-center'>
+        <h1 className='text-foreground text-lg font-semibold'>
+          {t('Create an account')}
+        </h1>
+        <p className='text-muted-foreground text-[0.825rem] leading-5'>
+          {t('Already have an account?')}{' '}
+          <Link
+            to='/sign-in'
+            className='hover:text-primary font-medium underline underline-offset-4'
+          >
+            {t('Sign in')}
+          </Link>
+          .
+        </p>
       </div>
+
+      <SignUpForm />
+
+      <TermsFooter
+        variant='sign-up'
+        status={status}
+        className='text-center'
+      />
+
+      <AuthFooterLinks />
     </AuthLayout>
   )
 }

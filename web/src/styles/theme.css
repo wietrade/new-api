@@ -95,7 +95,8 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 :root {
-  --radius: 1rem;
+  /* [改造-仿bifrost] 默认圆角 1rem → 0.25rem(4px) */
+  --radius: 0.25rem;
   --app-header-height: 3rem;
   /* Static build-channel fallback consumed when JS hasn't booted yet. */
   --app-rev: '2k6e8r7p';

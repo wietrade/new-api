@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -101,7 +101,8 @@ export function ForgotPasswordForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-2', className)}
+        data-auth-compact
+        className={cn('space-y-5', className)}
         {...props}
       >
         <FormField
@@ -109,9 +110,15 @@ export function ForgotPasswordForm({
           name='email'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className='text-[0.825rem] leading-5 font-medium'>
+                {t('Email')}
+              </FormLabel>
               <FormControl>
-                <Input placeholder='name@example.com' {...field} />
+                <Input
+                  placeholder='name@example.com'
+                  className='h-9 rounded-lg px-3 py-1 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -120,17 +127,17 @@ export function ForgotPasswordForm({
 
         <Button
           type='submit'
-          className='mt-2'
+          className='h-9 w-full justify-center rounded-lg bg-white text-black text-[0.825rem] font-medium hover:bg-white/90'
           disabled={isLoading || isActive || !turnstileReady}
         >
           {isActive
             ? t('Resend ({{seconds}}s)', { seconds: secondsLeft })
             : t('Send reset email')}
-          {isLoading ? <Loader2 className='animate-spin' /> : <ArrowRight />}
+          {isLoading ? <Loader2 className='size-4 animate-spin' /> : null}
         </Button>
 
         {isTurnstileEnabled && (
-          <div className='mt-2'>
+          <div>
             <Turnstile
               siteKey={turnstileSiteKey}
               onVerify={setTurnstileToken}

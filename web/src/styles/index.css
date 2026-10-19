@@ -135,6 +135,14 @@ For commercial licensing, please contact support@quantumnous.com
     textarea {
       font-size: 16px !important;
     }
+
+    /* [改造-仿bifrost] 登录表单内沿用 13.2px，与 bifrost 登录页一致。
+     * 仅缩小本表单，其他页面的防聚焦缩放规则不受影响。 */
+    [data-auth-compact] input,
+    [data-auth-compact] select,
+    [data-auth-compact] textarea {
+      font-size: 0.825rem !important;
+    }
   }
 }
 

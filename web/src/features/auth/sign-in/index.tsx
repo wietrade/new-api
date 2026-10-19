@@ -19,47 +19,39 @@ For commercial licensing, please contact support@quantumnous.com
 import { Link, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
-import { useStatus } from '@/hooks/use-status'
-
 import { AuthLayout } from '../auth-layout'
-import { TermsFooter } from '../components/terms-footer'
+import { AuthFooterLinks } from '../components/auth-footer-links'
 import { UserAuthForm } from './components/user-auth-form'
 
 export function SignIn() {
   const { t } = useTranslation()
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })
-  const { status } = useStatus()
 
   return (
     <AuthLayout>
-      <div className='w-full space-y-8'>
-        <div className='space-y-2'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
-            {t('Sign in')}
-          </h2>
-          {!status?.self_use_mode_enabled &&
-            status?.register_enabled !== false && (
-              <p className='text-muted-foreground text-left text-sm sm:text-base'>
-                {t("Don't have an account?")}{' '}
-                <Link
-                  to='/sign-up'
-                  className='hover:text-primary font-medium underline underline-offset-4'
-                >
-                  {t('Sign up')}
-                </Link>
-                .
-              </p>
-            )}
-        </div>
-
-        <UserAuthForm redirectTo={redirect} />
-
-        <TermsFooter
-          variant='sign-in'
-          status={status}
-          className='text-center'
-        />
+      {/* [改造-仿bifrost] 标题区：居中、18px 标题 + 13.2px 副标题 */}
+      <div className='space-y-2 text-center'>
+        <h1 className='text-foreground text-lg font-semibold'>
+          {t('Welcome back')}
+        </h1>
+        <p className='text-muted-foreground text-[0.825rem] leading-5'>
+          {t('Sign in to your account to continue')}
+        </p>
+        <p className='text-muted-foreground text-[0.825rem] leading-5'>
+          {t("Don't have an account?")}{' '}
+          <Link
+            to='/sign-up'
+            className='hover:text-primary font-medium underline underline-offset-4'
+          >
+            {t('Sign up')}
+          </Link>
+          .
+        </p>
       </div>
+
+      <UserAuthForm redirectTo={redirect} />
+
+      <AuthFooterLinks />
     </AuthLayout>
   )
 }

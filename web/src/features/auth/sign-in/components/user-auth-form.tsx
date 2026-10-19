@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { Loader2, LogIn, KeyRound } from 'lucide-react'
+import { Loader2, KeyRound } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -346,7 +346,8 @@ export function UserAuthForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-4', className)}
+        data-auth-compact
+        className={cn('space-y-5', className)}
         {...props}
       >
         {hasAlternativeLogin && alternativeLoginMethods}
@@ -359,10 +360,13 @@ export function UserAuthForm({
               name='username'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('Username or Email')}</FormLabel>
+                  <FormLabel className='text-[0.825rem] leading-5 font-medium'>
+                    {t('Username or Email')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={t('Enter your username or email')}
+                      className='h-9 rounded-lg px-3 py-1 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
                       {...field}
                     />
                   </FormControl>
@@ -377,17 +381,22 @@ export function UserAuthForm({
               name='password'
               render={({ field }) => (
                 <FormItem className='relative'>
-                  <FormLabel>{t('Password')}</FormLabel>
+                  <FormLabel className='text-[0.825rem] leading-5 font-medium'>
+                    {t('Password')}
+                  </FormLabel>
                   <FormControl>
                     <PasswordInput
                       placeholder={t('Enter password')}
+                      inputClassName='h-9 rounded-lg px-3 py-1 pr-10 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
+                      buttonClassName='end-3 h-4 w-4 rounded-none hover:bg-transparent'
+                      visibilityIcon='action'
                       {...field}
                     />
                   </FormControl>
                   <FormMessage />
                   <Link
                     to='/forgot-password'
-                    className='text-muted-foreground absolute end-0 -top-0.5 z-10 text-sm font-medium hover:opacity-75'
+                    className='text-muted-foreground hover:text-primary absolute end-0 -top-0.5 text-[0.825rem] font-medium'
                   >
                     {t('Forgot password?')}
                   </Link>
@@ -398,16 +407,16 @@ export function UserAuthForm({
             {/* Submit Button */}
             <Button
               type='submit'
-              className='mt-2 w-full justify-center gap-2'
+              className='h-9 w-full justify-center rounded-lg bg-white text-black text-[0.825rem] font-medium hover:bg-white/90'
               disabled={isLoading}
             >
-              {isLoading ? <Loader2 className='animate-spin' /> : <LogIn />}
+              {isLoading ? <Loader2 className='size-4 animate-spin' /> : null}
               {t('Sign in')}
             </Button>
 
             {/* Turnstile */}
             {isTurnstileEnabled && (
-              <div className='mt-2'>
+              <div>
                 <Turnstile
                   key={turnstileWidgetKey}
                   siteKey={turnstileSiteKey}

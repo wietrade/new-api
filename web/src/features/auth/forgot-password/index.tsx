@@ -20,36 +20,39 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { AuthLayout } from '../auth-layout'
+import { AuthFooterLinks } from '../components/auth-footer-links'
 import { ForgotPasswordForm } from './components/forgot-password-form'
 
 export function ForgotPassword() {
   const { t } = useTranslation()
+
   return (
     <AuthLayout>
-      <div className='w-full space-y-8'>
-        <div className='space-y-3'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
-            {t('Forgot password')}
-          </h2>
-          <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t(
-              'Enter your registered email and we will send you a link to reset your password.'
-            )}
-          </p>
-          <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t("Don't have an account?")}{' '}
-            <Link
-              to='/sign-up'
-              className='hover:text-primary font-medium underline underline-offset-4'
-            >
-              {t('Sign up')}
-            </Link>
-            .
-          </p>
-        </div>
-
-        <ForgotPasswordForm className='space-y-0' />
+      {/* [改造-仿bifrost] 与登录页一致：居中标题 + 13.2px 副标题 */}
+      <div className='space-y-2 text-center'>
+        <h1 className='text-foreground text-lg font-semibold'>
+          {t('Forgot password')}
+        </h1>
+        <p className='text-muted-foreground text-[0.825rem] leading-5'>
+          {t(
+            'Enter your registered email and we will send you a link to reset your password.'
+          )}
+        </p>
+        <p className='text-muted-foreground text-[0.825rem] leading-5'>
+          {t("Don't have an account?")}{' '}
+          <Link
+            to='/sign-up'
+            className='hover:text-primary font-medium underline underline-offset-4'
+          >
+            {t('Sign up')}
+          </Link>
+          .
+        </p>
       </div>
+
+      <ForgotPasswordForm />
+
+      <AuthFooterLinks />
     </AuthLayout>
   )
 }

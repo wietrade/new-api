@@ -248,7 +248,8 @@ export function SignUpForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-4', className)}
+        data-auth-compact
+        className={cn('space-y-5', className)}
         {...props}
       >
         {/* Username Field */}
@@ -257,9 +258,13 @@ export function SignUpForm({
           name='username'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('Username')}</FormLabel>
+              <FormLabel className='text-[0.825rem] leading-5 font-medium'>{t('Username')}</FormLabel>
               <FormControl>
-                <Input placeholder={t('Enter your username')} {...field} />
+                <Input
+                  placeholder={t('Enter your username')}
+                  className='h-9 rounded-lg px-3 py-1 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -272,10 +277,13 @@ export function SignUpForm({
           name='password'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('Password')}</FormLabel>
+              <FormLabel className='text-[0.825rem] leading-5 font-medium'>{t('Password')}</FormLabel>
               <FormControl>
                 <PasswordInput
                   placeholder={t('Enter password (8–128 characters)')}
+                  inputClassName='h-9 rounded-lg px-3 py-1 pr-10 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
+                  buttonClassName='end-3 h-4 w-4 rounded-none hover:bg-transparent'
+                  visibilityIcon='action'
                   {...field}
                 />
               </FormControl>
@@ -290,9 +298,15 @@ export function SignUpForm({
           name='confirmPassword'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('Confirm password')}</FormLabel>
+              <FormLabel className='text-[0.825rem] leading-5 font-medium'>{t('Confirm password')}</FormLabel>
               <FormControl>
-                <PasswordInput placeholder={t('Confirm password')} {...field} />
+                <PasswordInput
+                  placeholder={t('Confirm password')}
+                  inputClassName='h-9 rounded-lg px-3 py-1 pr-10 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
+                  buttonClassName='end-3 h-4 w-4 rounded-none hover:bg-transparent'
+                  visibilityIcon='action'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -308,13 +322,14 @@ export function SignUpForm({
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel className='text-[0.825rem] leading-5 font-medium'>
                     {t('Email (required for verification)')}
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={t('name@example.com')}
                       type='email'
+                      className='h-9 rounded-lg px-3 py-1 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
                       {...field}
                     />
                   </FormControl>
@@ -328,6 +343,7 @@ export function SignUpForm({
               <div className='flex-1'>
                 <Input
                   placeholder={t('Verification code')}
+                  className='h-9 rounded-lg px-3 py-1 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                 />
@@ -335,6 +351,7 @@ export function SignUpForm({
               <Button
                 variant='outline'
                 type='button'
+                className='h-9 text-[0.825rem]'
                 disabled={
                   isLoading ||
                   isSendingCode ||
@@ -352,7 +369,7 @@ export function SignUpForm({
 
         {/* Turnstile */}
         {isTurnstileEnabled && (
-          <div className='mt-2'>
+          <div>
             <Turnstile
               key={turnstileWidgetKey}
               siteKey={turnstileSiteKey}
@@ -371,7 +388,7 @@ export function SignUpForm({
         {/* Submit Button */}
         <Button
           type='submit'
-          className='mt-2 w-full justify-center gap-2'
+          className='h-9 w-full justify-center rounded-lg bg-white text-black text-[0.825rem] font-medium hover:bg-white/90'
           disabled={
             isLoading ||
             (requiresLegalConsent && !agreedToLegal) ||

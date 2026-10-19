@@ -7210,6 +7210,8 @@
     "Weight": "权重",
     "Weighted by request count": "按请求数加权",
     "Welcome back!": "欢迎回来！",
+    "Welcome back": "欢迎回来",
+    "Sign in to your account to continue": "登录您的账户以继续",
     "Welcome to our New API...": "欢迎使用我们的 New API...",
     "Well-Known URL": "Well-Known URL",
     "Well-Known URL must start with http:// or https://": "Well-Known URL 必须以 http:// 或 https:// 开头",

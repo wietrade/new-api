@@ -29,10 +29,19 @@ type PasswordInputProps = Omit<
   'type'
 > & {
   ref?: React.Ref<HTMLInputElement>
+  /** Extra classes for the inner input (the wrapper keeps `className`). */
+  inputClassName?: string
+  /** Extra classes for the show/hide button. */
+  buttonClassName?: string
+  /** `state` shows the current visibility, `action` shows what clicking does. */
+  visibilityIcon?: 'state' | 'action'
 }
 
 export function PasswordInput({
   className,
+  inputClassName,
+  buttonClassName,
+  visibilityIcon = 'state',
   disabled,
   ref,
   ...props
@@ -45,6 +54,7 @@ export function PasswordInput({
         type={showPassword ? 'text' : 'password'}
         ref={ref}
         disabled={disabled}
+        className={inputClassName}
         {...props}
       />
       <Button
@@ -52,11 +62,20 @@ export function PasswordInput({
         size='icon'
         variant='ghost'
         disabled={disabled}
-        className='text-muted-foreground absolute end-1 top-1/2 h-6 w-6 -translate-y-1/2 rounded-md'
+        className={cn(
+          'text-muted-foreground absolute end-1 top-1/2 h-6 w-6 -translate-y-1/2 rounded-md',
+          buttonClassName
+        )}
         onClick={() => setShowPassword((prev) => !prev)}
         aria-label='Toggle password visibility'
       >
-        {showPassword ? (
+        {visibilityIcon === 'action' ? (
+          showPassword ? (
+            <EyeOff size={18} aria-hidden='true' />
+          ) : (
+            <Eye size={18} aria-hidden='true' />
+          )
+        ) : showPassword ? (
           <Eye size={18} aria-hidden='true' />
         ) : (
           <EyeOff size={18} aria-hidden='true' />
