@@ -504,9 +504,35 @@ export function getDynamicPricingSummary(
     ? null
     : getCurrentTimePricingTiers(baseExpression, options.now ?? new Date())
   const summaryTiers = timeTiers ?? tiers
+  // [改造] 长度阶梯价（非时段）卡片默认展示“小请求适用的档位”：
+  // 表达式链最外层往往是最高阈值档，直接取 [0] 会把高档价当基础价展示
+  // （如 claude-haiku-5.5 显示 $0.5 而非 $0.1）。这里用空请求(p=0,c=0,len=0)筛选首档。
+  // 时段价仍走 currentTiers，不受影响。
+  const matchesEmptyRequest = (conditions: { var: string; op: string; value: number }[]) =>
+    conditions.every((condition) => {
+      switch (condition.op) {
+        case '<':
+          return 0 < condition.value
+        case '<=':
+          return 0 <= condition.value
+        case '>':
+          return 0 > condition.value
+        case '>=':
+          return 0 >= condition.value
+        default:
+          return false
+      }
+    })
+  const defaultRequestTier =
+    timeTiers === null
+      ? summaryTiers.find(
+          (item) =>
+            !isTaskPricingTier(item) && matchesEmptyRequest(item.conditions)
+        )
+      : undefined
   const tier = isTaskUsage
     ? (summaryTiers.at(-1) ?? null)
-    : (summaryTiers[0] ?? null)
+    : (defaultRequestTier ?? summaryTiers[0] ?? null)
   let entries = getDynamicPriceEntries(tier, {
     ...options,
     usageSchema: model.billing_usage_schema,

@@ -928,6 +928,33 @@ func convertOpenRouterToRatioData(reader io.Reader) (map[string]any, error) {
 		return strconv.FormatFloat(math.Round(v*1e9)/1e9, 'f', -1, 64)
 	}
 
+	// wrapBoolCondition 只给含 && / || 的复合条件补括号；单一比较保持裸写，
+	// 便于前端价格页把它们识别成普通分档条件。
+	enclosedInParens := func(expr string) bool {
+		if !strings.HasPrefix(expr, "(") || !strings.HasSuffix(expr, ")") {
+			return false
+		}
+		depth := 0
+		for index, char := range expr {
+			switch char {
+			case '(':
+				depth++
+			case ')':
+				depth--
+				if depth == 0 && index != len(expr)-1 {
+					return false
+				}
+			}
+		}
+		return depth == 0
+	}
+	wrapBoolCondition := func(expr string) string {
+		if strings.ContainsAny(expr, "|&") && !enclosedInParens(expr) {
+			return "(" + expr + ")"
+		}
+		return expr
+	}
+
 	// wrapCondition 给复合表达式补括号，避免条件/三元与算术运算的优先级歧义。
 	wrapCondition := func(expr string) string {
 		if strings.ContainsAny(expr, " ?|&=<>+*/") {
@@ -1028,8 +1055,13 @@ func convertOpenRouterToRatioData(reader io.Reader) (map[string]any, error) {
 	}
 
 	type overrideRule struct {
-		condition string
-		prices    map[string]float64
+		// condition 是完整条件串（同时含 len 与时间条件时用 && 连接），供无法拆档时回退使用。
+		condition     string
+		timeCondition string
+		threshold     float64
+		hasThreshold  bool
+		hasTime       bool
+		prices        map[string]float64
 	}
 
 	for _, m := range orResp.Data {
@@ -1095,7 +1127,7 @@ func convertOpenRouterToRatioData(reader io.Reader) (map[string]any, error) {
 					unsupportedOverrides = true
 					continue
 				}
-				conditions := make([]string, 0, 2)
+				rule := overrideRule{}
 				if _, hasThreshold := entryMap["min_prompt_tokens"]; hasThreshold {
 					threshold, thOK := priceValue(entryMap, "min_prompt_tokens")
 					if !thOK || threshold < 0 {
@@ -1103,17 +1135,16 @@ func convertOpenRouterToRatioData(reader io.Reader) (map[string]any, error) {
 						unsupportedOverrides = true
 						continue
 					}
-					// 上游语义：total prompt tokens strictly greater than the threshold。
-					conditions = append(conditions, fmt.Sprintf("len > %s", num(threshold)))
+					rule.hasThreshold = true
+					rule.threshold = threshold
 				}
-				condition, hasTimeCondition, supported := overrideCondition(entryMap)
+				timeCondition, hasTime, supported := overrideCondition(entryMap)
 				if !supported {
 					unsupportedOverrides = true
 					continue
 				}
-				if hasTimeCondition {
-					conditions = append(conditions, condition)
-				}
+				rule.hasTime = hasTime
+				rule.timeCondition = timeCondition
 				overridePrices, prOK := presentTokenPrices(entryMap)
 				if !prOK {
 					logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s has unparsable override pricing, entry ignored", id))
@@ -1136,60 +1167,166 @@ func convertOpenRouterToRatioData(reader io.Reader) (map[string]any, error) {
 					unsupportedOverrides = true
 					continue
 				}
-				rules = append(rules, overrideRule{
-					condition: strings.Join(conditions, " && "),
-					prices:    overridePrices,
-				})
+				conditions := make([]string, 0, 2)
+				if rule.hasThreshold {
+					// 上游语义：total prompt tokens strictly greater than the threshold。
+					conditions = append(conditions, fmt.Sprintf("len > %s", num(rule.threshold)))
+				}
+				if rule.hasTime {
+					conditions = append(conditions, rule.timeCondition)
+				}
+				rule.condition = strings.Join(conditions, " && ")
+				rule.prices = overridePrices
+				rules = append(rules, rule)
 			}
 		}
 
-		// 逐字段生成系数链：后面的 entry 优先，最后回落到基础价。
-		terms := make([]string, 0, len(tokenPriceFields))
-		hasTokenPrice := false
-		for _, field := range tokenPriceFields {
-			coefficient := num(basePrices[field.key] * 1_000_000)
-			simple := true
-			// 按 entry 原始顺序依次包裹（后出现的在外层），实现「later entries win per key」。
-			for i := 0; i < len(rules); i++ {
-				value, exists := rules[i].prices[field.key]
-				if !exists {
+		// priceBody 把一组 USD/token 单价渲染成表达式主体；全零时保持显式零价。
+		priceBody := func(prices map[string]float64) string {
+			terms := make([]string, 0, len(tokenPriceFields))
+			for _, field := range tokenPriceFields {
+				value := prices[field.key]
+				if value <= 0 {
 					continue
 				}
-				simple = false
-				term := num(value * 1_000_000)
-				if rules[i].condition == "" {
-					coefficient = term
+				terms = append(terms, fmt.Sprintf("%s * %s", field.variable, num(value*1_000_000)))
+			}
+			if len(terms) == 0 {
+				return "p * 0 + c * 0"
+			}
+			return strings.Join(terms, " + ")
+		}
+		mergePrices := func(inherited, overrides map[string]float64) map[string]float64 {
+			out := make(map[string]float64, len(tokenPriceFields))
+			for key, value := range inherited {
+				out[key] = value
+			}
+			for key, value := range overrides {
+				out[key] = value
+			}
+			return out
+		}
+		samePrices := func(a, b map[string]float64) bool {
+			for _, field := range tokenPriceFields {
+				if a[field.key] != b[field.key] {
+					return false
+				}
+			}
+			return true
+		}
+		// buildTierChain 生成「条件 ? tier(名称, 价格) : (下一档)」阶梯表达式。
+		// 前端模型广场只识别这种整档形式（tier 叶子 + 纯数字系数），
+		// 系数级条件（p * (cond ? a : b)）会被判定为「特殊计费表达式」。
+		buildTierChain := func(ordered []overrideRule, label string, accumulate bool) string {
+			expression := `tier("standard", ` + priceBody(basePrices) + `)`
+			fallback := basePrices
+			for i := range ordered {
+				inherited := basePrices
+				if accumulate {
+					inherited = fallback
+				}
+				merged := mergePrices(inherited, ordered[i].prices)
+				// 省略不影响结果的档位：累计档与上一档相同即可省略；
+				// 互斥时段档只有在与基础价相同时才能省略（多个时段可能同价）。
+				if samePrices(merged, basePrices) || (accumulate && samePrices(merged, fallback)) {
 					continue
 				}
-				coefficient = fmt.Sprintf("%s ? %s : %s", wrapCondition(rules[i].condition), term, wrapCondition(coefficient))
+				expression = fmt.Sprintf("%s ? tier(%q, %s) : (%s)", wrapBoolCondition(ordered[i].condition), label, priceBody(merged), expression)
+				fallback = merged
 			}
-			if coefficient == "0" || coefficient == "0.0" {
-				continue
+			return expression
+		}
+
+		thresholdOnly := true
+		timeOnly := true
+		for _, rule := range rules {
+			if !rule.hasThreshold || rule.hasTime {
+				thresholdOnly = false
 			}
-			hasTokenPrice = true
-			if !simple {
-				coefficient = wrapCondition(coefficient)
+			if !rule.hasTime || rule.hasThreshold {
+				timeOnly = false
 			}
-			terms = append(terms, fmt.Sprintf("%s * %s", field.variable, coefficient))
 		}
 
 		expression := ""
 		switch {
-		case hasTokenPrice:
-			expression = `tier("standard", ` + strings.Join(terms, " + ") + `)`
+		case len(rules) == 0:
+			expression = `tier("standard", ` + priceBody(basePrices) + `)`
+		case thresholdOnly:
+			// 阈值档：按阈值升序累计继承，高阈值分支在最外层。
+			ordered := make([]overrideRule, len(rules))
+			copy(ordered, rules)
+			sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].threshold < ordered[j].threshold })
+			expression = buildTierChain(ordered, "long-context", true)
+		case timeOnly:
+			// 时段档：后出现的 entry 优先，各档只覆盖自己显式给出的字段。
+			expression = buildTierChain(rules, "scheduled", false)
+		default:
+			// 混合条件（len + 时段）无法用单条阶梯表达，退回逐字段系数条件，保证计费正确。
+			terms := make([]string, 0, len(tokenPriceFields))
+			for _, field := range tokenPriceFields {
+				coefficient := num(basePrices[field.key] * 1_000_000)
+				simple := true
+				for i := 0; i < len(rules); i++ {
+					value, exists := rules[i].prices[field.key]
+					if !exists {
+						continue
+					}
+					simple = false
+					term := num(value * 1_000_000)
+					if rules[i].condition == "" {
+						coefficient = term
+						continue
+					}
+					coefficient = fmt.Sprintf("%s ? %s : %s", wrapCondition(rules[i].condition), term, wrapCondition(coefficient))
+				}
+				if coefficient == "0" || coefficient == "0.0" {
+					continue
+				}
+				if !simple {
+					coefficient = wrapCondition(coefficient)
+				}
+				terms = append(terms, fmt.Sprintf("%s * %s", field.variable, coefficient))
+			}
+			if len(terms) == 0 {
+				expression = `tier("standard", p * 0 + c * 0)`
+			} else {
+				expression = `tier("standard", ` + strings.Join(terms, " + ") + `)`
+			}
+			ignored["overrides(mixed conditions, UI shows special expression)"] = appendUnique(ignored["overrides(mixed conditions, UI shows special expression)"], id)
+		}
+
+		hasTokenPrice := false
+		for _, field := range tokenPriceFields {
+			if basePrices[field.key] > 0 {
+				hasTokenPrice = true
+				break
+			}
+		}
+		if !hasTokenPrice {
+			for _, rule := range rules {
+				for _, value := range rule.prices {
+					if value > 0 {
+						hasTokenPrice = true
+						break
+					}
+				}
+				if hasTokenPrice {
+					break
+				}
+			}
+		}
+		if hasTokenPrice {
 			if requestPrice > 0 {
 				ignored["request"] = appendUnique(ignored["request"], id)
 			}
 			if imagePrice > 0 {
 				ignored["image"] = appendUnique(ignored["image"], id)
 			}
-		case requestPrice > 0:
+		} else if requestPrice > 0 {
 			expression = `tier("request", fixed(` + num(requestPrice) + `))`
-		case imagePrice > 0:
+		} else if imagePrice > 0 {
 			expression = `tier("image", fixed(` + num(imagePrice) + `)) * image_count`
-		default:
-			// 完全免费：p/c 系数为 0，保持显式零价。
-			expression = `tier("standard", p * 0 + c * 0)`
 		}
 
 		if err := billing_setting.SmokeTestExpr(expression); err != nil {

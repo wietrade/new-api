@@ -3,6 +3,8 @@ package controller
 import (
 	"strings"
 	"testing"
+
+	"github.com/QuantumNous/new-api/pkg/billingexpr"
 )
 
 func convertOpenRouterJSON(t *testing.T, body string) map[string]any {
@@ -99,7 +101,7 @@ func TestConvertOpenRouterCoversNewPricingFields(t *testing.T) {
 	})
 }
 
-// 长上下文阶梯价（min_prompt_tokens）逐字段覆盖：后出现的 entry 优先。
+// 长上下文阶梯价必须生成「整档 tier 链」，前端模型广场才能正常展示（否则显示“特殊计费表达式”）。
 func TestConvertOpenRouterRestoresLongContextOverrides(t *testing.T) {
 	body := `{"data":[
           {"id":"vendor/long-context","pricing":{
@@ -117,13 +119,13 @@ func TestConvertOpenRouterRestoresLongContextOverrides(t *testing.T) {
 
 	converted := convertOpenRouterJSON(t, body)
 	assertExprs(t, converted, map[string]string{
-		"vendor/long-context": `tier("standard", p * ((len > 100000) ? 2 : 1) + c * ((len > 100000) ? 4 : 2))`,
+		"vendor/long-context": `len > 100000 ? tier("long-context", p * 2 + c * 4) : (tier("standard", p * 1 + c * 2))`,
 		// prompt 只有 200000 档设置；completion 两档都有，高阈值必须在外层。
-		"vendor/two-tiers": `tier("standard", p * ((len > 200000) ? 3 : 1) + c * ((len > 200000) ? 4 : ((len > 100000) ? 2 : 1)))`,
+		"vendor/two-tiers": `len > 200000 ? tier("long-context", p * 3 + c * 4) : (len > 100000 ? tier("long-context", p * 1 + c * 2) : (tier("standard", p * 1 + c * 1)))`,
 	})
 }
 
-// 时段价（utc_days / utc_start / utc_end）应还原为 weekday/hour/minute("UTC") 条件。
+// 时段价应还原为 weekday/hour/minute("UTC") 的整档条件。
 func TestConvertOpenRouterRestoresTimeWindowOverrides(t *testing.T) {
 	body := `{"data":[
           {"id":"vendor/weekend","pricing":{
@@ -142,13 +144,13 @@ func TestConvertOpenRouterRestoresTimeWindowOverrides(t *testing.T) {
 
 	converted := convertOpenRouterJSON(t, body)
 	assertExprs(t, converted, map[string]string{
-		"vendor/weekend":     `tier("standard", p * ((weekday("UTC") == 6) ? 0.5 : 1) + c * ((weekday("UTC") == 6) ? 1 : 2))`,
-		"vendor/hours":       `tier("standard", p * (((weekday("UTC") == 1 || weekday("UTC") == 2) && (hour("UTC") * 100 + minute("UTC")) >= 1000) ? 0.3 : (((weekday("UTC") == 1 || weekday("UTC") == 2) && (hour("UTC") * 100 + minute("UTC")) < 100) ? 0.15 : 0.3)) + c * (((weekday("UTC") == 1 || weekday("UTC") == 2) && (hour("UTC") * 100 + minute("UTC")) < 100) ? 0.6 : 1.2))`,
-		"vendor/wrap-around": `tier("standard", p * ((((hour("UTC") * 100 + minute("UTC")) >= 2200 || (hour("UTC") * 100 + minute("UTC")) < 600)) ? 0.5 : 1))`,
+		"vendor/weekend":     `weekday("UTC") == 6 ? tier("scheduled", p * 0.5 + c * 1) : (tier("standard", p * 1 + c * 2))`,
+		"vendor/hours":       `((weekday("UTC") == 1 || weekday("UTC") == 2) && (hour("UTC") * 100 + minute("UTC")) < 100) ? tier("scheduled", p * 0.15 + c * 0.6) : (tier("standard", p * 0.3 + c * 1.2))`,
+		"vendor/wrap-around": `((hour("UTC") * 100 + minute("UTC")) >= 2200 || (hour("UTC") * 100 + minute("UTC")) < 600) ? tier("scheduled", p * 0.5) : (tier("standard", p * 1))`,
 	})
 }
 
-// 无法表达的收费项不能导致模型被跳过；未知字段要保留可观测性。
+// 无法表达的收费项不能导致模型被跳过；未知字段、未知条件要保留可观测性。
 func TestConvertOpenRouterKeepsModelsWithUnexpressibleFees(t *testing.T) {
 	body := `{"data":[
           {"id":"vendor/web-search","pricing":{
@@ -159,7 +161,10 @@ func TestConvertOpenRouterKeepsModelsWithUnexpressibleFees(t *testing.T) {
               "prompt":"0.000001","completion":"0.000002","future_fee":"0.5"}},
           {"id":"vendor/unknown-condition","pricing":{
               "prompt":"0.000001","completion":"0.000002",
-              "overrides":[{"some_future_condition":"x","prompt":"0.000003"}]}}
+              "overrides":[{"some_future_condition":"x","prompt":"0.000003"}]}},
+          {"id":"vendor/mixed","pricing":{
+              "prompt":"0.000001","completion":"0.000002",
+              "overrides":[{"min_prompt_tokens":100000,"utc_days":["saturday"],"prompt":"0.000002"}]}}
         ]}`
 
 	converted := convertOpenRouterJSON(t, body)
@@ -168,5 +173,46 @@ func TestConvertOpenRouterKeepsModelsWithUnexpressibleFees(t *testing.T) {
 		"vendor/image-output":      `tier("standard", p * 8 + c * 15)`,
 		"vendor/brand-new-field":   `tier("standard", p * 1 + c * 2)`,
 		"vendor/unknown-condition": `tier("standard", p * 1 + c * 2)`,
+		// 混合条件（长度 + 时段）退回逐字段系数表达，保证计费正确。
+		"vendor/mixed": `tier("standard", p * ((len > 100000 && weekday("UTC") == 6) ? 2 : 1) + c * 2)`,
 	})
+}
+
+// 阶梯表达式与旧写法必须等价：在阈值两侧取相同 token 数比较结果。
+func TestOpenRouterChainEvaluatesAtBoundaries(t *testing.T) {
+	body := `{"data":[
+          {"id":"vendor/two-tiers","pricing":{
+              "prompt":"0.000001","completion":"0.000001",
+              "overrides":[
+                {"min_prompt_tokens":100000,"completion":"0.000002"},
+                {"min_prompt_tokens":200000,"prompt":"0.000003","completion":"0.000004"}
+              ]}}
+        ]}`
+	converted := convertOpenRouterJSON(t, body)
+	expr, ok := openRouterExpr(t, converted, "vendor/two-tiers")
+	if !ok {
+		t.Fatal("expression missing")
+	}
+
+	cases := []struct {
+		name    string
+		lenToks float64
+		wantSum float64 // p=1, c=1 时的表达式值（系数为 $/1M）
+	}{
+		{"below first threshold", 50000, 1 + 1},
+		{"exactly at first threshold", 100000, 1 + 1},
+		{"between thresholds", 150000, 1 + 2},
+		{"exactly at second threshold", 200000, 1 + 2},
+		{"above second threshold", 250000, 3 + 4},
+	}
+	for _, testCase := range cases {
+		params := billingexpr.TokenParams{P: 1, C: 1, Len: testCase.lenToks}
+		got, _, err := billingexpr.RunExpr(expr, params)
+		if err != nil {
+			t.Fatalf("%s: %v", testCase.name, err)
+		}
+		if got != testCase.wantSum {
+			t.Fatalf("%s (len=%v): got %v, want %v", testCase.name, testCase.lenToks, got, testCase.wantSum)
+		}
+	}
 }
