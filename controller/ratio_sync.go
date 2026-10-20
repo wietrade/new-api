@@ -835,21 +835,28 @@ func isModelsDevAPIEndpoint(rawURL string) bool {
 }
 
 // convertOpenRouterToRatioData parses OpenRouter's /v1/models response and converts
-// per-token USD pricing into the local ratio format.
-// model_ratio = prompt_price_per_token * 1_000_000 * (USD / 1000)
+// its per-token USD pricing into billing expressions.
 //
-//	since 1 ratio unit = $0.002/1K tokens and USD=500, the factor is 500_000
+// [改造] OpenRouter 同步改为表达式计费：
 //
-// completion_ratio = completion_price / prompt_price (output/input multiplier)
+//	billing_mode = tiered_expr
+//	billing_expr = tier("standard", p * <USD/1M> + c * ...)
+//
+// 表达式里的系数就是真实的 $/1M 单价（p/c 为 token 数），不再经过“倍率 ×2”的换算。
+//
+// OpenRouter 的 pricing 字段是持续增长的（2026-10 实测已出现 input_cache_write_1h /
+// audio / audio_output / image_output / image_token / input_audio_cache / web_search /
+// discount / overrides 等），因此这里按 map 解析而不是固定结构体：
+//   - 能映射到结算引擎 token 变量的字段（p/c/cr/cc/cc1h/ai/ao）全部折算进表达式；
+//   - overrides 的 min_prompt_tokens（长上下文阶梯价）与 utc_days/utc_start/utc_end
+//     （时段价）用 len / weekday("UTC") / hour("UTC") / minute("UTC") 还原；
+//   - 覆盖按上游语义「later entries win per key」逐字段生效；
+//   - 无法表达的收费项（按次/按张/按搜索等）不猜测，统一汇总 WARN。
 func convertOpenRouterToRatioData(reader io.Reader) (map[string]any, error) {
 	var orResp struct {
 		Data []struct {
-			ID      string `json:"id"`
-			Pricing struct {
-				Prompt         string `json:"prompt"`
-				Completion     string `json:"completion"`
-				InputCacheRead string `json:"input_cache_read"`
-			} `json:"pricing"`
+			ID      string         `json:"id"`
+			Pricing map[string]any `json:"pricing"`
 		} `json:"data"`
 	}
 
@@ -857,73 +864,397 @@ func convertOpenRouterToRatioData(reader io.Reader) (map[string]any, error) {
 		return nil, fmt.Errorf("failed to decode OpenRouter response: %w", err)
 	}
 
-	modelRatioMap := make(map[string]any)
-	completionRatioMap := make(map[string]any)
-	cacheRatioMap := make(map[string]any)
+	modeMap := make(map[string]any)
+	exprMap := make(map[string]any)
 
-	for _, m := range orResp.Data {
-		promptPrice, promptErr := strconv.ParseFloat(m.Pricing.Prompt, 64)
-		completionPrice, compErr := strconv.ParseFloat(m.Pricing.Completion, 64)
+	// tokenPriceFields 列出能映射到结算引擎 token 变量的字段（OpenRouter 单位：USD/token）。
+	tokenPriceFields := []struct {
+		key      string
+		variable string
+	}{
+		{"prompt", "p"},
+		{"completion", "c"},
+		{"input_cache_read", "cr"},
+		{"input_cache_write", "cc"},
+		{"input_cache_write_1h", "cc1h"},
+		{"audio", "ai"},
+		{"audio_output", "ao"},
+	}
+	tokenKeySet := make(map[string]bool, len(tokenPriceFields))
+	for _, field := range tokenPriceFields {
+		tokenKeySet[field.key] = true
+	}
 
-		if promptErr != nil && compErr != nil {
-			// Both unparseable — skip this model
-			continue
+	// 已知但无法并入 token 表达式的字段（按次/按张/按搜索/无对应 token 维度）。
+	unsupportedFields := []string{
+		"request", "image", "image_output", "image_token", "web_search",
+		"internal_reasoning", "input_audio_cache",
+	}
+	knownNonToken := map[string]bool{
+		"request": true, "image": true, "image_output": true, "image_token": true,
+		"web_search": true, "internal_reasoning": true, "input_audio_cache": true,
+		"discount": true, "overrides": true,
+	}
+	ignored := make(map[string][]string)
+
+	// priceValue 把 OpenRouter 的数值字段（字符串或数字）解析成 float64；缺失视为 0。
+	priceValue := func(pricing map[string]any, key string) (float64, bool) {
+		raw, exists := pricing[key]
+		if !exists || raw == nil {
+			return 0, true
+		}
+		switch value := raw.(type) {
+		case string:
+			text := strings.TrimSpace(value)
+			if text == "" {
+				return 0, true
+			}
+			parsed, err := strconv.ParseFloat(text, 64)
+			if err != nil || math.IsNaN(parsed) || math.IsInf(parsed, 0) {
+				return 0, false
+			}
+			return parsed, true
+		case float64:
+			if math.IsNaN(value) || math.IsInf(value, 0) {
+				return 0, false
+			}
+			return value, true
+		default:
+			return 0, false
+		}
+	}
+
+	num := func(v float64) string {
+		return strconv.FormatFloat(math.Round(v*1e9)/1e9, 'f', -1, 64)
+	}
+
+	// wrapCondition 给复合表达式补括号，避免条件/三元与算术运算的优先级歧义。
+	wrapCondition := func(expr string) string {
+		if strings.ContainsAny(expr, " ?|&=<>+*/") {
+			return "(" + expr + ")"
+		}
+		return expr
+	}
+
+	// presentTokenPrices 只返回 pricing 中显式出现的 token 单价（用于 overrides 继承语义）。
+	presentTokenPrices := func(pricing map[string]any) (map[string]float64, bool) {
+		out := make(map[string]float64, len(tokenPriceFields))
+		for _, field := range tokenPriceFields {
+			if _, exists := pricing[field.key]; !exists {
+				continue
+			}
+			value, ok := priceValue(pricing, field.key)
+			if !ok {
+				return nil, false
+			}
+			out[field.key] = value
+		}
+		return out, true
+	}
+
+	weekdayIndex := map[string]int{
+		"sunday": 0, "monday": 1, "tuesday": 2, "wednesday": 3,
+		"thursday": 4, "friday": 5, "saturday": 6,
+	}
+	// OpenRouter 的 utc_start/utc_end 是 HHMM 时钟数（100 = 01:00，1030 = 10:30）。
+	timeOfDayUTC := `(hour("UTC") * 100 + minute("UTC"))`
+	validHHMM := func(v float64) bool {
+		if v < 0 || v >= 2400 || math.Mod(v, 1) != 0 {
+			return false
+		}
+		return math.Mod(v, 100) < 60
+	}
+
+	// overrideCondition 把一条 override 的条件编译成表达式；supported=false 表示无法表达。
+	overrideCondition := func(entry map[string]any) (condition string, hasCondition bool, supported bool) {
+		parts := make([]string, 0, 2)
+		if rawDays, exists := entry["utc_days"]; exists {
+			list, ok := rawDays.([]any)
+			if !ok || len(list) == 0 {
+				return "", false, false
+			}
+			dayConds := make([]string, 0, len(list))
+			for _, item := range list {
+				name, _ := item.(string)
+				index, ok := weekdayIndex[strings.ToLower(strings.TrimSpace(name))]
+				if !ok {
+					return "", false, false
+				}
+				dayConds = append(dayConds, fmt.Sprintf(`weekday("UTC") == %d`, index))
+			}
+			dayExpr := strings.Join(dayConds, " || ")
+			if len(dayConds) > 1 {
+				// 多选星期必须分组，否则会与后面的时间条件按 && 优先于 || 结合错误。
+				dayExpr = "(" + dayExpr + ")"
+			}
+			parts = append(parts, dayExpr)
 		}
 
-		// Treat parse errors as 0
-		if promptErr != nil {
-			promptPrice = 0
-		}
-		if compErr != nil {
-			completionPrice = 0
-		}
-
-		// Negative values are sentinel values (e.g., -1 for dynamic/variable pricing) — skip
-		if promptPrice < 0 || completionPrice < 0 {
-			continue
-		}
-
-		if promptPrice == 0 && completionPrice == 0 {
-			// Free model
-			modelRatioMap[m.ID] = 0.0
-			continue
-		}
-		if promptPrice <= 0 {
-			// No meaningful prompt baseline, cannot derive ratios safely.
-			continue
-		}
-
-		// Normal case: promptPrice > 0
-		ratio := promptPrice * 1000 * ratio_setting.USD
-		ratio = roundRatioValue(ratio)
-		modelRatioMap[m.ID] = ratio
-
-		compRatio := completionPrice / promptPrice
-		compRatio = roundRatioValue(compRatio)
-		completionRatioMap[m.ID] = compRatio
-
-		// Convert input_cache_read to cache_ratio (= cache_read_price / prompt_price)
-		if m.Pricing.InputCacheRead != "" {
-			if cachePrice, err := strconv.ParseFloat(m.Pricing.InputCacheRead, 64); err == nil && cachePrice >= 0 {
-				cacheRatio := cachePrice / promptPrice
-				cacheRatio = roundRatioValue(cacheRatio)
-				cacheRatioMap[m.ID] = cacheRatio
+		_, hasStartKey := entry["utc_start"]
+		_, hasEndKey := entry["utc_end"]
+		if hasStartKey || hasEndKey {
+			start, startOK := priceValue(entry, "utc_start")
+			end, endOK := priceValue(entry, "utc_end")
+			if !startOK || !endOK || !validHHMM(start) || !validHHMM(end) {
+				return "", false, false
+			}
+			switch {
+			case start == end:
+				// 覆盖整个 UTC 日，无需时间条件。
+			case end == 0:
+				// 区间到当日 24:00 为止。
+				parts = append(parts, fmt.Sprintf("%s >= %s", timeOfDayUTC, num(start)))
+			case start == 0:
+				parts = append(parts, fmt.Sprintf("%s < %s", timeOfDayUTC, num(end)))
+			case start < end:
+				parts = append(parts, fmt.Sprintf("%s >= %s && %s < %s", timeOfDayUTC, num(start), timeOfDayUTC, num(end)))
+			default:
+				// 跨午夜：[start, 24:00) ∪ [00:00, end)
+				parts = append(parts, fmt.Sprintf("(%s >= %s || %s < %s)", timeOfDayUTC, num(start), timeOfDayUTC, num(end)))
 			}
 		}
+
+		for key := range entry {
+			if tokenKeySet[key] || key == "utc_days" || key == "utc_start" || key == "utc_end" || key == "min_prompt_tokens" {
+				continue
+			}
+			return "", false, false
+		}
+
+		if len(parts) == 0 {
+			return "", false, true
+		}
+		return strings.Join(parts, " && "), true, true
+	}
+
+	type overrideRule struct {
+		condition string
+		prices    map[string]float64
+	}
+
+	for _, m := range orResp.Data {
+		id := strings.TrimSpace(m.ID)
+		if id == "" {
+			continue
+		}
+		pricing := m.Pricing
+		if pricing == nil {
+			pricing = map[string]any{}
+		}
+
+		basePrices := make(map[string]float64, len(tokenPriceFields))
+		present, ok := presentTokenPrices(pricing)
+		if !ok {
+			logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s has unparsable pricing, skipped", id))
+			continue
+		}
+		for _, field := range tokenPriceFields {
+			basePrices[field.key] = present[field.key]
+		}
+
+		requestPrice, reqOK := priceValue(pricing, "request")
+		imagePrice, imgOK := priceValue(pricing, "image")
+		discount, discOK := priceValue(pricing, "discount")
+		if !reqOK || !imgOK || !discOK {
+			logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s has unparsable pricing, skipped", id))
+			continue
+		}
+
+		negative := requestPrice < 0 || imagePrice < 0
+		for _, field := range tokenPriceFields {
+			if basePrices[field.key] < 0 {
+				negative = true
+			}
+		}
+		if negative {
+			logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s uses dynamic pricing, skipped", id))
+			continue
+		}
+
+		factor := 1.0
+		if discount > 0 && discount < 1 {
+			factor = 1 - discount
+			for _, field := range tokenPriceFields {
+				basePrices[field.key] *= factor
+			}
+			requestPrice *= factor
+			imagePrice *= factor
+		}
+
+		// overrides：长上下文阶梯价 + 时段价，保持上游「later entries win per key」语义。
+		rules := make([]overrideRule, 0, 4)
+		unsupportedOverrides := false
+		if raw, exists := pricing["overrides"]; exists && raw != nil {
+			entries, okEntries := raw.([]any)
+			if !okEntries {
+				unsupportedOverrides = true
+			}
+			for _, entry := range entries {
+				entryMap, okMap := entry.(map[string]any)
+				if !okMap {
+					unsupportedOverrides = true
+					continue
+				}
+				conditions := make([]string, 0, 2)
+				if _, hasThreshold := entryMap["min_prompt_tokens"]; hasThreshold {
+					threshold, thOK := priceValue(entryMap, "min_prompt_tokens")
+					if !thOK || threshold < 0 {
+						logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s has unparsable min_prompt_tokens override, entry ignored", id))
+						unsupportedOverrides = true
+						continue
+					}
+					// 上游语义：total prompt tokens strictly greater than the threshold。
+					conditions = append(conditions, fmt.Sprintf("len > %s", num(threshold)))
+				}
+				condition, hasTimeCondition, supported := overrideCondition(entryMap)
+				if !supported {
+					unsupportedOverrides = true
+					continue
+				}
+				if hasTimeCondition {
+					conditions = append(conditions, condition)
+				}
+				overridePrices, prOK := presentTokenPrices(entryMap)
+				if !prOK {
+					logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s has unparsable override pricing, entry ignored", id))
+					unsupportedOverrides = true
+					continue
+				}
+				if len(overridePrices) == 0 {
+					continue
+				}
+				entryNegative := false
+				for key, value := range overridePrices {
+					if value < 0 {
+						entryNegative = true
+						break
+					}
+					overridePrices[key] = value * factor
+				}
+				if entryNegative {
+					logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s has dynamic override pricing, entry ignored", id))
+					unsupportedOverrides = true
+					continue
+				}
+				rules = append(rules, overrideRule{
+					condition: strings.Join(conditions, " && "),
+					prices:    overridePrices,
+				})
+			}
+		}
+
+		// 逐字段生成系数链：后面的 entry 优先，最后回落到基础价。
+		terms := make([]string, 0, len(tokenPriceFields))
+		hasTokenPrice := false
+		for _, field := range tokenPriceFields {
+			coefficient := num(basePrices[field.key] * 1_000_000)
+			simple := true
+			// 按 entry 原始顺序依次包裹（后出现的在外层），实现「later entries win per key」。
+			for i := 0; i < len(rules); i++ {
+				value, exists := rules[i].prices[field.key]
+				if !exists {
+					continue
+				}
+				simple = false
+				term := num(value * 1_000_000)
+				if rules[i].condition == "" {
+					coefficient = term
+					continue
+				}
+				coefficient = fmt.Sprintf("%s ? %s : %s", wrapCondition(rules[i].condition), term, wrapCondition(coefficient))
+			}
+			if coefficient == "0" || coefficient == "0.0" {
+				continue
+			}
+			hasTokenPrice = true
+			if !simple {
+				coefficient = wrapCondition(coefficient)
+			}
+			terms = append(terms, fmt.Sprintf("%s * %s", field.variable, coefficient))
+		}
+
+		expression := ""
+		switch {
+		case hasTokenPrice:
+			expression = `tier("standard", ` + strings.Join(terms, " + ") + `)`
+			if requestPrice > 0 {
+				ignored["request"] = appendUnique(ignored["request"], id)
+			}
+			if imagePrice > 0 {
+				ignored["image"] = appendUnique(ignored["image"], id)
+			}
+		case requestPrice > 0:
+			expression = `tier("request", fixed(` + num(requestPrice) + `))`
+		case imagePrice > 0:
+			expression = `tier("image", fixed(` + num(imagePrice) + `)) * image_count`
+		default:
+			// 完全免费：p/c 系数为 0，保持显式零价。
+			expression = `tier("standard", p * 0 + c * 0)`
+		}
+
+		if err := billing_setting.SmokeTestExpr(expression); err != nil {
+			logger.LogWarn(context.Background(), common.LogText("OpenRouter model %s expression rejected: %s", id, err.Error()))
+			continue
+		}
+
+		// 统计无法表达的收费项（按次/按张/按搜索/未知条件等），统一汇总告警。
+		for _, key := range unsupportedFields {
+			value, parseOK := priceValue(pricing, key)
+			if parseOK && value > 0 {
+				ignored[key] = appendUnique(ignored[key], id)
+			}
+		}
+		if unsupportedOverrides {
+			ignored["overrides(unsupported)"] = appendUnique(ignored["overrides(unsupported)"], id)
+		}
+		for key := range pricing {
+			if tokenKeySet[key] || knownNonToken[key] {
+				continue
+			}
+			value, parseOK := priceValue(pricing, key)
+			if parseOK && value != 0 {
+				ignored["unknown:"+key] = appendUnique(ignored["unknown:"+key], id)
+			}
+		}
+
+		modeMap[id] = billing_setting.BillingModeTieredExpr
+		exprMap[id] = expression
+	}
+
+	if len(ignored) > 0 {
+		keys := make([]string, 0, len(ignored))
+		for key := range ignored {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		parts := make([]string, 0, len(keys))
+		for _, key := range keys {
+			models := ignored[key]
+			sample := models
+			if len(sample) > 3 {
+				sample = sample[:3]
+			}
+			parts = append(parts, fmt.Sprintf("%s=%d[%s]", key, len(models), strings.Join(sample, ",")))
+		}
+		logger.LogWarn(context.Background(), common.LogText("OpenRouter sync: fees that cannot be expressed in token pricing (ignored, verify manually): %s", strings.Join(parts, "; ")))
 	}
 
 	converted := make(map[string]any)
-	if len(modelRatioMap) > 0 {
-		converted["model_ratio"] = modelRatioMap
+	if len(modeMap) > 0 {
+		converted[billing_setting.BillingModeField] = modeMap
+		converted[billing_setting.BillingExprField] = exprMap
 	}
-	if len(completionRatioMap) > 0 {
-		converted["completion_ratio"] = completionRatioMap
-	}
-	if len(cacheRatioMap) > 0 {
-		converted["cache_ratio"] = cacheRatioMap
-	}
-
 	return converted, nil
+}
+
+// appendUnique 去重追加，避免同一模型重复计数。
+func appendUnique(list []string, value string) []string {
+	for _, item := range list {
+		if item == value {
+			return list
+		}
+	}
+	return append(list, value)
 }
 
 type modelsDevProvider struct {
