@@ -187,7 +187,7 @@ export function ResetPasswordConfirm({
         )}
 
         <Button
-          className='h-9 w-full rounded-lg bg-white text-black text-[0.825rem] font-medium hover:bg-white/90'
+          className='h-9 w-full rounded-lg bg-[#238636] text-white text-[0.825rem] font-medium hover:bg-[#2ea043]'
           onClick={
             newPassword
               ? () => navigate({ to: '/sign-in', replace: true })

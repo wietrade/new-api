@@ -407,7 +407,7 @@ export function UserAuthForm({
             {/* Submit Button */}
             <Button
               type='submit'
-              className='h-9 w-full justify-center rounded-lg bg-white text-black text-[0.825rem] font-medium hover:bg-white/90'
+              className='h-9 w-full justify-center rounded-lg bg-[#238636] text-white text-[0.825rem] font-medium hover:bg-[#2ea043]'
               disabled={isLoading}
             >
               {isLoading ? <Loader2 className='size-4 animate-spin' /> : null}

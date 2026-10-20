@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Dialog } from '@/components/dialog'
@@ -27,7 +27,6 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { SystemUpdateAction } from '@/features/system-update/system-update-action'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
@@ -76,7 +75,6 @@ export function PublicHeader(props: PublicHeaderProps) {
 
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [authPromptTarget, setAuthPromptTarget] =
     useState<AuthPromptTarget | null>(null)
@@ -99,35 +97,43 @@ export function PublicHeader(props: PublicHeaderProps) {
   const displaySiteName = customSiteName || systemName
   const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
 
+  // [改造] 对齐 tokenmix.ai：站点名前半实色、后半弱化（如 Token + Mix）
+  const [siteNameHead, siteNameTail] = useMemo(() => {
+    const name = displaySiteName || ''
+    const camel = name.match(/^([A-Z][a-z0-9]*)(.+)$/)
+    if (camel) return [camel[1], camel[2]]
+    return [name, '']
+  }, [displaySiteName])
+
   let logoContent: ReactNode = (
     <HeaderLogo
       src={systemLogo}
       loading={loading}
       logoLoaded={logoLoaded}
-      className='size-full rounded-lg object-contain'
+      className='size-8 rounded-[6px] object-contain'
     />
   )
   if (customLogo) logoContent = customLogo
-  if (loading) logoContent = <Skeleton className='size-full rounded-lg' />
+  if (loading) logoContent = <Skeleton className='size-8 rounded-[6px]' />
 
   let authContent = (
-    <Button
-      size='sm'
-      className='h-8 rounded-lg px-3.5 text-xs font-medium'
-      render={<Link to='/sign-in' />}
-    >
-      {t('Sign in')}
-    </Button>
+    <div className='flex items-center gap-3'>
+      <Link
+        to='/sign-in'
+        className='text-muted-foreground hover:text-foreground text-sm font-medium transition-colors'
+      >
+        {t('Sign in')}
+      </Link>
+      <Link
+        to='/sign-up'
+        className='bg-foreground text-background hover:bg-foreground/90 inline-flex items-center justify-center rounded-[6px] px-4 py-1.5 text-sm font-medium shadow-sm transition-colors'
+      >
+        {t('Get Started')}
+      </Link>
+    </div>
   )
   if (isAuthenticated) authContent = <ProfileDropdown />
-  if (loading) authContent = <Skeleton className='h-8 w-20 rounded-lg' />
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  if (loading) authContent = <Skeleton className='h-8 w-24 rounded-[6px]' />
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
@@ -199,48 +205,38 @@ export function PublicHeader(props: PublicHeaderProps) {
 
   return (
     <>
-      <header className='pointer-events-none fixed inset-x-0 top-0 z-50'>
-        <div
-          className={cn(
-            'pointer-events-auto mx-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
-            scrolled ? 'max-w-[52rem] px-3 pt-3' : 'max-w-7xl px-4 pt-0 md:px-6'
-          )}
-        >
-          <nav
-            className={cn(
-              'flex items-center justify-between gap-2 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
-              scrolled
-                ? 'bg-background/60 ring-border/50 h-12 rounded-2xl pr-1.5 pl-4 shadow-[0_2px_16px_-6px_rgba(0,0,0,0.08),0_0_0_0.5px_rgba(0,0,0,0.02)] ring-[0.5px] backdrop-blur-2xl dark:shadow-[0_2px_16px_-6px_rgba(0,0,0,0.4)]'
-                : 'h-16 px-2'
-            )}
-          >
-            {/* Logo */}
-            <div className='@container/system-brand flex min-w-0 flex-1 items-center gap-1 lg:min-w-36'>
-              <Link
-                to={homeUrl}
-                className='group flex min-w-0 items-center gap-2.5'
-              >
-                <div className='flex size-7 shrink-0 items-center justify-center transition-all duration-300 group-hover:scale-105'>
-                  {logoContent}
-                </div>
-                <span
-                  className='max-w-48 truncate text-sm font-semibold tracking-tight'
-                  title={displaySiteName}
-                >
-                  {loading ? (
-                    <Skeleton className='h-4 w-16' />
-                  ) : (
-                    displaySiteName
-                  )}
-                </span>
-              </Link>
-              <SystemUpdateAction presentation='version' />
-            </div>
+      {/* [改造] 完全对齐 tokenmix.ai 顶部导航：全宽吸顶 + 1280px 容器 + 56px 行高 */}
+      <header className='bg-background/90 border-border/80 fixed inset-x-0 top-0 z-50 w-full border-b backdrop-blur-xl'>
+        <nav className='mx-auto w-full max-w-[1280px] px-4 md:px-8'>
+          <div className='flex h-14 items-center justify-between'>
+            {/* 品牌：32px 方标 + 18px 半粗站点名 */}
+            <Link to={homeUrl} className='group flex items-center gap-2.5'>
+              <div className='flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[6px]'>
+                {logoContent}
+              </div>
+              <span className='text-[18px] leading-none font-semibold tracking-tight'>
+                {loading ? (
+                  <Skeleton className='h-4 w-16' />
+                ) : (
+                  <>
+                    {siteNameHead}
+                    <span className='text-muted-foreground'>{siteNameTail}</span>
+                  </>
+                )}
+              </span>
+            </Link>
 
-            {/* Desktop nav */}
-            <div className='hidden min-w-0 items-center gap-0.5 lg:flex'>
+            {/* 桌面导航：13px / px-3 py-1.5 / 6px 圆角 */}
+            <div className='hidden items-center gap-1 lg:flex'>
               {links.map((link) => {
                 const isActive = pathname === link.href
+                const linkClassName = cn(
+                  'rounded-[6px] px-3 py-1.5 text-[13px] font-medium transition-colors',
+                  isActive
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                  link.disabled && 'pointer-events-none opacity-50'
+                )
                 if (link.external) {
                   return (
                     <a
@@ -252,10 +248,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                       aria-disabled={link.disabled}
                       tabIndex={link.disabled ? -1 : undefined}
                       onClick={(event) => handleNavLinkClick(event, link)}
-                      className={cn(
-                        'text-muted-foreground hover:text-foreground min-w-0 truncate rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-200',
-                        link.disabled && 'pointer-events-none opacity-50'
-                      )}
+                      className={linkClassName}
                     >
                       {t(link.title)}
                     </a>
@@ -268,27 +261,20 @@ export function PublicHeader(props: PublicHeaderProps) {
                     title={t(link.title)}
                     disabled={link.disabled}
                     onClick={(event) => handleNavLinkClick(event, link)}
-                    className={cn(
-                      'min-w-0 truncate rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-200',
-                      isActive
-                        ? 'text-foreground'
-                        : 'text-muted-foreground hover:text-foreground',
-                      link.disabled && 'pointer-events-none opacity-50'
-                    )}
+                    className={linkClassName}
                   >
                     {t(link.title)}
                   </Link>
                 )
               })}
+            </div>
 
-              {(showLanguageSwitcher ||
-                showThemeSwitch ||
-                showNotifications) && (
-                <div className='bg-border/40 mx-2 h-4 w-px' />
+            {/* 桌面右侧：图标按钮 + 登录 + 立即开始 */}
+            <div className='hidden items-center gap-2 lg:flex'>
+              {showLanguageSwitcher && (
+                <LanguageSwitcher className='h-8 w-8' />
               )}
-
-              {showLanguageSwitcher && <LanguageSwitcher />}
-              {showThemeSwitch && <ThemeSwitch />}
+              {showThemeSwitch && <ThemeSwitch className='h-8 w-8' />}
               {showNotifications && (
                 <NotificationPopover
                   open={notifications.popoverOpen}
@@ -299,20 +285,15 @@ export function PublicHeader(props: PublicHeaderProps) {
                   notice={notifications.notice}
                   announcements={notifications.announcements}
                   loading={notifications.loading}
+                  className='size-8'
                 />
               )}
-
-              {showAuthButtons && (
-                <>
-                  <div className='bg-border/40 mx-1 h-4 w-px' />
-                  {authContent}
-                </>
-              )}
+              {showAuthButtons && authContent}
             </div>
 
-            {/* Mobile: compact actions + hamburger */}
-            <div className='flex shrink-0 items-center gap-2 lg:hidden'>
-              {showThemeSwitch && <ThemeSwitch />}
+            {/* 移动端：汉堡按钮 */}
+            <div className='flex shrink-0 items-center gap-1 lg:hidden'>
+              {showThemeSwitch && <ThemeSwitch className='h-8 w-8' />}
               {showAuthButtons && !loading && isAuthenticated && (
                 <ProfileDropdown />
               )}
@@ -320,7 +301,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                 type='button'
                 variant='ghost'
                 size='icon'
-                className='size-9'
+                className='size-8'
                 onClick={() => setMobileOpen((v) => !v)}
                 aria-label={t('Toggle navigation menu')}
               >
@@ -346,8 +327,8 @@ export function PublicHeader(props: PublicHeaderProps) {
                 </div>
               </Button>
             </div>
-          </nav>
-        </div>
+          </div>
+        </nav>
       </header>
 
       {/* Mobile full-screen overlay */}
@@ -359,7 +340,7 @@ export function PublicHeader(props: PublicHeaderProps) {
             : 'pointer-events-none opacity-0'
         )}
       >
-        <div className='flex h-full flex-col justify-between px-8 pt-20 pb-10'>
+        <div className='flex h-full flex-col justify-between px-6 pt-20 pb-10'>
           <nav className='flex flex-col gap-1'>
             {links.map((link, i) => {
               const isActive = pathname === link.href

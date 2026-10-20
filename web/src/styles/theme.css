@@ -110,7 +110,8 @@ For commercial licensing, please contact support@quantumnous.com
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.692 0.141 243.716);
+  /* [改造] 主色改为绿色 rgb(35,134,54) */
+  --primary: #238636;
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.95 0 0);
   --secondary-foreground: oklch(0.42 0.16 250);
@@ -183,21 +184,22 @@ For commercial licensing, please contact support@quantumnous.com
   /* Native controls follow the theme; Dark Reader also reads this to detect
      the built-in dark theme. */
   color-scheme: dark;
-  /* OpenAI-like dark mode with a crisp charcoal canvas. */
-  --background: oklch(0.235 0 0);
-  --foreground: oklch(0.965 0 0);
-  --card: oklch(0.285 0 0);
-  --card-foreground: oklch(0.965 0 0);
-  --popover: oklch(0.305 0 0);
-  --popover-foreground: oklch(0.965 0 0);
-  --primary: oklch(0.54 0.142 248.516);
+  /* [改造] 深色配色对齐 tokenmix.ai：近黑画布 #08080a / 卡片 #101012 / 描边 #27272a */
+  --background: #08080a;
+  --foreground: #fafafa;
+  --card: #101012;
+  --card-foreground: #fafafa;
+  --popover: #141416;
+  --popover-foreground: #fafafa;
+  /* [改造] 主色改为绿色 rgb(35,134,54) */
+  --primary: #238636;
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.335 0 0);
-  --secondary-foreground: oklch(0.9 0.05 250);
-  --muted: oklch(0.305 0 0);
-  --muted-foreground: oklch(0.78 0 0);
-  --accent: color-mix(in oklch, var(--primary) 20%, var(--background));
-  --accent-foreground: oklch(0.985 0 0);
+  --secondary: #202024;
+  --secondary-foreground: #e4e4e7;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #202024;
+  --accent-foreground: #fafafa;
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --success: oklch(0.696 0.17 162.48);
@@ -208,24 +210,24 @@ For commercial licensing, please contact support@quantumnous.com
   --info-foreground: oklch(0.145 0 0);
   --neutral: oklch(0.76 0 0);
   --neutral-foreground: oklch(0.155 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 17%);
-  --ring: oklch(0.554 0.148 250.726);
+  --border: #27272a;
+  --input: #3f3f46;
+  --ring: #2ea043;
   --chart-1: oklch(0.76 0.14 250);
   --chart-2: oklch(0.76 0.13 200);
   --chart-3: oklch(0.76 0.13 285);
   --chart-4: oklch(0.75 0.16 325);
   --chart-5: oklch(0.76 0.14 155);
-  --sidebar: oklch(0.225 0 0);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.588 0.123 246.488);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: color-mix(in oklch, var(--primary) 20%, var(--background));
-  --sidebar-accent-foreground: oklch(0.9 0.05 250);
-  --sidebar-border: oklch(1 0 0 / 11%);
-  --sidebar-ring: oklch(0.7 0.17 250);
-  --skeleton-base: oklch(0.335 0 0);
-  --skeleton-highlight: oklch(0.44 0 0);
+  --sidebar: #101012;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #2ea043;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #202024;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #2ea043;
+  --skeleton-base: #1a1a1d;
+  --skeleton-highlight: #26262a;
   --table-row: var(--background);
   --table-header: color-mix(in oklch, var(--foreground) 6%, var(--background));
   --table-header-hover: color-mix(

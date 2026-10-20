@@ -20,14 +20,12 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { AnimateInView } from '@/components/animate-in-view'
-import { Button } from '@/components/ui/button'
-
 interface CTAProps {
   className?: string
   isAuthenticated?: boolean
 }
 
+/* [改造] 仿 tokenmix.ai 的收尾 CTA */
 export function CTA(props: CTAProps) {
   const { t } = useTranslation()
 
@@ -36,49 +34,24 @@ export function CTA(props: CTAProps) {
   }
 
   return (
-    <section className='relative z-10 overflow-hidden px-6 py-24 md:py-32'>
-      {/* Gradient mesh background */}
-      <div
-        aria-hidden
-        className='absolute inset-0 -z-10 opacity-20 dark:opacity-[0.08]'
-        style={{
-          background: [
-            'radial-gradient(ellipse 50% 50% at 30% 50%, oklch(0.7 0.15 250 / 70%) 0%, transparent 70%)',
-            'radial-gradient(ellipse 40% 40% at 70% 40%, oklch(0.65 0.12 200 / 50%) 0%, transparent 70%)',
-          ].join(', '),
-        }}
-      />
-
-      <AnimateInView
-        className='mx-auto max-w-2xl text-center'
-        animation='scale-in'
-      >
-        <h2 className='text-2xl leading-tight font-bold tracking-tight md:text-4xl'>
-          {t('Ready to simplify')}
-          <br />
-          <span className='bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500 bg-clip-text text-transparent'>
-            {t('your AI integration?')}
-          </span>
-        </h2>
-        <p className='text-muted-foreground/80 mx-auto mt-5 max-w-md text-sm leading-relaxed md:text-base'>
-          {t(
-            'Deploy your own gateway and start routing requests through your configured upstream services.'
-          )}
-        </p>
-        <div className='mt-8 flex items-center justify-center gap-3'>
-          <Button className='group rounded-lg' render={<Link to='/sign-up' />}>
-            {t('Get Started')}
-            <ArrowRight className='ml-1 size-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
-          </Button>
-          <Button
-            variant='outline'
-            className='border-border/50 hover:border-border hover:bg-muted/50 rounded-lg'
-            render={<Link to='/pricing' />}
-          >
-            {t('View Pricing')}
-          </Button>
+    <section className='border-border/80 border-b'>
+      <div className='mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-6 px-5 py-10 sm:flex-row sm:items-center sm:px-6 sm:py-14'>
+        <div>
+          <h2 className='text-2xl font-semibold tracking-tight sm:text-3xl'>
+            {t('Start building now')}
+          </h2>
+          <p className='text-muted-foreground mt-2 text-sm'>
+            {t('No credit card required. Explore the live model catalog right away.')}
+          </p>
         </div>
-      </AnimateInView>
+        <Link
+          to='/sign-up'
+          className='bg-foreground text-background hover:bg-foreground/90 inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[6px] px-6 text-sm font-semibold transition-colors'
+        >
+          {t('Start for free')}
+          <ArrowRight className='size-4' />
+        </Link>
+      </div>
     </section>
   )
 }
