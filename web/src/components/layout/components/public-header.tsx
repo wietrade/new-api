@@ -22,12 +22,10 @@ import { useTranslation } from 'react-i18next'
 
 import { Dialog } from '@/components/dialog'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { NotificationPopover } from '@/components/notification-popover'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useNotifications } from '@/hooks/use-notifications'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 import { cn } from '@/lib/utils'
@@ -57,7 +55,6 @@ export interface PublicHeaderProps {
   rightContent?: React.ReactNode
   showNavigation?: boolean
   showAuthButtons?: boolean
-  showNotifications?: boolean
   className?: string
 }
 
@@ -70,7 +67,6 @@ export function PublicHeader(props: PublicHeaderProps) {
     siteName: customSiteName,
     homeUrl = '/',
     showAuthButtons = true,
-    showNotifications = true,
   } = props
 
   const { t } = useTranslation()
@@ -88,7 +84,6 @@ export function PublicHeader(props: PublicHeaderProps) {
     logoLoaded,
   } = useSystemConfig()
   const dynamicLinks = useTopNavLinks()
-  const notifications = useNotifications()
   const routerState = useRouterState()
   const pathname = routerState.location.pathname
 
@@ -118,12 +113,6 @@ export function PublicHeader(props: PublicHeaderProps) {
 
   let authContent = (
     <div className='flex items-center gap-3'>
-      <Link
-        to='/sign-in'
-        className='text-muted-foreground hover:text-foreground text-sm font-medium transition-colors'
-      >
-        {t('Sign in')}
-      </Link>
       <Link
         to='/sign-up'
         className='bg-foreground text-background hover:bg-foreground/90 inline-flex items-center justify-center rounded-[6px] px-4 py-1.5 text-sm font-medium shadow-sm transition-colors'
@@ -275,19 +264,6 @@ export function PublicHeader(props: PublicHeaderProps) {
                 <LanguageSwitcher className='h-8 w-8' />
               )}
               {showThemeSwitch && <ThemeSwitch className='h-8 w-8' />}
-              {showNotifications && (
-                <NotificationPopover
-                  open={notifications.popoverOpen}
-                  onOpenChange={notifications.setPopoverOpen}
-                  unreadCount={notifications.unreadCount}
-                  activeTab={notifications.activeTab}
-                  onTabChange={notifications.setActiveTab}
-                  notice={notifications.notice}
-                  announcements={notifications.announcements}
-                  loading={notifications.loading}
-                  className='size-8'
-                />
-              )}
               {showAuthButtons && authContent}
             </div>
 
