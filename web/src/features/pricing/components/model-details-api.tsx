@@ -556,6 +556,10 @@ function CodeSamplesSection(props: {
   )
 }
 
+// API-tab tables share the pricing tables' header treatment: muted label text
+// on the neutral header surface.
+const apiTableHeaderRow = `${tableStyles.mutedHeaderRow} [&_th]:text-muted-foreground`
+
 // ---------------------------------------------------------------------------
 // Supported parameters table
 // ---------------------------------------------------------------------------
@@ -575,7 +579,7 @@ function SupportedParametersSection(props: { model: PricingModel }) {
       <StaticDataTable
         className={tableStyles.sectionContainer}
         tableClassName='[&_tbody>tr]:h-auto [&_td]:align-middle'
-        headerRowClassName={tableStyles.mutedHeaderRow}
+        headerRowClassName={apiTableHeaderRow}
         data={params}
         getRowKey={(param) => param.name}
         getRowClassName={() => 'hover:bg-muted/20'}
@@ -686,7 +690,7 @@ function RateLimitsSection(props: { model: PricingModel }) {
       <StaticDataTable
         className={tableStyles.sectionContainer}
         tableClassName='[&_tbody>tr]:h-auto [&_td]:align-middle'
-        headerRowClassName={tableStyles.mutedHeaderRow}
+        headerRowClassName={apiTableHeaderRow}
         data={limits}
         getRowKey={(limit) => limit.group}
         getRowClassName={() => 'hover:bg-muted/20'}
@@ -695,7 +699,7 @@ function RateLimitsSection(props: { model: PricingModel }) {
             id: 'group',
             header: t('Group'),
             className: 'h-9',
-            cellClassName: 'py-2 font-mono',
+            cellClassName: 'py-2',
             cell: (limit) => limit.group,
           },
           {
