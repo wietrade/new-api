@@ -43,6 +43,11 @@ hero:
   <span>config.toml 自定义 provider，走 Responses 接口</span>
 </a>
 
+<a class="entry" href="/docs/tools/">
+  <strong>客户端接入</strong>
+  <span>Cherry Studio、Chatbox、Cline、Cursor、Claude Code…一站配好</span>
+</a>
+
 <a class="entry" href="/docs/models.html">
   <strong>模型与价格</strong>
   <span>在线模型清单、可用分组与直连详情页</span>

@@ -98,7 +98,7 @@ function endpoints(m: Model) {
             <th>分组</th>
             <th>协议</th>
             <th>计费</th>
-            <th>单价</th>
+            <th>价格</th>
           </tr>
         </thead>
         <tbody>
@@ -113,14 +113,14 @@ function endpoints(m: Model) {
             </td>
             <td>{{ endpoints(m).join('、') }}</td>
             <td>{{ billing(m) }}</td>
-            <td><a :href="`/pricing/${encodeURIComponent(m.model_name)}`" target="_blank">查看 →</a></td>
+            <td><a :href="`/pricing/${encodeURIComponent(m.model_name)}`" target="_blank">查看模型详情 →</a></td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <p class="catalog-tip">
-      单价含分组倍率且随时调整，这里不缓存价格；点模型名进入模型广场看实时分档价格。
+      价格随分组倍率与档位浮动，这里不缓存；点「查看模型详情」到模型广场看实时分档价格。
     </p>
   </div>
 </template>

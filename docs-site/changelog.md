@@ -17,6 +17,11 @@
 - 新增 `llms-full.txt`（全站正文合并，约 40 KB），供 AI 编程助手一次读完
 - 域名落地：站点 `nowhub.org`、API `api.nowhub.org`
 
+## 2026-10-22（客户端）
+
+- 新增「客户端接入」：总览 + VS Code（Cline / Roo Code / Continue / Kilo Code）+ AI IDE（Cursor / Windsurf / Trae）+ 桌面与网页客户端（Cherry Studio / Chatbox / LobeChat / NextChat / Open WebUI / SillyTavern / 沉浸式翻译）+ 终端 CLI（Gemini CLI / Aider）
+- 模型与价格页：价格列改为「查看模型详情」，不再暗示文档内可查单价
+
 ## 待补充
 
 - 图像 / 视频模型接入

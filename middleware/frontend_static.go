@@ -36,6 +36,25 @@ func ServeFrontendFiles(frontendFS static.ServeFileSystem) gin.HandlerFunc {
 	var cache sync.Map // URL path -> *precompressedFile
 	return func(c *gin.Context) {
 		urlPath := c.Request.URL.Path
+
+		// 目录索引自己处理：http.FileServer 会把 "*/index.html" 301 到 "./"，
+		// 与尾斜杠处理叠加后会在 "/docs/x" 与 "/docs/x/" 之间来回跳。
+		if strings.HasSuffix(urlPath, "/") {
+			indexPath := urlPath + "index.html"
+			if frontendFS.Exists("/", indexPath) {
+				if f, err := frontendFS.Open(indexPath); err == nil {
+					data, readErr := io.ReadAll(f)
+					_ = f.Close()
+					if readErr == nil {
+						c.Abort()
+						c.Header("Cache-Control", "no-cache")
+						c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+						return
+					}
+				}
+			}
+		}
+
 		if !frontendFS.Exists("/", urlPath) {
 			return
 		}

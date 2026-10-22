@@ -31,7 +31,7 @@ export default defineConfig({
     nav: [
       { text: '指南', link: '/guide/introduction', activeMatch: '^/docs/guide/' },
       { text: 'API', link: '/api/chat-completions', activeMatch: '^/docs/api/' },
-      { text: '工具', link: '/tools/claude-code', activeMatch: '^/docs/tools/' },
+      { text: '客户端', link: '/tools/', activeMatch: '^/docs/tools/' },
       { text: '排障', link: '/faq/', activeMatch: '^/docs/faq/' },
     ],
     sidebar: [
@@ -65,11 +65,15 @@ export default defineConfig({
         ],
       },
       {
-        text: '工具接入',
+        text: '客户端接入',
         items: [
+          { text: '客户端总览', link: '/tools/' },
+          { text: 'VS Code（Cline / Roo / Continue）', link: '/tools/vscode' },
+          { text: 'AI IDE（Cursor / Windsurf / Trae）', link: '/tools/ide' },
+          { text: '桌面与网页客户端', link: '/tools/desktop' },
+          { text: '终端 CLI', link: '/tools/cli' },
           { text: 'Claude Code', link: '/tools/claude-code' },
           { text: 'Codex CLI', link: '/tools/codex-cli' },
-          { text: 'Cline / Cherry Studio', link: '/tools/cline' },
           { text: 'LangChain', link: '/tools/langchain' },
         ],
       },

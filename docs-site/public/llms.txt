@@ -30,11 +30,15 @@
 - [Embeddings](https://nowhub.org/docs/api/embeddings.html)：POST /v1/embeddings
 - [函数调用](https://nowhub.org/docs/api/function-calling.html)：tools / tool_result / functionResponse
 
-## 工具接入
+## 客户端接入
 
+- [客户端总览](https://nowhub.org/docs/tools/)：Base URL / Key / 模型 ID 三件套与一览表
+- [VS Code](https://nowhub.org/docs/tools/vscode.html)：Cline、Roo Code、Continue、Kilo Code
+- [AI IDE](https://nowhub.org/docs/tools/ide.html)：Cursor、Windsurf、Trae、JetBrains
+- [桌面与网页客户端](https://nowhub.org/docs/tools/desktop.html)：Cherry Studio、Chatbox、LobeChat、NextChat、Open WebUI、SillyTavern、沉浸式翻译
+- [终端 CLI](https://nowhub.org/docs/tools/cli.html)：Gemini CLI、Aider 与通用环境变量
 - [Claude Code](https://nowhub.org/docs/tools/claude-code.html)
 - [Codex CLI](https://nowhub.org/docs/tools/codex-cli.html)
-- [Cline / Cherry Studio](https://nowhub.org/docs/tools/cline.html)
 - [LangChain](https://nowhub.org/docs/tools/langchain.html)
 
 ## 排障
