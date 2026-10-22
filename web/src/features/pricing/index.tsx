@@ -25,7 +25,6 @@ import { PageTransition } from '@/components/page-transition'
 import {
   LoadingSkeleton,
   EmptyState,
-  SearchBar,
   PricingTable,
   PricingSidebar,
   PricingToolbar,
@@ -60,8 +59,8 @@ export function Pricing() {
     vendorFilter,
     groupFilter,
     quotaTypeFilter,
-    endpointTypeFilter,
-    tagFilter,
+    capabilityFilter,
+    contextFilter,
     tokenUnit,
     viewMode,
     showRechargePrice,
@@ -70,15 +69,14 @@ export function Pricing() {
     setVendorFilter,
     setGroupFilter,
     setQuotaTypeFilter,
-    setEndpointTypeFilter,
-    setTagFilter,
+    setCapabilityFilter,
+    setContextFilter,
     setTokenUnit,
     setViewMode,
     setShowRechargePrice,
     filteredModels,
     hasActiveFilters,
     activeFilterCount,
-    availableTags,
     clearFilters,
     clearSearch,
   } = useFilters(models || [])
@@ -182,42 +180,25 @@ export function Pricing() {
               {t('Model Square')}
             </h1>
             <p className='text-muted-foreground/80 mt-3 text-sm sm:mt-4 sm:text-base'>
-              {t('This site currently has {{count}} models enabled', {
-                count: models?.length || 0,
-              })}
+              一个 API 接入主流大模型，价格透明、开箱可用！
             </p>
-            <p className='text-muted-foreground/60 mx-auto mt-2 max-w-2xl text-xs leading-relaxed sm:text-sm'>
-              {t(
-                'Discover curated AI models, compare pricing and capabilities, and choose the right model for every scenario.'
-              )}
-            </p>
-            <SearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              onClear={clearSearch}
-              placeholder={t(
-                'Search model name, provider, endpoint, or tag...'
-              )}
-              className='mx-auto mt-4 max-w-2xl sm:mt-6'
-            />
           </header>
 
           <div className='grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)]'>
             <PricingSidebar
               quotaTypeFilter={quotaTypeFilter}
-              endpointTypeFilter={endpointTypeFilter}
+              capabilityFilter={capabilityFilter}
+              contextFilter={contextFilter}
               vendorFilter={vendorFilter}
               groupFilter={groupFilter}
-              tagFilter={tagFilter}
               onQuotaTypeChange={setQuotaTypeFilter}
-              onEndpointTypeChange={setEndpointTypeFilter}
+              onCapabilityChange={setCapabilityFilter}
+              onContextChange={setContextFilter}
               onVendorChange={setVendorFilter}
               onGroupChange={setGroupFilter}
-              onTagChange={setTagFilter}
               vendors={vendors || []}
               groups={availableGroups}
               groupRatios={groupRatio}
-              tags={availableTags}
               models={models || []}
               hasActiveFilters={hasActiveFilters}
               onClearFilters={clearFilters}
@@ -228,6 +209,9 @@ export function Pricing() {
               <PricingToolbar
                 filteredCount={filteredModels.length}
                 totalCount={models?.length}
+                searchQuery={searchInput}
+                onSearchChange={setSearchInput}
+                onSearchClear={clearSearch}
                 sortBy={sortBy}
                 onSortChange={setSortBy}
                 tokenUnit={tokenUnit}
@@ -237,19 +221,18 @@ export function Pricing() {
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
                 quotaTypeFilter={quotaTypeFilter}
-                endpointTypeFilter={endpointTypeFilter}
+                capabilityFilter={capabilityFilter}
+                contextFilter={contextFilter}
                 vendorFilter={vendorFilter}
                 groupFilter={groupFilter}
-                tagFilter={tagFilter}
                 onQuotaTypeChange={setQuotaTypeFilter}
-                onEndpointTypeChange={setEndpointTypeFilter}
+                onCapabilityChange={setCapabilityFilter}
+                onContextChange={setContextFilter}
                 onVendorChange={setVendorFilter}
                 onGroupChange={setGroupFilter}
-                onTagChange={setTagFilter}
                 vendors={vendors || []}
                 groups={availableGroups}
                 groupRatios={groupRatio}
-                tags={availableTags}
                 models={models || []}
                 hasActiveFilters={hasActiveFilters}
                 activeFilterCount={activeFilterCount}

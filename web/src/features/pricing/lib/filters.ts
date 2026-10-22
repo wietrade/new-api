@@ -22,6 +22,9 @@ import {
   QUOTA_TYPES,
   QUOTA_TYPE_VALUES,
   ENDPOINT_TYPES,
+  CONTEXT_RANGES,
+  CONTEXT_RANGE_BOUNDS,
+  type ContextRange,
   type SortOption,
 } from '../constants'
 import type { PricingModel } from '../types'
@@ -31,7 +34,7 @@ import {
   hasTaskUsageSchema,
   isUnconfiguredTaskUsageModel,
 } from './dynamic-price'
-import { isTokenBasedModel } from './model-helpers'
+import { getDisplayGroupRatio, isTokenBasedModel } from './model-helpers'
 import { calculateTokenPrice } from './price'
 
 // ----------------------------------------------------------------------------
@@ -113,6 +116,45 @@ export function filterByEndpointType(
   )
 }
 
+/** Normalized capability keys declared by the backend catalog. */
+export function getModelCapabilities(model: PricingModel): string[] {
+  return (model.capabilities ?? []).map((item) => item.toLowerCase())
+}
+
+/** Filter models by a structured capability key. */
+export function filterByCapability(
+  models: PricingModel[],
+  capability: string
+): PricingModel[] {
+  if (!capability || capability === FILTER_ALL) return models
+  const key = capability.toLowerCase()
+  return models.filter((m) => getModelCapabilities(m).includes(key))
+}
+
+/** Bucket a model by its declared context window; undefined when unknown. */
+export function getContextRangeOf(
+  model: PricingModel
+): ContextRange | undefined {
+  const value = model.context_length ?? 0
+  if (value <= 0) return undefined
+  if (value < CONTEXT_RANGE_BOUNDS[CONTEXT_RANGES.SMALL].max) {
+    return CONTEXT_RANGES.SMALL
+  }
+  if (value < CONTEXT_RANGE_BOUNDS[CONTEXT_RANGES.MEDIUM].max) {
+    return CONTEXT_RANGES.MEDIUM
+  }
+  return CONTEXT_RANGES.LARGE
+}
+
+/** Filter models by context window bucket. */
+export function filterByContextRange(
+  models: PricingModel[],
+  range: string
+): PricingModel[] {
+  if (!range || range === CONTEXT_RANGES.ALL) return models
+  return models.filter((m) => getContextRangeOf(m) === range)
+}
+
 type SortPriceKind = 'input' | 'output' | 'request'
 
 const PRICE_SORTS: Partial<
@@ -132,6 +174,17 @@ const PRICE_SORTS: Partial<
  * model has no price of that kind.
  */
 function getSortPrice(
+  model: PricingModel,
+  kind: SortPriceKind,
+  group?: string
+): number | undefined {
+  // Sort by the price the card actually displays (base price x group ratio)
+  const ratio = getDisplayGroupRatio(model, group)
+  const raw = getSortBasePrice(model, kind)
+  return raw === undefined ? undefined : raw * ratio
+}
+
+function getSortBasePrice(
   model: PricingModel,
   kind: SortPriceKind
 ): number | undefined {
@@ -165,7 +218,8 @@ function getSortPrice(
  */
 export function sortModels(
   models: PricingModel[],
-  sortBy: string
+  sortBy: string,
+  group?: string
 ): PricingModel[] {
   const sorted = [...models]
 
@@ -173,7 +227,7 @@ export function sortModels(
   if (priceSort) {
     // Extracting the price parses the billing expression, so compute once
     const price = new Map(
-      sorted.map((m) => [m, getSortPrice(m, priceSort.kind)])
+      sorted.map((m) => [m, getSortPrice(m, priceSort.kind, group)])
     )
     // Models without this kind of price stay last in both directions
     sorted.sort((a, b) => {
@@ -208,8 +262,8 @@ export function filterAndSortModels(
     vendor: string
     group: string
     quotaType: string
-    endpointType: string
-    tag: string
+    capability: string
+    context: string
     sortBy: string
   }
 ): PricingModel[] {
@@ -217,9 +271,9 @@ export function filterAndSortModels(
   result = filterByVendor(result, filters.vendor)
   result = filterByGroup(result, filters.group)
   result = filterByQuotaType(result, filters.quotaType)
-  result = filterByEndpointType(result, filters.endpointType)
-  result = filterByTag(result, filters.tag)
-  result = sortModels(result, filters.sortBy)
+  result = filterByCapability(result, filters.capability)
+  result = filterByContextRange(result, filters.context)
+  result = sortModels(result, filters.sortBy, filters.group)
 
   return result
 }

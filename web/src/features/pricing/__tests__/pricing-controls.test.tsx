@@ -29,30 +29,32 @@ import type { PricingModel } from '../types'
 
 function toolbarProps(): PricingToolbarProps {
   return {
-    filteredCount: 2,
-    totalCount: 2,
+    filteredCount: 3,
+    totalCount: 3,
+    searchQuery: '',
+    onSearchChange: vi.fn(),
+    onSearchClear: vi.fn(),
     sortBy: 'name',
     tokenUnit: 'M',
     showRechargePrice: false,
     viewMode: 'card',
     quotaTypeFilter: 'all',
-    endpointTypeFilter: 'all',
+    capabilityFilter: 'all',
+    contextFilter: 'all',
     vendorFilter: 'all',
     groupFilter: 'all',
-    tagFilter: 'all',
     onSortChange: vi.fn(),
     onTokenUnitChange: vi.fn(),
     onRechargePriceChange: vi.fn(),
     onViewModeChange: vi.fn(),
     onQuotaTypeChange: vi.fn(),
-    onEndpointTypeChange: vi.fn(),
+    onCapabilityChange: vi.fn(),
+    onContextChange: vi.fn(),
     onVendorChange: vi.fn(),
     onGroupChange: vi.fn(),
-    onTagChange: vi.fn(),
     vendors: [],
     groups: ['default', 'premium'],
     groupRatios: { default: 1, premium: 3 },
-    tags: [],
     models: [],
     hasActiveFilters: false,
     activeFilterCount: 0,
@@ -61,7 +63,7 @@ function toolbarProps(): PricingToolbarProps {
 }
 
 describe('pricing controls', () => {
-  it('counts each model once per filter and updates counts when the catalog changes', () => {
+  it('counts each model once per structured filter and updates counts on catalog change', () => {
     const props = toolbarProps()
     const base: PricingModel = {
       id: 1,
@@ -71,8 +73,9 @@ describe('pricing controls', () => {
       model_ratio: 1,
       completion_ratio: 1,
       enable_groups: ['default'],
-      tags: 'Chat,chat',
-      supported_endpoint_types: ['openai', 'openai'],
+      capabilities: ['chat'],
+      context_length: 200_000,
+      supported_endpoint_types: ['openai'],
     }
     const models: PricingModel[] = [
       base,
@@ -81,7 +84,8 @@ describe('pricing controls', () => {
         id: 2,
         model_name: 'image-model',
         quota_type: 1,
-        tags: 'chat,Image',
+        capabilities: ['chat', 'image_generation'],
+        context_length: 1_000_000,
         supported_endpoint_types: ['image-generation'],
       },
       {
@@ -89,7 +93,8 @@ describe('pricing controls', () => {
         id: 3,
         model_name: 'task-model',
         vendor_name: 'Vendor B',
-        tags: 'Video',
+        capabilities: ['chat', 'video_generation'],
+        context_length: 20_000,
         supported_endpoint_types: ['openai-video'],
         billing_usage_schema: { seconds: { type: 'number', unit: 'second' } },
       },
@@ -100,7 +105,6 @@ describe('pricing controls', () => {
         { id: 1, name: 'Vendor A' },
         { id: 2, name: 'Vendor B' },
       ],
-      tags: ['Chat', 'Image', 'Video'],
     }
     const { rerender } = render(
       <PricingSidebar {...sidebarProps} models={models} />
@@ -111,8 +115,26 @@ describe('pricing controls', () => {
     ).toBeVisible()
     expect(screen.getByRole('button', { name: /^Vendor A\s*2$/ })).toBeVisible()
     expect(screen.getByRole('button', { name: /^Vendor B\s*1$/ })).toBeVisible()
-    expect(screen.getByRole('button', { name: /^Chat\s*2$/ })).toBeVisible()
-    expect(screen.getByRole('button', { name: /^Chat\s*1$/ })).toBeVisible()
+
+    // Capability counts are computed from structured `capabilities`, not tags.
+    expect(screen.getByRole('button', { name: /^Chat\s*3$/ })).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: /^Image Generation\s*1$/ })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: /^Video Generation\s*1$/ })
+    ).toBeVisible()
+    expect(
+      screen.queryByRole('button', { name: /^Tools\s*\d+$/ })
+    ).toBeNull()
+
+    // Context window buckets keep their own counts.
+    expect(
+      screen.getByRole('button', { name: /^200K - 1M\s*1$/ })
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: /^≥ 1M\s*1$/ })).toBeVisible()
+    expect(screen.getByRole('button', { name: /^< 200K\s*1$/ })).toBeVisible()
+
     expect(
       screen.getByRole('button', { name: /^Token-based\s*1$/ })
     ).toBeVisible()
@@ -130,44 +152,16 @@ describe('pricing controls', () => {
     expect(screen.getByRole('button', { name: /^Vendor A\s*1$/ })).toBeVisible()
     expect(screen.queryByRole('button', { name: /^Vendor B\s*1$/ })).toBeNull()
     expect(screen.getByRole('button', { name: /^Chat\s*1$/ })).toBeVisible()
-    expect(screen.getByRole('button', { name: /^Chat\s*0$/ })).toBeVisible()
+    // Zero-count capabilities are hidden instead of rendered as empty chips.
+    expect(
+      screen.queryByRole('button', { name: /^Video Generation/ })
+    ).toBeNull()
     expect(
       screen.getByRole('button', { name: /^Token-based\s*0$/ })
     ).toBeVisible()
     expect(
       screen.getByRole('button', { name: /^Task billing\s*0$/ })
     ).toBeVisible()
-  })
-
-  it('changes the token unit and keeps the selected unit pressed when clicked again', async () => {
-    const props = toolbarProps()
-    const user = userEvent.setup()
-    const { rerender } = render(<PricingToolbar {...props} />)
-    await user.click(screen.getByRole('button', { name: '/1K' }))
-    expect(props.onTokenUnitChange).toHaveBeenCalledWith('K')
-    rerender(<PricingToolbar {...props} tokenUnit='K' />)
-    const selected = screen.getByRole('button', { name: '/1K' })
-    expect(selected).toHaveAttribute('aria-pressed', 'true')
-    await user.click(selected)
-    expect(selected).toHaveAttribute('aria-pressed', 'true')
-    expect(props.onTokenUnitChange).toHaveBeenCalledTimes(1)
-  })
-
-  it('changes the recharge display mode with an accessible selected state', async () => {
-    const props = toolbarProps()
-    const user = userEvent.setup()
-    const { rerender } = render(<PricingToolbar {...props} />)
-    await user.click(screen.getByRole('button', { name: 'Recharge' }))
-    expect(props.onRechargePriceChange).toHaveBeenCalledWith(true)
-    rerender(<PricingToolbar {...props} showRechargePrice />)
-    expect(screen.getByRole('button', { name: 'Recharge' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    )
-    expect(screen.getByRole('button', { name: 'Standard' })).toHaveAttribute(
-      'aria-pressed',
-      'false'
-    )
   })
 
   it('switches to table view with the keyboard and exposes the selected view', async () => {

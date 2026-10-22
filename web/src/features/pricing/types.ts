@@ -106,18 +106,32 @@ export type PricingModel = {
 /** Input/output modalities supported by a model. */
 export type Modality = 'text' | 'image' | 'audio' | 'video' | 'file'
 
-/** Functional capabilities a model exposes. */
+/**
+ * Model capabilities exposed by the catalog.
+ *
+ * The `chat` ... `rerank` values are the closed vocabulary mirrored by
+ * `MODEL_CAPABILITIES` in constants.ts and the backend metadata sync
+ * (`MetadataCapabilityVocabulary`). The remaining values are accepted for
+ * upstream catalogs that describe API-level features instead.
+ */
 export type ModelCapability =
-  | 'function_calling'
-  | 'streaming'
-  | 'vision'
-  | 'json_mode'
-  | 'structured_output'
+  | 'chat'
   | 'reasoning'
   | 'tools'
-  | 'system_prompt'
+  | 'vision'
+  | 'files'
+  | 'audio'
+  | 'image_generation'
+  | 'video_generation'
+  | 'embedding'
+  | 'rerank'
   | 'web_search'
   | 'code_interpreter'
+  | 'function_calling'
+  | 'streaming'
+  | 'json_mode'
+  | 'structured_output'
+  | 'system_prompt'
   | 'caching'
   | 'embeddings'
 

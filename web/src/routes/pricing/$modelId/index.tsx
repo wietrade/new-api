@@ -31,6 +31,8 @@ const modelDetailsSearchSchema = z.object({
   quotaType: z.string().optional(),
   endpointType: z.string().optional(),
   tag: z.string().optional(),
+  capability: z.string().optional(),
+  context: z.string().optional(),
   tokenUnit: z.enum(['M', 'K']).optional(),
   view: z.enum(['card', 'table']).optional().catch(undefined),
   rechargePrice: z.boolean().optional(),

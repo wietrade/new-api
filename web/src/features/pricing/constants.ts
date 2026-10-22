@@ -110,11 +110,115 @@ export function getEndpointTypeLabels(
 /** Filter section keys */
 export const FILTER_SECTIONS = {
   PRICING_TYPE: 'pricingType',
-  ENDPOINT_TYPE: 'endpointType',
+  CAPABILITY: 'capability',
+  CONTEXT: 'context',
   VENDOR: 'vendor',
   GROUP: 'group',
-  TAG: 'tag',
 } as const
+
+/** Structured model capabilities (closed set; mirrors the backend vocabulary). */
+export const MODEL_CAPABILITIES = {
+  CHAT: 'chat',
+  REASONING: 'reasoning',
+  TOOLS: 'tools',
+  VISION: 'vision',
+  FILES: 'files',
+  AUDIO: 'audio',
+  IMAGE_GENERATION: 'image_generation',
+  VIDEO_GENERATION: 'video_generation',
+  EMBEDDING: 'embedding',
+  RERANK: 'rerank',
+  WEB_SEARCH: 'web_search',
+  CODE_INTERPRETER: 'code_interpreter',
+} as const
+
+export type ModelCapabilityKey =
+  (typeof MODEL_CAPABILITIES)[keyof typeof MODEL_CAPABILITIES]
+
+/** Stable display order for capability chips and filters. */
+export const MODEL_CAPABILITY_ORDER: ModelCapabilityKey[] = [
+  MODEL_CAPABILITIES.CHAT,
+  MODEL_CAPABILITIES.REASONING,
+  MODEL_CAPABILITIES.TOOLS,
+  MODEL_CAPABILITIES.VISION,
+  MODEL_CAPABILITIES.FILES,
+  MODEL_CAPABILITIES.IMAGE_GENERATION,
+  MODEL_CAPABILITIES.VIDEO_GENERATION,
+  MODEL_CAPABILITIES.EMBEDDING,
+  MODEL_CAPABILITIES.RERANK,
+  MODEL_CAPABILITIES.AUDIO,
+  MODEL_CAPABILITIES.WEB_SEARCH,
+  MODEL_CAPABILITIES.CODE_INTERPRETER,
+]
+
+const CAPABILITY_LABEL_KEYS: Record<ModelCapabilityKey, string> = {
+  [MODEL_CAPABILITIES.CHAT]: 'Chat',
+  [MODEL_CAPABILITIES.REASONING]: 'Reasoning',
+  [MODEL_CAPABILITIES.TOOLS]: 'Tools',
+  [MODEL_CAPABILITIES.VISION]: 'Vision',
+  [MODEL_CAPABILITIES.FILES]: 'Files',
+  [MODEL_CAPABILITIES.AUDIO]: 'Audio',
+  [MODEL_CAPABILITIES.IMAGE_GENERATION]: 'Image Generation',
+  [MODEL_CAPABILITIES.VIDEO_GENERATION]: 'Video Generation',
+  [MODEL_CAPABILITIES.EMBEDDING]: 'Embeddings',
+  [MODEL_CAPABILITIES.RERANK]: 'Rerank',
+  [MODEL_CAPABILITIES.WEB_SEARCH]: 'Web Search',
+  [MODEL_CAPABILITIES.CODE_INTERPRETER]: 'Code Interpreter',
+}
+
+/** Localized label for a capability key; unknown keys pass through unchanged. */
+export function getCapabilityLabel(t: TFunction, key: string): string {
+  const labelKey = CAPABILITY_LABEL_KEYS[key as ModelCapabilityKey]
+  return labelKey ? t(labelKey) : key
+}
+
+/** Context window buckets. Upper bounds are exclusive. */
+export const CONTEXT_RANGES = {
+  ALL: 'all',
+  SMALL: 'small',
+  MEDIUM: 'medium',
+  LARGE: 'large',
+} as const
+
+export type ContextRange = (typeof CONTEXT_RANGES)[keyof typeof CONTEXT_RANGES]
+
+export const CONTEXT_RANGE_ORDER: Exclude<ContextRange, 'all'>[] = [
+  CONTEXT_RANGES.SMALL,
+  CONTEXT_RANGES.MEDIUM,
+  CONTEXT_RANGES.LARGE,
+]
+
+export const CONTEXT_RANGE_BOUNDS: Record<
+  Exclude<ContextRange, 'all'>,
+  { min: number; max: number }
+> = {
+  [CONTEXT_RANGES.SMALL]: { min: 0, max: 200_000 },
+  [CONTEXT_RANGES.MEDIUM]: { min: 200_000, max: 1_000_000 },
+  [CONTEXT_RANGES.LARGE]: { min: 1_000_000, max: Number.POSITIVE_INFINITY },
+}
+
+export function getContextRangeLabels(
+  t: TFunction
+): Record<ContextRange, string> {
+  return {
+    [CONTEXT_RANGES.ALL]: t('All Context Lengths'),
+    [CONTEXT_RANGES.SMALL]: t('< 200K'),
+    [CONTEXT_RANGES.MEDIUM]: t('200K - 1M'),
+    [CONTEXT_RANGES.LARGE]: t('≥ 1M'),
+  }
+}
+
+/** Formats a token count as 200K / 1M / 1.1M for compact display. */
+export function formatContextLength(tokens?: number | null): string | undefined {
+  if (!tokens || tokens <= 0) return undefined
+  const format = (value: number, suffix: string) => {
+    const rounded = value >= 100 ? Math.round(value) : Math.round(value * 10) / 10
+    return `${rounded}${suffix}`
+  }
+  if (tokens >= 1_000_000) return format(tokens / 1_000_000, 'M')
+  if (tokens >= 1_000) return format(tokens / 1_000, 'K')
+  return String(tokens)
+}
 
 /** Maximum number of tags to display in model row */
 export const MAX_TAGS_DISPLAY = 5

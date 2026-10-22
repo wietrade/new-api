@@ -37,16 +37,83 @@ func lockMetadataMutation(tx *gorm.DB) error {
 
 var ErrMetadataSyncConflict = errors.New("metadata changed; preview again before applying")
 
-var MetadataSyncFields = []string{"description", "icon", "tags", "vendor", "endpoints", "name_rule", "status"}
+var MetadataSyncFields = []string{"description", "icon", "tags", "capabilities", "context_length", "max_output_tokens", "vendor", "endpoints", "name_rule", "status"}
+
+// MetadataCapabilityVocabulary is the closed set of structured capability keys.
+// Keep it in sync with web/src/features/pricing/constants.ts (MODEL_CAPABILITIES).
+var MetadataCapabilityVocabulary = map[string]bool{
+	"chat":             true,
+	"reasoning":        true,
+	"tools":            true,
+	"vision":           true,
+	"files":            true,
+	"audio":            true,
+	"image_generation": true,
+	"video_generation": true,
+	"embedding":        true,
+	"rerank":           true,
+	"web_search":       true,
+	"code_interpreter": true,
+}
+
+// SplitMetadataList splits the comma-separated list columns (tags, capabilities)
+// and removes blanks and duplicates while preserving order.
+func SplitMetadataList(raw string) []string {
+	if strings.TrimSpace(raw) == "" {
+		return []string{}
+	}
+	parts := strings.FieldsFunc(raw, func(r rune) bool {
+		return r == ',' || r == ';' || r == '|'
+	})
+	out := make([]string, 0, len(parts))
+	seen := make(map[string]bool, len(parts))
+	for _, part := range parts {
+		item := strings.TrimSpace(part)
+		if item == "" || seen[item] {
+			continue
+		}
+		seen[item] = true
+		out = append(out, item)
+	}
+	return out
+}
+
+// NormalizeCapabilities lowercases, trims and deduplicates upstream capability keys.
+func NormalizeCapabilities(items []string) []string {
+	out := make([]string, 0, len(items))
+	seen := make(map[string]bool, len(items))
+	for _, raw := range items {
+		item := strings.ToLower(strings.TrimSpace(raw))
+		if item == "" || seen[item] {
+			continue
+		}
+		seen[item] = true
+		out = append(out, item)
+	}
+	return out
+}
+
+// ValidateModelCapabilities rejects capability keys outside the closed vocabulary.
+func ValidateModelCapabilities(raw string) error {
+	for _, item := range SplitMetadataList(raw) {
+		if !MetadataCapabilityVocabulary[item] {
+			return fmt.Errorf("unsupported model capability: %s", item)
+		}
+	}
+	return nil
+}
 
 type MetadataValues struct {
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
-	Tags        string `json:"tags"`
-	Vendor      string `json:"vendor"`
-	Endpoints   string `json:"endpoints"`
-	NameRule    int    `json:"name_rule"`
-	Status      int    `json:"status"`
+	Description     string `json:"description"`
+	Icon            string `json:"icon"`
+	Tags            string `json:"tags"`
+	Capabilities    string `json:"capabilities"`
+	ContextLength   int    `json:"context_length"`
+	MaxOutputTokens int    `json:"max_output_tokens"`
+	Vendor          string `json:"vendor"`
+	Endpoints       string `json:"endpoints"`
+	NameRule        int    `json:"name_rule"`
+	Status          int    `json:"status"`
 }
 
 type MetadataSyncSelection struct {
@@ -98,6 +165,15 @@ func ValidateMetadataValues(values MetadataValues) error {
 	}
 	if values.Status != 0 && values.Status != 1 {
 		return errors.New("invalid catalog visibility")
+	}
+	if values.ContextLength < 0 || values.MaxOutputTokens < 0 {
+		return errors.New("context_length and max_output_tokens must not be negative")
+	}
+	if values.ContextLength > 0 && values.MaxOutputTokens > values.ContextLength {
+		return errors.New("max_output_tokens must not exceed context_length")
+	}
+	if err := ValidateModelCapabilities(values.Capabilities); err != nil {
+		return err
 	}
 	return ValidateModelEndpoints(values.Endpoints)
 }
@@ -221,6 +297,12 @@ func ApplyMetadataSync(updates []MetadataSyncUpdate, upstreamVendors map[string]
 					fields[field] = update.Values.Icon
 				case "tags":
 					fields[field] = update.Values.Tags
+				case "capabilities":
+					fields[field] = update.Values.Capabilities
+				case "context_length":
+					fields[field] = update.Values.ContextLength
+				case "max_output_tokens":
+					fields[field] = update.Values.MaxOutputTokens
 				case "endpoints":
 					fields[field] = update.Values.Endpoints
 				case "name_rule":

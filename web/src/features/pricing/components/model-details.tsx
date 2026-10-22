@@ -196,6 +196,13 @@ const CAPABILITY_LABEL_KEYS: Record<ModelCapability, string> = {
   code_interpreter: 'Code interpreter',
   caching: 'Prompt caching',
   embeddings: 'Embeddings',
+  chat: 'Chat',
+  files: 'Files',
+  audio: 'Audio',
+  embedding: 'Embeddings',
+  image_generation: 'Image generation',
+  video_generation: 'Video generation',
+  rerank: 'Rerank',
 }
 
 const MODALITY_LABEL_KEYS: Record<string, string> = {

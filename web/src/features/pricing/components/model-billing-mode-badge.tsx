@@ -37,8 +37,9 @@ export function ModelBillingModeBadge(props: ModelBillingModeBadgeProps) {
   const label = t(labelKey)
   const isCaption = props.appearance === 'caption'
   let variant: StatusVariant = 'purple'
+  const isDynamic = isDynamicPricingModel(props.model)
 
-  if (isDynamicPricingModel(props.model)) {
+  if (isDynamic) {
     variant = 'warning'
   } else if (labelKey === 'Token-based') {
     variant = 'info'
@@ -51,7 +52,11 @@ export function ModelBillingModeBadge(props: ModelBillingModeBadgeProps) {
       type={isCaption ? 'text' : undefined}
       copyable={false}
       size='sm'
-      className={cn(isCaption && 'text-xs font-normal', props.className)}
+      className={cn(
+        isCaption && 'text-xs font-normal',
+        isDynamic && 'text-dynamic-billing',
+        props.className
+      )}
     />
   )
 }

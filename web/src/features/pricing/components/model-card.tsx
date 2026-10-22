@@ -27,7 +27,11 @@ import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
 import { useSystemConfigStore } from '@/stores/system-config-store'
 
-import { DEFAULT_TOKEN_UNIT } from '../constants'
+import {
+  DEFAULT_TOKEN_UNIT,
+  formatContextLength,
+  getCapabilityLabel,
+} from '../constants'
 import { useBillingTime } from '../hooks/use-billing-time'
 import {
   getCardExamplePrice,
@@ -36,7 +40,7 @@ import {
   getDynamicPricingSummary,
   isUnconfiguredTaskUsageModel,
 } from '../lib/dynamic-price'
-import { parseTags } from '../lib/filters'
+import { getModelCapabilities } from '../lib/filters'
 import { isTokenBasedModel } from '../lib/model-helpers'
 import { formatPrice, formatRequestPrice } from '../lib/price'
 import { taskPriceLabel, taskUsageUnitLabel } from '../lib/task-price-display'
@@ -63,7 +67,8 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   const showRechargePrice = props.showRechargePrice ?? false
   const isTokenBased = isTokenBasedModel(props.model)
   const tokenUnitLabel = tokenUnit === 'K' ? '1K' : '1M'
-  const tags = parseTags(props.model.tags)
+  const capabilities = getModelCapabilities(props.model)
+  const contextLabel = formatContextLength(props.model.context_length)
   const groups = props.model.enable_groups || []
   const endpoints = props.model.supported_endpoint_types || []
   const modelIconKey = props.model.icon || props.model.vendor_icon
@@ -307,19 +312,37 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           <p className='text-muted-foreground line-clamp-2 text-[13px] leading-5 break-words'>
             {props.model.description || t('No description available.')}
           </p>
-          {tags.length > 0 && (
+          {(capabilities.length > 0 || contextLabel) && (
             <div
               role='group'
-              aria-label={t('Tags')}
-              className='text-muted-foreground flex min-w-0 items-baseline gap-1.5 text-xs'
+              aria-label={t('Model Capabilities')}
+              className='flex min-w-0 flex-wrap items-center gap-1.5 text-xs'
             >
-              <span className='shrink-0'>{t('Tags')}</span>
-              <span className='truncate' title={tags.join(', ')}>
-                {tags.slice(0, 2).join(', ')}
-              </span>
-              {tags.length > 2 && (
-                <span className='shrink-0' title={tags.slice(2).join(', ')}>
-                  +{tags.length - 2}
+              {capabilities.slice(0, 4).map((capability) => (
+                <span
+                  key={capability}
+                  className='bg-muted text-muted-foreground rounded px-1.5 py-0.5'
+                >
+                  {getCapabilityLabel(t, capability)}
+                </span>
+              ))}
+              {capabilities.length > 4 && (
+                <span
+                  className='text-muted-foreground'
+                  title={capabilities
+                    .slice(4)
+                    .map((capability) => getCapabilityLabel(t, capability))
+                    .join(', ')}
+                >
+                  +{capabilities.length - 4}
+                </span>
+              )}
+              {contextLabel && (
+                <span
+                  className='text-muted-foreground ml-auto shrink-0'
+                  title={t('Context Length')}
+                >
+                  {t('Context')} {contextLabel}
                 </span>
               )}
             </div>

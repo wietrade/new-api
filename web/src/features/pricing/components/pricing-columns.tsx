@@ -28,7 +28,8 @@ import { GroupBadge } from '@/components/group-badge'
 import { StatusBadge } from '@/components/status-badge'
 import { getLobeIcon } from '@/lib/lobe-icon'
 
-import { parseTags } from '../lib/filters'
+import { formatContextLength, getCapabilityLabel } from '../constants'
+import { getModelCapabilities } from '../lib/filters'
 import type { PricingModel } from '../types'
 import { CachedPriceCell } from './cached-price-cell'
 import { ModelBillingModeBadge } from './model-billing-mode-badge'
@@ -134,27 +135,41 @@ export function usePricingColumns(
       enableSorting: false,
     },
 
-    // Tags column
+    // Capabilities column (structured catalog data, not free-form tags)
     {
-      accessorKey: 'tags',
-      header: t('Tags'),
+      accessorKey: 'capabilities',
+      header: t('Model Capabilities'),
       cell: ({ row }) => {
-        const tags = parseTags(row.original.tags)
+        const capabilities = getModelCapabilities(row.original)
+        const contextLabel = formatContextLength(row.original.context_length)
         return (
           <BadgeListCell
-            items={tags.map((tag) => (
-              <StatusBadge
-                key={tag}
-                label={tag}
-                autoColor={tag}
-                size='sm'
-                copyable={false}
-              />
-            ))}
+            items={[
+              ...capabilities.map((capability) => (
+                <StatusBadge
+                  key={capability}
+                  label={getCapabilityLabel(t, capability)}
+                  autoColor={capability}
+                  size='sm'
+                  copyable={false}
+                />
+              )),
+              ...(contextLabel
+                ? [
+                    <StatusBadge
+                      key='context-length'
+                      label={contextLabel}
+                      autoColor='context'
+                      size='sm'
+                      copyable={false}
+                    />,
+                  ]
+                : []),
+            ]}
           />
         )
       },
-      size: 140,
+      size: 180,
       enableSorting: false,
     },
 

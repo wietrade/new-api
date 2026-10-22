@@ -255,23 +255,24 @@ describe('model cards', () => {
     expect(within(idle).getByText('—t/s')).toBeVisible()
   })
 
-  it('keeps group, endpoint and tag overflow counts with their own metadata', () => {
+  it('keeps group, endpoint and capability overflow counts with their own metadata', () => {
     const groups = ['default-with-a-long-group-name', 'premium', 'internal']
     const endpoints = ['openai-response', 'openai', 'claude', 'gemini', 'jina']
-    const tags = [
-      'video-generation',
-      'high-resolution',
-      'fast',
-      'batch',
-      'hd',
-      'pro',
+    const capabilities = [
+      'chat',
+      'reasoning',
+      'tools',
+      'vision',
+      'files',
+      'rerank',
     ]
     render(
       <ModelCard
         model={pricingModel({
           enable_groups: groups,
           supported_endpoint_types: endpoints,
-          tags: tags.join(','),
+          capabilities,
+          context_length: 1_100_000,
         })}
         onClick={vi.fn()}
       />
@@ -282,7 +283,9 @@ describe('model cards', () => {
     if (!groupField || !endpointField) {
       throw new Error('Expected labeled group and endpoint fields')
     }
-    const tagField = screen.getByRole('group', { name: 'Tags' })
+    const capabilityField = screen.getByRole('group', {
+      name: 'Model Capabilities',
+    })
     expect(within(groupField).getByText(groups[0])).toBeVisible()
     expect(within(groupField).getByText('+2')).toHaveAttribute(
       'title',
@@ -292,10 +295,13 @@ describe('model cards', () => {
       within(endpointField).getByText('openai-response, openai')
     ).toHaveAttribute('title', endpoints.join(', '))
     expect(within(endpointField).getByText('+3')).toBeVisible()
-    expect(
-      within(tagField).getByText('video-generation, high-resolution')
-    ).toHaveAttribute('title', tags.join(', '))
-    expect(within(tagField).getByText('+4')).toBeVisible()
+    expect(within(capabilityField).getByText('Chat')).toBeVisible()
+    expect(within(capabilityField).getByText('Vision')).toBeVisible()
+    expect(within(capabilityField).getByText('+2')).toHaveAttribute(
+      'title',
+      'Files, Rerank'
+    )
+    expect(within(capabilityField).getByText('Context 1.1M')).toBeVisible()
     expect(
       within(screen.getByRole('group', { name: 'Pricing' })).getByText(
         'Token-based'
@@ -303,7 +309,7 @@ describe('model cards', () => {
     ).toBeVisible()
   })
 
-  it('omits metadata fields when the model has no groups, endpoints or tags', () => {
+  it('omits metadata fields when the model has no groups, endpoints or capabilities', () => {
     render(
       <ModelCard
         model={pricingModel({ enable_groups: [] })}
@@ -313,7 +319,7 @@ describe('model cards', () => {
     expect(screen.queryByText('Groups')).not.toBeInTheDocument()
     expect(screen.queryByText('Endpoints')).not.toBeInTheDocument()
     expect(
-      screen.queryByRole('group', { name: 'Tags' })
+      screen.queryByRole('group', { name: 'Model Capabilities' })
     ).not.toBeInTheDocument()
   })
 

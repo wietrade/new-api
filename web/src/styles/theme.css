@@ -61,6 +61,8 @@ For commercial licensing, please contact support@quantumnous.com
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  /* 动态计费标签专用色（模型广场） */
+  --color-dynamic-billing: #3fb950;
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-neutral: var(--neutral);

@@ -60,14 +60,17 @@ type upstreamEnvelope[T any] struct {
 }
 
 type upstreamModel struct {
-	Description string          `json:"description"`
-	Endpoints   json.RawMessage `json:"endpoints"`
-	Icon        string          `json:"icon"`
-	ModelName   string          `json:"model_name"`
-	NameRule    int             `json:"name_rule"`
-	Status      int             `json:"status"`
-	Tags        string          `json:"tags"`
-	VendorName  string          `json:"vendor_name"`
+	Capabilities    []string        `json:"capabilities"`
+	ContextLength   int             `json:"context_length"`
+	Description     string          `json:"description"`
+	Endpoints       json.RawMessage `json:"endpoints"`
+	Icon            string          `json:"icon"`
+	MaxOutputTokens int             `json:"max_output_tokens"`
+	ModelName       string          `json:"model_name"`
+	NameRule        int             `json:"name_rule"`
+	Status          int             `json:"status"`
+	Tags            string          `json:"tags"`
+	VendorName      string          `json:"vendor_name"`
 }
 
 type upstreamVendor struct {
@@ -92,6 +95,9 @@ func newHTTPClient() *http.Client {
 		TLSHandshakeTimeout:   time.Duration(timeoutSec) * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		ResponseHeaderTimeout: time.Duration(timeoutSec) * time.Second,
+		// Honor HTTP(S)_PROXY: a bare Transport has Proxy == nil, which disables
+		// proxying entirely and breaks hosts whose DNS is filtered.
+		Proxy: http.ProxyFromEnvironment,
 	}
 	if common.TLSInsecureSkipVerify {
 		transport.TLSClientConfig = common.InsecureTLSConfig.Clone()
@@ -297,7 +303,18 @@ func fetchMetadataCatalog(c *gin.Context, locale string) (metadataSyncSource, ma
 				endpoints = string(item.Endpoints)
 			}
 		}
-		values := model.MetadataValues{Description: item.Description, Icon: item.Icon, Tags: item.Tags, Vendor: strings.TrimSpace(item.VendorName), Endpoints: endpoints, NameRule: item.NameRule, Status: item.Status}
+		values := model.MetadataValues{
+			Description:     item.Description,
+			Icon:            item.Icon,
+			Tags:            item.Tags,
+			Capabilities:    strings.Join(model.NormalizeCapabilities(item.Capabilities), ","),
+			ContextLength:   item.ContextLength,
+			MaxOutputTokens: item.MaxOutputTokens,
+			Vendor:          strings.TrimSpace(item.VendorName),
+			Endpoints:       endpoints,
+			NameRule:        item.NameRule,
+			Status:          item.Status,
+		}
 		if err := model.ValidateMetadataValues(values); err != nil {
 			return source, nil, nil, fmt.Errorf("model %s: %w", item.ModelName, err)
 		}
@@ -387,7 +404,17 @@ func SyncUpstreamPreview(c *gin.Context) {
 		localValues := model.MetadataValues{}
 		if local != nil {
 			candidate.Kind = "update"
-			localValues = model.MetadataValues{Description: local.Description, Icon: local.Icon, Tags: local.Tags, Endpoints: local.Endpoints, NameRule: local.NameRule, Status: local.Status}
+			localValues = model.MetadataValues{
+				Description:     local.Description,
+				Icon:            local.Icon,
+				Tags:            local.Tags,
+				Capabilities:    local.Capabilities,
+				ContextLength:   local.ContextLength,
+				MaxOutputTokens: local.MaxOutputTokens,
+				Endpoints:       local.Endpoints,
+				NameRule:        local.NameRule,
+				Status:          local.Status,
+			}
 			if localVendor != nil {
 				localValues.Vendor = localVendor.Name
 			}
