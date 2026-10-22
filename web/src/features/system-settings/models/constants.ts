@@ -32,7 +32,7 @@ export const DEFAULT_ENDPOINT = '/api/pricing'
 // ---------------------------------------------------------------------------
 
 export const OFFICIAL_CHANNEL_ID = -100
-export const OFFICIAL_CHANNEL_NAME = '官方倍率预设'
+export const OFFICIAL_CHANNEL_NAME = '上游倍率预设'
 export const OFFICIAL_CHANNEL_BASE_URL = 'https://basellm.github.io'
 export const OFFICIAL_CHANNEL_ENDPOINT =
   '/llm-metadata/api/newapi/ratio_config-v1-base.json'

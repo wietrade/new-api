@@ -29,8 +29,10 @@ import sys
 if __package__ in (None, ""):  # allow `python3 scripts/model_sync/sync_models.py`
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from model_sync import merge, sources  # type: ignore
+    from model_sync.normalize import normalize_key  # type: ignore
 else:
     from . import merge, sources
+    from .normalize import normalize_key
 
 DEFAULT_VENDORS = ("anthropic", "openai")
 DEFAULT_SOURCES = ("models.dev", "openrouter")
@@ -99,6 +101,11 @@ def parse_args(argv):
         help="create models that are not in models.json yet",
     )
     parser.add_argument(
+        "--allow-new-models",
+        default="",
+        help="with --allow-new: comma separated allowlist of model names to create",
+    )
+    parser.add_argument(
         "--min-release-date",
         default="",
         help="with --allow-new, ignore models released before this YYYY-MM-DD",
@@ -144,9 +151,13 @@ def main(argv=None):
         return 2
 
     index, duplicates = merge.index_incoming(incoming)
+    conflicts = merge.detect_conflicts(index)
+    skip_fields = {(item["key"], item["field"]) for item in conflicts}
 
     models_envelope, models = load_envelope(models_path)
     vendors_envelope, vendor_records = load_envelope(vendors_path)
+    models_before = list(models)
+    source_keys = set(index)
 
     pending = []
 
@@ -156,6 +167,13 @@ def main(argv=None):
             index,
             allow_new=args.allow_new,
             min_release_date=args.min_release_date,
+            allowed_new={
+                item.strip()
+                for item in args.allow_new_models.split(",")
+                if item.strip()
+            }
+            or None,
+            skip_fields=skip_fields,
         )
         vendor_added = merge.ensure_vendors(vendor_records, models)
 
@@ -173,12 +191,17 @@ def main(argv=None):
             pending.append((path, text))
 
         if not args.quiet:
+            matched = sum(
+                1
+                for record in models_before
+                if normalize_key(str(record.get("model_name", ""))) in source_keys
+            )
             print("sources: %s" % ", ".join("%s=%d" % kv for kv in stats.items()))
             print(
-                "models: %d existing, %d matched, %d added, %d ambiguous, %d missing"
+                "models: %d in file, %d matched to sources, %d added, %d ambiguous, %d without source"
                 % (
-                    len(models) - len(added),
-                    len(index) - duplicates,
+                    len(models_before),
+                    matched,
                     len(added),
                     len(ambiguous),
                     len(missing),
@@ -201,6 +224,15 @@ def main(argv=None):
                         json.dumps(change["from"], ensure_ascii=False),
                         json.dumps(change["to"], ensure_ascii=False),
                     )
+                )
+            for conflict in conflicts:
+                values = ", ".join(
+                    "%s (%s)" % (value, "/".join(names))
+                    for value, names in sorted(conflict["values"].items())
+                )
+                print(
+                    "  ! conflict %s.%s: %s"
+                    % (conflict["key"], conflict["field"], values)
                 )
 
     if args.only in ("pricing", "all"):

@@ -45,18 +45,73 @@ DEFAULT_MODEL = {
 
 
 def index_incoming(incoming):
-    """First source wins for duplicate normalized keys."""
+    """Group sources by normalized key, in source-priority order.
+
+    Multiple entries for one key are kept (models.dev and openrouter disagree
+    often enough that dropping them would hide real conflicts).
+    """
     index = {}
     duplicates = 0
     for model in incoming:
         key = model.key
         if not key:
             continue
-        if key in index:
+        bucket = index.setdefault(key, [])
+        if bucket:
             duplicates += 1
-            continue
-        index[key] = model
+        bucket.append(model)
     return index, duplicates
+
+
+def pick_incoming(candidates, model_name):
+    """Choose the candidate that best matches a concrete model name.
+
+    1. identical model name (``gpt-5.6-sol`` == ``gpt-5.6-sol``)
+    2. source id ending with the name (``anthropic/claude-haiku-4-5``)
+    3. highest-priority source (first in ``--sources`` order)
+    """
+    if not candidates:
+        return None
+    for candidate in candidates:
+        if candidate.model_name == model_name:
+            return candidate
+    for candidate in candidates:
+        if candidate.source_id.endswith("/" + model_name) or candidate.source_id == model_name:
+            return candidate
+    return candidates[0]
+
+
+CONFLICT_FIELDS = ("context_length", "max_output_tokens")
+
+
+def detect_conflicts(index):
+    """Report keys where sources disagree on a factual field.
+
+    Silent "first source wins" is how a 1.05M context window becomes 1.31M
+    in production, so disagreements are surfaced explicitly.
+    """
+    conflicts = []
+    for key, candidates in index.items():
+        if len(candidates) < 2:
+            continue
+        for field in CONFLICT_FIELDS:
+            values = {}
+            for candidate in candidates:
+                value = int(getattr(candidate, field) or 0)
+                if value > 0:
+                    values.setdefault(value, []).append(candidate.source)
+            if len(values) > 1:
+                conflicts.append(
+                    {
+                        "key": key,
+                        "field": field,
+                        "values": {
+                            value: sorted(set(sources))
+                            for value, sources in values.items()
+                        },
+                    }
+                )
+    return conflicts
 
 
 def _incoming_values(model):
@@ -71,9 +126,10 @@ def _incoming_values(model):
     }
 
 
-def _new_record(model):
+def _new_record(model, name=None, skip=None):
+    skip = skip or set()
     record = {
-        "model_name": model.model_name,
+        "model_name": name or model.model_name,
         "vendor_name": model.vendor_name,
         "description": model.description or "",
         "icon": model.icon or "",
@@ -83,18 +139,29 @@ def _new_record(model):
         "capabilities": list(model.capabilities or []),
         "input_modalities": list(model.input_modalities or []),
         "output_modalities": list(model.output_modalities or []),
-        "context_length": int(model.context_length or 0),
-        "max_output_tokens": int(model.max_output_tokens or 0),
+        "context_length": 0 if (model.key, "context_length") in skip
+        else int(model.context_length or 0),
+        "max_output_tokens": 0 if (model.key, "max_output_tokens") in skip
+        else int(model.max_output_tokens or 0),
         "is_free": bool(model.is_free),
         "endpoints": None,
     }
     return record
 
 
-def _refresh(record, model, changes):
-    """Apply factual fields, ignoring empty/unknown source values."""
+def _refresh(record, model, changes, skip=None, skipped=None):
+    """Apply factual fields, ignoring empty/unknown source values.
+
+    Fields listed in ``skip`` (source disagreement) are left untouched: a
+    guessed context window is worse than an unknown one.
+    """
+    skip = skip or set()
     values = _incoming_values(model)
     for field in FACTUAL_FIELDS:
+        if (model.key, field) in skip:
+            if skipped is not None and record.get(field) is not None:
+                skipped.append({"model": record.get("model_name", ""), "field": field})
+            continue
         new = values[field]
         old = record.get(field)
 
@@ -120,42 +187,62 @@ def _refresh(record, model, changes):
             record[field] = new
 
 
-def merge_metadata(existing, index, allow_new=False, min_release_date=""):
-    """Return (records, changes, added, ambiguous, missing)."""
+def merge_metadata(existing, index, allow_new=False, min_release_date="",
+                   allowed_new=None, skip_fields=None):
+    """Return (records, changes, added, ambiguous, missing).
+
+    ``allowed_new`` restricts creation to an explicit set of model names, so
+    补全 can be reviewed model by model instead of trusting every aggregator row.
+    ``skip_fields`` is a set of ``(normalized_key, field)`` that sources
+    disagree on; those fields are never written.
+    """
     changes = []
     added = []
     ambiguous = []
     matched_keys = set()
+    skip_fields = set(skip_fields or ())
 
     # exact names first, then normalized keys (only when unambiguous)
     by_name = {str(item.get("model_name", "")): item for item in existing}
-    by_key = {}
-    for item in existing:
-        by_key.setdefault(normalize_key(str(item.get("model_name", ""))), []).append(item)
 
     for record in existing:
         name = str(record.get("model_name", ""))
-        model = index.get(normalize_key(name))
-        if model is not None:
-            candidates = by_key.get(model.key) or []
-            if len(candidates) > 1 and name != model.model_name:
-                ambiguous.append(name)
-                continue
-            matched_keys.add(model.key)
-            _refresh(record, model, changes)
+        candidates = index.get(normalize_key(name)) or []
+        if not candidates:
+            continue
+        model = pick_incoming(candidates, name)
+        ambiguous_names = {c.model_name for c in candidates}
+        if len(ambiguous_names) > 1 and model.model_name != name:
+            ambiguous.append(name)
+            continue
+        matched_keys.add(model.key)
+        _refresh(record, model, changes, skip=skip_fields)
 
     if allow_new:
-        for key, model in sorted(
-            index.items(), key=lambda item: (item[1].vendor_name, item[1].model_name)
+        pending = {
+            normalize_key(name): name for name in (allowed_new or ()) if name
+        }
+        existing_names = {str(item.get("model_name", "")) for item in existing}
+        for key, candidates in sorted(
+            index.items(),
+            key=lambda item: (item[1][0].vendor_name, item[1][0].model_name),
         ):
-            if key in matched_keys:
+            desired = pending.get(key) if pending else None
+            if pending and desired is None:
                 continue
+            if desired is not None and desired in existing_names:
+                continue
+            if key in matched_keys and desired is None:
+                continue
+            model = pick_incoming(candidates, desired or "")
             if min_release_date and (model.release_date or "") < min_release_date:
                 continue
-            if not model.model_name:
+            name = desired or model.model_name
+            if not name:
                 continue
-            existing.append(_new_record(model))
-            added.append(model.model_name)
+            existing.append(_new_record(model, name, skip_fields))
+            existing_names.add(name)
+            added.append(name)
             matched_keys.add(key)
 
     missing = sorted(
@@ -175,7 +262,8 @@ def price_records(existing, index):
         key = normalize_key(name)
         if key in seen:
             continue
-        model = index.get(key)
+        candidates = index.get(key) or []
+        model = pick_incoming(candidates, name)
         if model is None or not model.price:
             continue
         seen.add(key)

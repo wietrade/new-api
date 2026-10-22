@@ -4051,7 +4051,7 @@
     "Official Repository": "官方仓库",
     "Official Sync": "官方同步",
     "Official documentation": "官方说明",
-    "Official pricing preset": "官方定价预设",
+    "Official pricing preset": "上游倍率预设（basellm）",
     "OhMyGPT": "OhMyGPT",
     "Old Format Template": "旧格式模板",
     "Old format: Direct override. New format: Supports conditional judgment and custom JSON operations.": "旧格式：直接覆盖。新格式：支持条件判断和自定义 JSON 操作。",

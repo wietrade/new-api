@@ -29,6 +29,13 @@ python3 scripts/model_sync/sync_models.py --only pricing
 # 允许新增最近发布的模型（避免把厂商历史模型全量灌进广场）
 python3 scripts/model_sync/sync_models.py --allow-new --min-release-date 2026-01-01
 
+# 只新增指定模型（推荐：逐个确认，可控补全）
+python3 scripts/model_sync/sync_models.py --allow-new \
+  --allow-new-models claude-haiku-4-5,glm-5,gpt-5.4
+
+# 冲突/变动预览（不写文件，列出血缘冲突）
+python3 scripts/model_sync/sync_models.py --dry-run
+
 # 同时查询厂商官方 API（存在对应环境变量才生效）
 OPENAI_API_KEY=... ANTHROPIC_API_KEY=... GEMINI_API_KEY=... \
   python3 scripts/model_sync/sync_models.py --official
@@ -68,18 +75,22 @@ python3 -m unittest discover -s scripts/model_sync/tests -t . -v
 模型名归一化：去掉 vendor 前缀、`:free`/`:nitro`、`-latest`、日期后缀，
 `.` 与 `_` 统一成 `-` ⇒ `claude-haiku-4-5-20251001` ≡ `anthropic/claude-haiku-4.5`。
 
-## 与后台「上游价格同步」的关系
+## 数据正确性保障
 
-new-api 后台已经内置两个可直接写库的换算源（虚拟渠道）：
+1. **多个候选时精确优先**：同一 key 命中多条源记录时，先选 `model_name` 完全相同者，
+   再选 `source_id` 以该名结尾者，最后才按 `--sources` 优先级取第一条。
+2. **冲突字段不写入**：源之间对 `context_length` / `max_output_tokens` 数值不一致时，
+   该字段保持原值（新模型则为 0 = 未知），并在输出里以 `! conflict` 列出。
+   宁可缺值，也不写入猜测值。
+3. **空值不覆盖**：源里为 `0`/空数组的字段不会清空本地已有值。
+4. **新增模型可控**：`--allow-new-models` 按名字白名单创建；
+   当源里的 canonical slug 与站内名称不同时（`glm-5-20260211` → `glm-5`），
+   以白名单里的名字为准。
+5. **描述需人工本地化**：新模型会继承源的英文 `description`，建议提交前改成中文（脚本不会覆写已有描述）。
+6. **`tags` 永远属于本地**，脚本不写入、不覆盖。
 
-| 虚拟渠道 | ID | 数据 | 语义 |
-|:---|:---|:---|:---|
-| 官方定价预设 | -100 | `basellm.github.io/llm-metadata/api/newapi/ratio_config-v1-base.json` | 上游项目维护的倍率配置，已是 new-api 倍率语义 |
-| models.dev 定价预设 | -101 | `https://models.dev/api.json` | 第三方聚合价，后台换算成倍率 |
-
-二者都能直接改库，所以**本脚本的 `pricing.json` 只是 Git 里的价格快照**，
-用于 review 涨跌与追溯（后台预设是实时拉取，没有历史），不参与任何自动写库，
-避免出现第三个价格来源。
+已知、暂不自动填充的冲突（保持 0 = 未知，需要人工核对官方文档）：
+`gemini-3-pro-image(.preview)` 的上下文、`kimi-k3` / `deepseek-v4-pro` / `gemini-3.1-flash-image-preview` 的最大输出。
 
 ## GitHub Actions
 

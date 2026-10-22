@@ -4260,7 +4260,7 @@
     "Official OpenAI Embeddings": "Официальные OpenAI Embeddings",
     "Official OpenAI Images": "Официальные OpenAI Images",
     "Official OpenAI Responses": "Официальный OpenAI Responses",
-    "Official pricing preset": "Официальный набор цен",
+    "Official pricing preset": "Пресет коэффициентов апстрима (basellm)",
     "Official Repository": "Официальный репозиторий",
     "Official Sync": "Официальная синхронизация",
     "OhMyGPT": "OhMyGPT",

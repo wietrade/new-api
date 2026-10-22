@@ -35,7 +35,7 @@ const (
 	maxRatioConfigBytes         = 10 << 20 // 10MB
 	floatEpsilon                = 1e-9
 	officialRatioPresetID       = -100
-	officialRatioPresetName     = "官方倍率预设"
+	officialRatioPresetName     = "上游倍率预设"
 	officialRatioPresetBaseURL  = "https://basellm.github.io"
 	modelsDevPresetID           = -101
 	modelsDevPresetName         = "models.dev 价格预设"

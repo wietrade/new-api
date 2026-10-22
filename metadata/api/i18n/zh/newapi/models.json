@@ -23,7 +23,7 @@
         "text"
       ],
       "context_length": 1000000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -48,7 +48,7 @@
         "text"
       ],
       "context_length": 1000000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -73,7 +73,7 @@
         "text"
       ],
       "context_length": 200000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 64000,
       "is_free": false,
       "endpoints": null
     },
@@ -98,7 +98,7 @@
         "text"
       ],
       "context_length": 1000000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -123,7 +123,7 @@
         "text"
       ],
       "context_length": 1000000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -148,7 +148,7 @@
         "text"
       ],
       "context_length": 1000000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -173,7 +173,7 @@
         "text"
       ],
       "context_length": 1000000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -198,7 +198,7 @@
         "text"
       ],
       "context_length": 1000000,
-      "max_output_tokens": 0,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -222,8 +222,8 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1100000,
-      "max_output_tokens": 0,
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -247,8 +247,8 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1100000,
-      "max_output_tokens": 0,
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -272,8 +272,8 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1100000,
-      "max_output_tokens": 0,
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },
@@ -297,7 +297,324 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1100000,
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "chatgpt-image-latest",
+      "vendor_name": "OpenAI",
+      "description": "GPT 图像模型，面向提示词生成、编辑与视觉设计流程",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-5.4",
+      "vendor_name": "OpenAI",
+      "description": "面向编程与计算机操作的 GPT 模型，成本更低",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-5.5",
+      "vendor_name": "OpenAI",
+      "description": "默认前沿 GPT 模型，面向编程、计算机操作、研究与知识工作",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-5.6-luna",
+      "vendor_name": "OpenAI",
+      "description": "GPT-5.6 轻量档，面向高并发、低成本的快速任务",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-5.6-terra",
+      "vendor_name": "OpenAI",
+      "description": "GPT-5.6 均衡档，兼顾能力与成本的日常任务",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1050000,
+      "max_output_tokens": 128000,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-haiku-4-5",
+      "vendor_name": "Anthropic",
+      "description": "快速型 Claude 模型，面向轻量智能体、办公任务与即时对话",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 200000,
+      "max_output_tokens": 64000,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "glm-5",
+      "vendor_name": "Z.AI",
+      "description": "GLM-5 是 Z.AI 的旗舰开源基础模型，面向复杂系统设计与长程智能体工作流",
+      "icon": "ZAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 204800,
+      "max_output_tokens": 131072,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "deepseek-v4-pro",
+      "vendor_name": "DeepSeek",
+      "description": "DeepSeek V4 Pro 大规模混合专家模型，面向复杂推理与长程任务",
+      "icon": "DeepSeek.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gemini-3-pro-image",
+      "vendor_name": "Google",
+      "description": "Gemini 3 Pro 图像模型（Nano Banana Pro），面向高保真图像生成与编辑",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 32768,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gemini-3-pro-image-preview",
+      "vendor_name": "Google",
+      "description": "Gemini 3 Pro 图像模型预览版，面向高保真图像生成与编辑",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 32768,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gemini-3.1-flash-image",
+      "vendor_name": "Google",
+      "description": "Gemini 3.1 Flash 图像模型，面向快速图像生成与编辑",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "video",
+        "file"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ],
+      "context_length": 131072,
+      "max_output_tokens": 32768,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gemini-3.1-flash-image-preview",
+      "vendor_name": "Google",
+      "description": "Gemini 3.1 Flash 图像模型预览版，面向快速图像生成与编辑",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ],
+      "context_length": 65536,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "kimi-k3",
+      "vendor_name": "Moonshot AI",
+      "description": "Kimi K3 多模态模型，1M 上下文，可切换推理强度",
+      "icon": "Moonshot",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
       "max_output_tokens": 0,
       "is_free": false,
       "endpoints": null

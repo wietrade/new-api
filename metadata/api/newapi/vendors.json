@@ -19,6 +19,30 @@
       "description": "本站自建上游",
       "icon": "",
       "status": 1
+    },
+    {
+      "name": "Z.AI",
+      "description": "",
+      "icon": "ZAI",
+      "status": 1
+    },
+    {
+      "name": "DeepSeek",
+      "description": "",
+      "icon": "DeepSeek.Color",
+      "status": 1
+    },
+    {
+      "name": "Google",
+      "description": "",
+      "icon": "Gemini.Color",
+      "status": 1
+    },
+    {
+      "name": "Moonshot AI",
+      "description": "",
+      "icon": "Moonshot",
+      "status": 1
     }
   ]
 }

@@ -162,6 +162,107 @@ class MergeTest(unittest.TestCase):
         self.assertEqual(rows[0]["input"], 1.0)
         self.assertNotIn("cache_write", rows[0])
 
+    def test_exact_name_wins_over_source_priority(self):
+        """ollama-hosted and official rows share a key; the exact id must win."""
+        index, _ = merge.index_incoming(
+            [
+                source("kimi-k3", source="openrouter", context_length=1048576),
+                source("kimi-k3", source="models.dev", context_length=131072),
+            ]
+        )
+        picked = merge.pick_incoming(index["kimi-k3"], "kimi-k3")
+        self.assertEqual(picked.context_length, 1048576)
+
+        prefixed = [
+            source("claude-haiku-4-5", source="openrouter"),
+            source("claude-haiku-4-5-20251001", source="models.dev"),
+        ]
+        picked = merge.pick_incoming(prefixed, "claude-haiku-4-5-20251001")
+        self.assertEqual(picked.model_name, "claude-haiku-4-5-20251001")
+
+    def test_conflicts_are_reported(self):
+        index, _ = merge.index_incoming(
+            [
+                source("gpt-6-sol", source="models.dev", context_length=1050000),
+                source("gpt-6-sol", source="openrouter", context_length=131072),
+            ]
+        )
+        conflicts = merge.detect_conflicts(index)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0]["key"], "gpt-6-sol")
+        self.assertEqual(conflicts[0]["field"], "context_length")
+        self.assertEqual(
+            conflicts[0]["values"],
+            {1050000: ["models.dev"], 131072: ["openrouter"]},
+        )
+
+    def test_allow_new_allowlist(self):
+        index, _ = merge.index_incoming(
+            [source("gpt-5-4"), source("gpt-5-5")]
+        )
+        records, _, added, *_ = merge.merge_metadata(
+            [], index, allow_new=True, allowed_new={"gpt-5-5"}
+        )
+        self.assertEqual(added, ["gpt-5-5"])
+        self.assertEqual([r["model_name"] for r in records], ["gpt-5-5"])
+
+    def test_allowlist_overrides_source_slug(self):
+        """openrouter reports glm-5-20260211; the site calls it glm-5."""
+        index, _ = merge.index_incoming([source("glm-5-20260211", context_length=204800)])
+        records, _, added, *_ = merge.merge_metadata(
+            [], index, allow_new=True, allowed_new={"glm-5"}
+        )
+        self.assertEqual(added, ["glm-5"])
+        self.assertEqual(records[0]["model_name"], "glm-5")
+        self.assertEqual(records[0]["context_length"], 204800)
+
+    def test_alias_can_be_added_even_when_key_is_matched(self):
+        """claude-haiku-4-5 and claude-haiku-4-5-20251001 are separate site rows."""
+        index, _ = merge.index_incoming([source("claude-haiku-4-5")])
+        records, _, added, *_ = merge.merge_metadata(
+            list(self.existing), index, allow_new=True, allowed_new={"claude-haiku-4-5"}
+        )
+        self.assertEqual(added, ["claude-haiku-4-5"])
+        self.assertEqual(len(records), 2)
+
+    def test_conflicted_fields_stay_unknown(self):
+        """gemini image models disagree on context; max output agrees."""
+        index, _ = merge.index_incoming(
+            [
+                source("gemini-3-pro-image", source="models.dev",
+                       context_length=65536, max_output_tokens=32768),
+                source("gemini-3-pro-image", source="openrouter",
+                       context_length=131072, max_output_tokens=32768),
+            ]
+        )
+        skip = {(c["key"], c["field"]) for c in merge.detect_conflicts(index)}
+        records, *_ = merge.merge_metadata(
+            [],
+            index,
+            allow_new=True,
+            allowed_new={"gemini-3-pro-image"},
+            skip_fields=skip,
+        )
+        self.assertEqual(records[0]["context_length"], 0)
+        self.assertEqual(records[0]["max_output_tokens"], 32768)
+
+    def test_conflicted_field_is_not_overwritten_on_existing(self):
+        self.existing[0]["context_length"] = 200000
+        index, _ = merge.index_incoming(
+            [
+                source("claude-haiku-4-5", source="models.dev", context_length=1000),
+                source("claude-haiku-4-5", source="openrouter", context_length=2000),
+            ]
+        )
+        skip = {(c["key"], c["field"]) for c in merge.detect_conflicts(index)}
+        records, changes, *_ = merge.merge_metadata(
+            self.existing, index, skip_fields=skip
+        )
+        self.assertEqual(records[0]["context_length"], 200000)
+        self.assertEqual(
+            [change for change in changes if change["field"] == "context_length"], []
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

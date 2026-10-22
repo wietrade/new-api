@@ -64,17 +64,13 @@ type ChannelSelectorDialogProps = {
 
 // Synthesized presets from `controller/ratio_sync.go` always carry stable
 // negative IDs, so matching by ID alone is reliable and self-documenting.
-// Both are built in, but only the upstream ratio_config preset is "official";
-// models.dev is a third-party aggregator and must not carry the same badge
-// (it used to render two indistinguishable "Official" rows).
+// Neither preset is a vendor price list: basellm publishes new-api ratios and
+// models.dev is a third-party aggregate. They are badged "Built-in" only, so
+// "official" stays reserved for vendor list prices (OpenAI/Anthropic/etc.).
 function isBuiltinPreset(channel: UpstreamChannel): boolean {
   return (
     channel.id === OFFICIAL_CHANNEL_ID || channel.id === MODELS_DEV_PRESET_ID
   )
-}
-
-function isOfficialChannel(channel: UpstreamChannel): boolean {
-  return channel.id === OFFICIAL_CHANNEL_ID
 }
 
 export function ChannelSelectorDialog({
@@ -161,14 +157,14 @@ export function ChannelSelectorDialog({
         cell: ({ row }) => {
           const name = getUpstreamDisplayName(row.getValue('name') as string, t)
           const channel = row.original
-          const isOfficial = isOfficialChannel(channel)
+          const isBuiltin = isBuiltinPreset(channel)
 
           return (
             <div className='flex items-center gap-2'>
               <span className='font-medium'>{name}</span>
-              {isOfficial && (
+              {isBuiltin && (
                 <StatusBadge
-                  label={t('Official')}
+                  label={t('Built-in')}
                   variant='success'
                   size='sm'
                   copyable={false}
