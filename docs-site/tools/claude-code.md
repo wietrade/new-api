@@ -39,5 +39,5 @@ claude -p "只回复 OK"
 | 回复质量像别家 | 模型被映射到了其他上游，用 `/status` 确认实际模型 |
 
 ::: tip 与 cc-switch 之类工具共存
-这类工具会**改写** `~/.claude/settings.json`。要么只用它管配置，要么只用文件配置，别两边同时改。
+这类工具会**改写** `~/.claude/settings.json`。要么只用它管配置，要么只用文件配置，别两边同时改。具体配置见 [cc-switch](/tools/cc-switch)。
 :::

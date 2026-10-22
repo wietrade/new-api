@@ -32,6 +32,7 @@
 | [Windsurf](/tools/ide#windsurf) | AI IDE | Windows / macOS / Linux | OpenAI |
 | [Trae](/tools/ide#trae) | AI IDE | Windows / macOS | OpenAI |
 | [Claude Code](/tools/claude-code) | 终端编程助手 | CLI | Anthropic |
+| [cc-switch](/tools/cc-switch) | 配置切换 / 本地代理 | 桌面（托盘） | Anthropic + OpenAI |
 | [Codex CLI](/tools/codex-cli) | 终端编程助手 | CLI | Responses |
 | [Gemini CLI](/tools/cli#gemini-cli) | 终端编程助手 | CLI | Gemini |
 | [Aider](/tools/cli#aider) | 终端编程助手 | CLI | OpenAI |

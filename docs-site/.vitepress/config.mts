@@ -74,6 +74,7 @@ export default defineConfig({
           { text: '终端 CLI', link: '/tools/cli' },
           { text: 'OpenCode', link: '/tools/opencode' },
           { text: 'Claude Code', link: '/tools/claude-code' },
+          { text: 'cc-switch（多配置切换）', link: '/tools/cc-switch' },
           { text: 'Codex CLI', link: '/tools/codex-cli' },
           { text: 'LangChain', link: '/tools/langchain' },
         ],

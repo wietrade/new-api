@@ -76,9 +76,41 @@ Continue 用配置文件，支持 VS Code 与 JetBrains。
 
 ## Kilo Code
 
-1. 设置 → API Provider → `OpenAI Compatible`
-2. Base URL `https://api.nowhub.org/v1`，填 Key 与 Model ID
-3. 其余（自动批准、上下文长度）按需调整
+Kilo Code 是 Roo Code 的分支，主打开箱即用的多种模式（Architect / Coder / Debugger / 自定义编排）、内置 MCP 与更细的任务审批，同样跑在 VS Code 里。
+
+### 配置
+
+1. 安装扩展 **Kilo Code**
+2. 打开设置（齿轮）→ **API Provider** 选 `OpenAI Compatible`
+3. 填写：
+   - **Base URL**：`https://api.nowhub.org/v1`
+   - **API Key**：你的令牌
+   - **Model**：点下拉会自动请求 `/v1/models`；拉不到就手动填模型 ID
+4. 建议同时填这两个字段，否则大文件会提前被截断：
+   - **Context Window**：模型详情页里的上下文长度（`1M` 就填 `1048576`）
+   - **Max Output Tokens**：按模型能力填，不确定就留空
+5. 保存后新建任务，随便问一句验证
+
+### 和 Cline / Roo Code 的差别
+
+| 项目 | Kilo Code | Cline | Roo Code |
+| --- | --- | --- | --- |
+| 模式 | 内置多种 + 自定义编排 | 单一流程 | 内置多种 |
+| MCP | 内置管理面板 | 支持 | 支持 |
+| 审批粒度 | 按工具/命令逐项配置 | 相对简单 | 中等 |
+| 配置方式 | 图形化为主 | 图形化 | 图形化 + JSON |
+
+三者配置项完全一致：Base URL 带 `/v1`、Key、模型 ID。**选哪个主要看交互偏好**，模型侧不需要任何改动。
+
+### Kilo Code 常见问题
+
+| 现象 | 原因 |
+| --- | --- |
+| 报 `404` | Base URL 少了 `/v1`，或选了令牌不可用的模型 |
+| 报 `400 model not found` | 模型 ID 有空格或大小写不对，回模型广场复制 |
+| 上下文只有 8K/32K | 没填 Context Window，扩展用了默认值 |
+| 能对话但不能改文件 | 模型不支持工具调用，换支持 tools 的模型 |
+| 一直等待无输出 | 上游超时或模型不支持流式，换模型或调小 max tokens |
 
 ## 通用排查
 

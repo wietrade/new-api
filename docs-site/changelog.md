@@ -31,6 +31,11 @@
 
 - 补充 VS Code 内置 BYOK 接入（Chat → Manage Models → OpenAI Compatible）
 
+## 2026-10-22（Kilo Code / cc-switch）
+
+- Kilo Code 扩写：完整配置、与 Cline/Roo Code 的差异对照、常见报错
+- 新增 cc-switch：多 provider 切换、直连与代理两种模式、六个坑
+
 ## 待补充
 
 - 图像 / 视频模型接入
