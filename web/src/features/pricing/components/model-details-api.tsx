@@ -46,6 +46,7 @@ import {
   formatRateLimit,
   type SupportedParameter,
 } from '../lib/mock-stats'
+import { getProtocolLabel } from '../constants'
 import { replaceModelInPath } from '../lib/model-helpers'
 import type { PricingModel } from '../types'
 
@@ -507,9 +508,10 @@ function CodeSamplesSection(props: {
                 <TabsTrigger
                   key={ep.type}
                   value={ep.type}
+                  title={ep.type}
                   className='h-7 px-2.5 text-xs'
                 >
-                  {ep.type}
+                  {getProtocolLabel(t, ep.type)}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -598,7 +600,7 @@ function SupportedParametersSection(props: { model: PricingModel }) {
             cell: (p) => (
               <Badge
                 variant='secondary'
-                className='h-7 rounded-full px-2.5 font-mono text-sm font-normal'
+                className='h-7 rounded-md px-2.5 font-mono text-sm font-normal'
               >
                 {p.type}
               </Badge>
@@ -782,8 +784,8 @@ function SectionTitle(props: {
 }) {
   const Icon = props.icon
   return (
-    <h3 className='text-foreground mb-3 flex items-center gap-1.5 text-sm font-semibold'>
-      <Icon className='text-muted-foreground/70 size-3.5' />
+    <h3 className='text-muted-foreground mb-3 flex items-center gap-1.5 text-xs font-semibold'>
+      <Icon className='size-3.5' />
       {props.children}
     </h3>
   )

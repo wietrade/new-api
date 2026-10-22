@@ -511,11 +511,24 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
   }
 
   if (endpoints.length > 0) {
+    const endpointLabels = endpoints.map((endpoint) =>
+      getProtocolLabel(t, endpoint)
+    )
     cells.push(
       <CatalogSpecRow key='endpoints' label={t('API Protocol')}>
-        <CatalogPillList
-          items={endpoints.map((endpoint) => getProtocolLabel(t, endpoint))}
-        />
+        <span className='flex min-w-0 flex-wrap items-baseline gap-1'>
+          <span title={endpointLabels.join(', ')}>
+            {endpointLabels.slice(0, 2).join(', ')}
+          </span>
+          {endpointLabels.length > 2 && (
+            <span
+              className='text-muted-foreground'
+              title={endpointLabels.slice(2).join(', ')}
+            >
+              +{endpointLabels.length - 2}
+            </span>
+          )}
+        </span>
       </CatalogSpecRow>
     )
   }
