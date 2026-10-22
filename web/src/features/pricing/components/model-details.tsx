@@ -474,17 +474,12 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const model = props.model
   const endpoints = normalizeCatalogItems(model.supported_endpoint_types)
+  // 能力来自官方元数据（同步时写入 capabilities）；标签是站点自定义，不参与同步。
   const capabilities = normalizeCatalogItems(model.capabilities)
   const capabilityLabels = capabilities.map((capability) =>
     t(CAPABILITY_LABEL_KEYS[capability as ModelCapability] ?? capability)
   )
-  // 标签与能力重复时只保留能力，避免同一信息出现两次
-  const visibleTags = parseTags(model.tags).filter(
-    (tag) =>
-      !capabilityLabels.some(
-        (label) => label.toLowerCase() === tag.toLowerCase()
-      )
-  )
+  const tags = parseTags(model.tags)
   const cells: React.ReactNode[] = []
 
   if (model.vendor_name) {
@@ -526,10 +521,10 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
     )
   }
 
-  if (visibleTags.length > 0) {
+  if (tags.length > 0) {
     cells.push(
       <CatalogSpecRow key='tags' label={t('Tags')}>
-        <CatalogPillList items={visibleTags} />
+        <CatalogPillList items={tags} />
       </CatalogSpecRow>
     )
   }

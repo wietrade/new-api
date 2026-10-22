@@ -37,7 +37,7 @@ func lockMetadataMutation(tx *gorm.DB) error {
 
 var ErrMetadataSyncConflict = errors.New("metadata changed; preview again before applying")
 
-var MetadataSyncFields = []string{"description", "icon", "tags", "capabilities", "input_modalities", "output_modalities", "context_length", "max_output_tokens", "is_free", "vendor", "endpoints", "name_rule", "status"}
+var MetadataSyncFields = []string{"description", "icon", "capabilities", "input_modalities", "output_modalities", "context_length", "max_output_tokens", "is_free", "vendor", "endpoints", "name_rule", "status"}
 
 // MetadataCapabilityVocabulary is the closed set of structured capability keys.
 // Keep it in sync with web/src/features/pricing/constants.ts (MODEL_CAPABILITIES).
@@ -54,6 +54,62 @@ var MetadataCapabilityVocabulary = map[string]bool{
 	"rerank":           true,
 	"web_search":       true,
 	"code_interpreter": true,
+}
+
+// upstreamTagCapabilities maps upstream metadata tags onto the closed
+// capability vocabulary. Size tags (200K / 1M) have no entry and are dropped.
+var upstreamTagCapabilities = map[string]string{
+	"推理":               "reasoning",
+	"reasoning":        "reasoning",
+	"thinking":         "reasoning",
+	"工具":               "tools",
+	"tools":            "tools",
+	"function calling": "tools",
+	"function_calling": "tools",
+	"文件":               "files",
+	"files":            "files",
+	"file":             "files",
+	"多模态":              "vision",
+	"视觉":               "vision",
+	"multimodal":       "vision",
+	"vision":           "vision",
+	"音频":               "audio",
+	"audio":            "audio",
+	"图片生成":             "image_generation",
+	"image generation": "image_generation",
+	"image_generation": "image_generation",
+	"视频":               "video_generation",
+	"video generation": "video_generation",
+	"video_generation": "video_generation",
+	"嵌入":               "embedding",
+	"embedding":        "embedding",
+	"embeddings":       "embedding",
+	"重排":               "rerank",
+	"rerank":           "rerank",
+	"联网":               "web_search",
+	"web search":       "web_search",
+	"web_search":       "web_search",
+	"代码解释器":            "code_interpreter",
+	"code interpreter": "code_interpreter",
+	"code_interpreter": "code_interpreter",
+	"对话":               "chat",
+	"chat":             "chat",
+}
+
+// CapabilitiesFromUpstreamTags converts upstream metadata tags into capability
+// keys. Unknown tags and context-size tags are ignored.
+func CapabilitiesFromUpstreamTags(raw string) []string {
+	out := make([]string, 0, 4)
+	seen := make(map[string]bool, 4)
+	for _, tag := range SplitMetadataList(raw) {
+		capability, ok := upstreamTagCapabilities[strings.ToLower(strings.TrimSpace(tag))]
+		if !ok || seen[capability] {
+			continue
+		}
+		seen[capability] = true
+		out = append(out, capability)
+	}
+	return out
 }
 
 // BoolToInt normalizes JSON boolean flags onto the 0/1 storage convention.

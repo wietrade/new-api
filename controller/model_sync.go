@@ -306,11 +306,17 @@ func fetchMetadataCatalog(c *gin.Context, locale string) (metadataSyncSource, ma
 				endpoints = string(item.Endpoints)
 			}
 		}
+		// Capabilities come from the official catalog: prefer an explicit
+		// capabilities list, otherwise derive them from the upstream tags.
+		// Local tags are site-defined and never overwritten by sync.
+		capabilities := model.NormalizeCapabilities(item.Capabilities)
+		if len(capabilities) == 0 {
+			capabilities = model.CapabilitiesFromUpstreamTags(item.Tags)
+		}
 		values := model.MetadataValues{
 			Description:      item.Description,
 			Icon:             item.Icon,
-			Tags:             item.Tags,
-			Capabilities:     strings.Join(model.NormalizeCapabilities(item.Capabilities), ","),
+			Capabilities:     strings.Join(capabilities, ","),
 			InputModalities:  strings.Join(model.NormalizeCapabilities(item.InputModalities), ","),
 			OutputModalities: strings.Join(model.NormalizeCapabilities(item.OutputModalities), ","),
 			ContextLength:    item.ContextLength,
