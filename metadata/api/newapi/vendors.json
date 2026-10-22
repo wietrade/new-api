@@ -1,0 +1,24 @@
+{
+  "success": true,
+  "message": "ok",
+  "data": [
+    {
+      "name": "Anthropic",
+      "description": "Claude 系列模型",
+      "icon": "Claude.Color",
+      "status": 1
+    },
+    {
+      "name": "OpenAI",
+      "description": "GPT 系列模型",
+      "icon": "OpenAI",
+      "status": 1
+    },
+    {
+      "name": "自建渠道",
+      "description": "本站自建上游",
+      "icon": "",
+      "status": 1
+    }
+  ]
+}
