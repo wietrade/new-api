@@ -945,7 +945,7 @@ function AutoGroupChain(props: { model: PricingModel; autoGroups: string[] }) {
       <span className='text-muted-foreground/40'>→</span>
       {autoChain.map((g, idx) => (
         <span key={g} className='flex items-center gap-1'>
-          <GroupBadge group={g} size='sm' />
+          <GroupBadge group={g} size='sm' className='text-dynamic-billing' />
           {idx < autoChain.length - 1 && (
             <span className='text-muted-foreground/40'>→</span>
           )}
@@ -1205,7 +1205,7 @@ function ProviderGroupPricingSection(
             return (
               <div key={group} className='overflow-hidden rounded-lg border'>
                 <div className='bg-muted/20 flex items-center justify-between gap-3 border-b px-3 py-2'>
-                  <GroupBadge group={group} size='sm' />
+                  <GroupBadge group={group} size='sm' className='text-dynamic-billing' />
                   <span className='text-muted-foreground font-mono text-xs'>
                     {ratio}x
                   </span>
@@ -1229,7 +1229,7 @@ function ProviderGroupPricingSection(
                               : t('Tier'),
                             className: thClass,
                             cellClassName:
-                              'text-muted-foreground py-2.5 whitespace-normal break-words',
+                              'text-dynamic-billing py-2.5 whitespace-normal break-words',
                             cell: (tier: DynamicPricingTier) => {
                               if ('unitPrices' in tier) {
                                 return (
@@ -1396,7 +1396,9 @@ function ProviderGroupPricingSection(
             header: t('Group'),
             className: thClass,
             cellClassName: 'py-2.5',
-            cell: (group) => <GroupBadge group={group} size='sm' />,
+            cell: (group) => (
+              <GroupBadge group={group} size='sm' className='text-dynamic-billing' />
+            ),
           },
           {
             id: 'ratio',
