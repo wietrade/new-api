@@ -127,7 +127,7 @@ function FilterChip(props: {
         <span className='shrink-0'>{props.option.icon}</span>
       )}
       <span className='truncate'>{props.option.label}</span>
-      {(props.option.suffix || props.option.count != null) && (
+      {props.option.suffix != null && (
         <span
           className={cn(
             'rounded-md px-1.5 py-0.5 text-[12px]',
@@ -136,7 +136,7 @@ function FilterChip(props: {
               : 'bg-muted text-muted-foreground'
           )}
         >
-          {props.option.suffix ?? props.option.count}
+          {props.option.suffix}
         </span>
       )}
     </Button>

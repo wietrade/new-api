@@ -66,49 +66,68 @@ function toolbarProps(): PricingToolbarProps {
   }
 }
 
+/** Filter chips are buttons with aria-pressed; section titles are not. */
+function chips(name: string | RegExp): HTMLElement[] {
+  return screen
+    .queryAllByRole('button', { name })
+    .filter((button) => button.hasAttribute('aria-pressed'))
+}
+
+function chip(name: string | RegExp): HTMLElement {
+  const matches = chips(name)
+  if (matches.length !== 1) {
+    throw new Error(`expected exactly one chip for ${name}, got ${matches.length}`)
+  }
+  return matches[0]
+}
+
+function sampleModels(): PricingModel[] {
+  const base: PricingModel = {
+    id: 1,
+    model_name: 'text-model',
+    vendor_name: 'Vendor A',
+    quota_type: 0,
+    model_ratio: 1,
+    completion_ratio: 1,
+    enable_groups: ['default'],
+    capabilities: ['reasoning', 'tools'],
+    input_modalities: ['text', 'image', 'file'],
+    output_modalities: ['text'],
+    context_length: 200_000,
+    is_free: false,
+    supported_endpoint_types: ['openai'],
+  }
+  return [
+    base,
+    {
+      ...base,
+      id: 2,
+      model_name: 'image-model',
+      quota_type: 1,
+      capabilities: ['tools'],
+      input_modalities: ['text'],
+      output_modalities: ['image'],
+      context_length: 1_000_000,
+      is_free: true,
+    },
+    {
+      ...base,
+      id: 3,
+      model_name: 'video-model',
+      vendor_name: 'Vendor B',
+      capabilities: [],
+      input_modalities: ['text', 'video'],
+      output_modalities: ['video'],
+      context_length: 20_000,
+      billing_usage_schema: { seconds: { type: 'number', unit: 'second' } },
+    },
+  ]
+}
+
 describe('pricing controls', () => {
-  it('derives model types, input types, context buckets and price tiers from structured data', () => {
+  it('renders filter options without model counts', () => {
     const props = toolbarProps()
-    const base: PricingModel = {
-      id: 1,
-      model_name: 'text-model',
-      vendor_name: 'Vendor A',
-      quota_type: 0,
-      model_ratio: 1,
-      completion_ratio: 1,
-      enable_groups: ['default'],
-      capabilities: ['reasoning', 'tools'],
-      input_modalities: ['text', 'image', 'file'],
-      output_modalities: ['text'],
-      context_length: 200_000,
-      is_free: false,
-      supported_endpoint_types: ['openai'],
-    }
-    const models: PricingModel[] = [
-      base,
-      {
-        ...base,
-        id: 2,
-        model_name: 'image-model',
-        quota_type: 1,
-        capabilities: ['tools'],
-        input_modalities: ['text'],
-        output_modalities: ['image'],
-        context_length: 1_000_000,
-        is_free: true,
-      },
-      {
-        ...base,
-        id: 3,
-        model_name: 'video-model',
-        vendor_name: 'Vendor B',
-        capabilities: [],
-        input_modalities: ['text', 'video'],
-        output_modalities: ['video'],
-        context_length: 20_000,
-        billing_usage_schema: { seconds: { type: 'number', unit: 'second' } },
-      },
-    ]
+    const models = sampleModels()
     const sidebarProps = {
       ...props,
       vendors: [
@@ -120,61 +139,38 @@ describe('pricing controls', () => {
       <PricingSidebar {...sidebarProps} models={models} />
     )
 
-    expect(
-      screen.getByRole('button', { name: /^All Vendors\s*3$/ })
-    ).toBeVisible()
-    expect(screen.getByRole('button', { name: /^Vendor A\s*2$/ })).toBeVisible()
-    expect(screen.getByRole('button', { name: /^Vendor B\s*1$/ })).toBeVisible()
+    // Chips show the label only.
+    expect(chip('All Vendors').textContent).toBe('All Vendors')
+    expect(chip('Vendor A').textContent).toBe('Vendor A')
+    expect(chip('Vendor B').textContent).toBe('Vendor B')
+    expect(chip('Files').textContent).toBe('Files')
+    expect(chip('Embeddings').textContent).toBe('Embeddings')
+    expect(chip('Rerank').textContent).toBe('Rerank')
 
-    // `Text` / `Image` / `Video` labels exist in both the model-type and the
-    // input-type section, so each count is asserted as "at least one chip".
-    const chip = (name: RegExp) =>
-      screen.getAllByRole('button', { name }).length
-    expect(chip(/^Text\s*1$/)).toBeGreaterThan(0)
-    expect(chip(/^Image\s*1$/)).toBeGreaterThan(0)
-    expect(chip(/^Video\s*1$/)).toBeGreaterThan(0)
-    expect(chip(/^Audio\s*0$/)).toBeGreaterThan(0)
-    expect(chip(/^Embeddings\s*0$/)).toBe(1)
-    expect(chip(/^Rerank\s*0$/)).toBe(1)
-    expect(chip(/^Files\s*1$/)).toBe(1)
+    // `Text` / `Image` / `Video` / `Audio` exist in both sections, no counts.
+    for (const label of ['Text', 'Image', 'Video', 'Audio']) {
+      expect(chips(label).length).toBeGreaterThan(0)
+      for (const element of chips(label)) {
+        expect(element.textContent).toBe(label)
+      }
+    }
 
-    // Context buckets.
-    expect(
-      screen.getByRole('button', { name: /^200K - 1M\s*1$/ })
-    ).toBeVisible()
-    expect(screen.getByRole('button', { name: /^≥ 1M\s*1$/ })).toBeVisible()
-    expect(screen.getByRole('button', { name: /^< 200K\s*1$/ })).toBeVisible()
+    expect(chip('< 200K').textContent).toBe('< 200K')
+    expect(chip('200K - 1M').textContent).toBe('200K - 1M')
+    expect(chip('≥ 1M').textContent).toBe('≥ 1M')
+    expect(chip('Free of charge').textContent).toBe('Free of charge')
+    expect(chip('Paid').textContent).toBe('Paid')
+    expect(chip('Token-based').textContent).toBe('Token-based')
+    expect(chip('Per Request').textContent).toBe('Per Request')
+    expect(chip('Task billing').textContent).toBe('Task billing')
 
-    // Price tiers.
-    expect(
-      screen.getByRole('button', { name: /^Free of charge\s*1$/ })
-    ).toBeVisible()
-    expect(screen.getByRole('button', { name: /^Paid\s*2$/ })).toBeVisible()
+    // Group chips keep their ratio suffix (that is not a model count).
+    expect(chip(/premium\s*x3/)).toBeVisible()
 
-    expect(
-      screen.getByRole('button', { name: /^Token-based\s*1$/ })
-    ).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: /^Per Request\s*1$/ })
-    ).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: /^Task billing\s*1$/ })
-    ).toBeVisible()
-
+    // Zero-count vendors disappear from the option list.
     rerender(<PricingSidebar {...sidebarProps} models={[models[1]]} />)
-    expect(
-      screen.getByRole('button', { name: /^All Vendors\s*1$/ })
-    ).toBeVisible()
-    expect(
-      screen.queryByRole('button', { name: /^Vendor B\s*1$/ })
-    ).toBeNull()
-    expect(
-      screen.getAllByRole('button', { name: /^Image\s*1$/ }).length
-    ).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: /^Text\s*0$/ })).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: /^Free of charge\s*1$/ })
-    ).toBeVisible()
+    expect(chips('Vendor B')).toHaveLength(0)
+    expect(chip('Vendor A')).toBeVisible()
   })
 
   it('keeps several options selected in the same section and highlights them green', async () => {
@@ -183,8 +179,8 @@ describe('pricing controls', () => {
     const { rerender } = render(
       <PricingSidebar {...props} models={[]} modelTypeFilter={[]} />
     )
-    const embeddings = screen.getByRole('button', { name: /^Embeddings\s*0$/ })
-    const rerank = screen.getByRole('button', { name: /^Rerank\s*0$/ })
+    const embeddings = chip('Embeddings')
+    const rerank = chip('Rerank')
     expect(embeddings).toHaveAttribute('aria-pressed', 'false')
     expect(rerank).toHaveAttribute('aria-pressed', 'false')
 
@@ -198,18 +194,13 @@ describe('pricing controls', () => {
         modelTypeFilter={['embedding', 'rerank']}
       />
     )
-    const activeEmbeddings = screen.getByRole('button', {
-      name: /^Embeddings\s*0$/,
-    })
-    const activeRerank = screen.getByRole('button', { name: /^Rerank\s*0$/ })
+    const activeEmbeddings = chip('Embeddings')
+    const activeRerank = chip('Rerank')
     expect(activeEmbeddings).toHaveAttribute('aria-pressed', 'true')
     expect(activeRerank).toHaveAttribute('aria-pressed', 'true')
     expect(activeEmbeddings.className).toContain('emerald')
-    // `Text` exists in the model-type and the input-type section.
-    for (const chip of screen.getAllByRole('button', {
-      name: /^Text\s*0$/,
-    })) {
-      expect(chip).toHaveAttribute('aria-pressed', 'false')
+    for (const element of chips('Text')) {
+      expect(element).toHaveAttribute('aria-pressed', 'false')
     }
   })
 
