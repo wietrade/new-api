@@ -1,6 +1,13 @@
 name: sync-model-metadata
 
 on:
+  push:
+    branches: [main]
+    # only the pipeline itself triggers a run; metadata commits made by the
+    # action are excluded so it cannot loop
+    paths:
+      - '.github/workflows/sync-model-metadata.yml'
+      - 'scripts/model_sync/**'
   schedule:
     # daily at 02:17 UTC
     - cron: '17 2 * * *'
