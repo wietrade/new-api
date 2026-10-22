@@ -729,7 +729,6 @@
     "Base Price": "基础价格",
     "Official price": "官方价",
     "Lowest price group": "最低价分组",
-    "Vendor list price (ratio 1)": "厂商原始定价（倍率 1）",
     "Base URL": "API 地址",
     "Base URL *": "基础 URL *",
     "Base URL is required for this channel type": "此渠道类型需要填写 Base URL",
