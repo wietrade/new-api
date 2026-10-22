@@ -117,6 +117,17 @@ function SectionTitle(props: { children: React.ReactNode }) {
   )
 }
 
+/** Muted parenthetical note appended to a section title. */
+function SectionTitleNote(props: { children: React.ReactNode }) {
+  return (
+    <span className='text-muted-foreground/70 font-normal'>
+      {' ('}
+      {props.children}
+      {')'}
+    </span>
+  )
+}
+
 function DynamicPriceEntryLabel(props: { entry: DynamicPriceEntry }) {
   const { t, i18n } = useTranslation()
   if (props.entry.labelKind === 'schema') {
@@ -1197,13 +1208,6 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
         ) : null}
       </div>
 
-      <p className='text-muted-foreground text-[11px]'>
-        {props.tiers.some(
-          (tier) => 'unitPrices' in tier || tier.billingUnit === 'request'
-        )
-          ? t('Prices shown per usage unit')
-          : t('Prices shown per {{unit}} tokens', { unit: props.tokenUnitLabel })}
-      </p>
     </div>
   )
 }
@@ -1342,7 +1346,18 @@ function ProviderGroupPricingSection(
     return (
       <section>
         {!props.hideTitle && (
-          <SectionTitle>{t('Pricing by Group')}</SectionTitle>
+          <SectionTitle>
+            {t('Pricing by Group')}
+            <SectionTitleNote>
+              {dynamicTiers.some(
+                (tier) => 'unitPrices' in tier || tier.billingUnit === 'request'
+              )
+                ? t('Prices shown per usage unit')
+                : t('Prices shown per {{unit}} tokens', {
+                    unit: tokenUnitLabel,
+                  })}
+            </SectionTitleNote>
+          </SectionTitle>
         )}
         <AutoGroupChain model={props.model} autoGroups={props.autoGroups} />
         <DynamicGroupPricingTable
@@ -1400,7 +1415,16 @@ function ProviderGroupPricingSection(
 
   return (
     <section>
-      {!props.hideTitle && <SectionTitle>{t('Pricing by Group')}</SectionTitle>}
+      {!props.hideTitle && (
+        <SectionTitle>
+          {t('Pricing by Group')}
+          {isTokenBased && (
+            <SectionTitleNote>
+              {t('Prices shown per {{unit}} tokens', { unit: tokenUnitLabel })}
+            </SectionTitleNote>
+          )}
+        </SectionTitle>
+      )}
       <AutoGroupChain model={props.model} autoGroups={props.autoGroups} />
       <StaticDataTable
         className='-mx-4 rounded-none border-0 sm:mx-0'
@@ -1460,13 +1484,6 @@ function ProviderGroupPricingSection(
               ]),
         ]}
       />
-      <div className='-mx-4 sm:mx-0'>
-        {isTokenBased && (
-          <p className='text-muted-foreground mt-1.5 px-4 text-[11px] sm:px-0'>
-            {t('Prices shown per {{unit}} tokens', { unit: tokenUnitLabel })}
-          </p>
-        )}
-      </div>
     </section>
   )
 }
