@@ -114,10 +114,20 @@ jobs:
           合并后到后台「同步资料」预览并应用，才会写入模型库。
           BODY
 
-          if [ -z "$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')" ]; then
-            gh pr create --base "${{ github.event.repository.default_branch }}" --head "$branch" \
-              --title "chore(metadata): sync official model metadata and prices" \
-              --body-file /tmp/pr-body.md
-          else
+          if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')" ]; then
             echo "PR already open, branch updated."
+          elif gh pr create --base "${{ github.event.repository.default_branch }}" --head "$branch" \
+              --title "chore(metadata): sync official model metadata and prices" \
+              --body-file /tmp/pr-body.md; then
+            echo "PR created."
+          else
+            # "Allow GitHub Actions to create and approve pull requests" is off.
+            # Fall back to a direct commit so unattended updates keep working.
+            echo "::warning::pull request creation not permitted; committing directly to ${{ github.event.repository.default_branch }}"
+            git push origin "HEAD:${{ github.event.repository.default_branch }}"
+            {
+              echo "### metadata sync"
+              echo "PR creation is not permitted for this repository, so the update was committed directly."
+              echo "Enable Settings - Actions - General - Allow GitHub Actions to create and approve pull requests to restore review."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
