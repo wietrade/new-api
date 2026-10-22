@@ -1,0 +1,52 @@
+# NowHub API 文档
+
+> NowHub API 是一个大模型 API 中转服务：兼容 OpenAI、Anthropic Messages 与 Gemini 原生协议，
+> 按 token 或按次计费。一个令牌即可调用多厂商模型。
+
+## 基础信息
+
+- 站点：https://nowhub.org
+- OpenAI SDK Base URL：https://api.nowhub.org/v1
+- Anthropic SDK Base URL：https://api.nowhub.org
+- Gemini Base URL：https://api.nowhub.org
+- 鉴权：`Authorization: Bearer <TOKEN>`；Anthropic/Gemini 端点也接受 `x-api-key` / `x-goog-api-key`
+- 密钥来源：控制台 → 令牌。密钥只放本地环境变量，不要写进对话或仓库
+
+## 开始
+
+- [简介](https://nowhub.org/docs/guide/introduction.html)：令牌 / 分组 / 模型 / 档位 / 额度
+- [快速开始](https://nowhub.org/docs/guide/quick-start.html)：三步发出第一个请求
+- [模型与分组](https://nowhub.org/docs/guide/models-and-groups.html)：分组如何影响可用性与价格
+- [定价与计费](https://nowhub.org/docs/guide/pricing.html)：三种计费类型、档位与计算公式
+- [速率限制](https://nowhub.org/docs/guide/rate-limits.html)：RPM / TPM / RPD 与 429 处理
+- [错误码](https://nowhub.org/docs/guide/errors.html)
+
+## API 参考
+
+- [Chat Completions](https://nowhub.org/docs/api/chat-completions.html)：POST /v1/chat/completions
+- [Anthropic Messages](https://nowhub.org/docs/api/messages.html)：POST /v1/messages
+- [Gemini generateContent](https://nowhub.org/docs/api/gemini.html)：POST /v1beta/models/{model}:generateContent
+- [Models](https://nowhub.org/docs/api/models.html)：GET /v1/models
+- [Embeddings](https://nowhub.org/docs/api/embeddings.html)：POST /v1/embeddings
+- [函数调用](https://nowhub.org/docs/api/function-calling.html)：tools / tool_result / functionResponse
+
+## 工具接入
+
+- [Claude Code](https://nowhub.org/docs/tools/claude-code.html)
+- [Codex CLI](https://nowhub.org/docs/tools/codex-cli.html)
+- [Cline / Cherry Studio](https://nowhub.org/docs/tools/cline.html)
+- [LangChain](https://nowhub.org/docs/tools/langchain.html)
+
+## 排障
+
+- [鉴权与路径](https://nowhub.org/docs/faq/auth.html)
+- [余额与额度](https://nowhub.org/docs/faq/quota.html)
+- [超时](https://nowhub.org/docs/faq/timeout.html)
+- [max_tokens](https://nowhub.org/docs/faq/max-tokens.html)
+- [缓存与计费](https://nowhub.org/docs/faq/cache.html)
+
+## 约定
+
+- 模型 ID 必须来自模型广场，不要加厂商前缀（除非 ID 本身带前缀）
+- OpenAI 客户端 base_url 需要 `/v1`；Anthropic / Gemini 客户端不要带 `/v1`
+- 单价随上游调整，实时价格以模型广场为准

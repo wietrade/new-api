@@ -16,7 +16,7 @@
 下面所有示例都使用一个变量，替换成你自己的域名即可：
 
 ```bash
-export BASE_URL="https://你的域名"
+export BASE_URL="https://api.nowhub.org"
 export NEW_API_KEY="sk-..."
 ```
 

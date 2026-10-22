@@ -30,14 +30,14 @@ x-api-key: <TOKEN>
 ```python
 from openai import OpenAI
 
-client = OpenAI(base_url="https://你的域名/v1", api_key="sk-...")
+client = OpenAI(base_url="https://api.nowhub.org/v1", api_key="sk-...")
 ```
 
 ```ts
 import Anthropic from '@anthropic-ai/sdk'
 
 const client = new Anthropic({
-  baseURL: 'https://你的域名',
+  baseURL: 'https://api.nowhub.org',
   apiKey: 'sk-...',
 })
 ```
@@ -52,7 +52,7 @@ const client = new Anthropic({
 import anthropic
 
 client = anthropic.Anthropic(
-    base_url="https://你的域名",
+    base_url="https://api.nowhub.org",
     api_key="sk-...",
 )
 ```
@@ -60,7 +60,7 @@ client = anthropic.Anthropic(
 ## Gemini 兼容
 
 ```bash
-curl "https://你的域名/v1beta/models/gemini-pro:generateContent" \
+curl "https://api.nowhub.org/v1beta/models/gemini-pro:generateContent" \
   -H "x-goog-api-key: sk-..." \
   -H "Content-Type: application/json" \
   -d '{"contents":[{"parts":[{"text":"你好"}]}]}'

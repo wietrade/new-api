@@ -30,3 +30,40 @@
 .VPContent {
   --vp-border-radius: 4px;
 }
+
+/* 首页热门入口 */
+.entry-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin: 16px 0 32px;
+}
+
+.entry {
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 4px;
+  background: var(--vp-c-bg-alt);
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.entry:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.entry strong {
+  display: block;
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.entry span {
+  display: block;
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  line-height: 1.5;
+}

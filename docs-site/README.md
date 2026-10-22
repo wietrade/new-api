@@ -1,7 +1,7 @@
 # 文档站（VitePress）
 
 中文文档，构建产物写入 `../web/dist/docs`，由 new-api 的静态文件服务同域提供：
-`https://<你的域名>/docs/`。
+`https://<nowhub.org>/docs/`。
 
 ## 本地开发
 
