@@ -727,6 +727,7 @@
     "Base": "基础",
     "Base Limits": "基础额度",
     "Base Price": "基础价格",
+    "Official price": "官方价",
     "Base URL": "API 地址",
     "Base URL *": "基础 URL *",
     "Base URL is required for this channel type": "此渠道类型需要填写 Base URL",

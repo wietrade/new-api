@@ -600,13 +600,13 @@ it('switches provider group prices, localized conditions and examples, and shows
     'true'
   )
   panel = screen.getByRole('tabpanel', { name: 'Beta' })
-  expect(within(panel).getByText('Beta sample')).toBeVisible()
+  expect(within(panel).getAllByText('Beta sample').length).toBeGreaterThan(0)
   expect(within(panel).queryByText('Alpha sample')).not.toBeInTheDocument()
-  expect(within(panel).getByText('Professional mode')).toBeVisible()
-  expect(within(panel).getByText('$3')).toBeVisible()
-  expect(within(panel).getByText('$6')).toBeVisible()
+  expect(within(panel).getAllByText('Professional mode').length).toBeGreaterThan(0)
+  expect(within(panel).getAllByText('$3').length).toBeGreaterThan(0)
+  expect(within(panel).getAllByText('$6').length).toBeGreaterThan(0)
   await act(() => i18next.changeLanguage('zhCN'))
-  expect(within(panel).getByText('专业模式')).toBeVisible()
+  expect(within(panel).getAllByText('专业模式').length).toBeGreaterThan(0)
   await act(() => i18next.changeLanguage('en'))
   await user.click(screen.getByRole('tab', { name: 'Gamma' }))
   panel = screen.getByRole('tabpanel', { name: 'Gamma' })
@@ -665,7 +665,7 @@ it('shows provider count, price range and missing-price status in both list and 
   expect(screen.getByText('$0.4 – $0.8')).toBeVisible()
 })
 
-it('lists a price table for every group without switching', async () => {
+it('lists every group price in one table without switching', async () => {
   vi.spyOn(api, 'get').mockResolvedValue({ data: { data: { groups: [] } } })
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -693,8 +693,8 @@ it('lists a price table for every group without switching', async () => {
     </QueryClientProvider>
   )
   const tables = screen.getAllByRole('table')
-  expect(tables).toHaveLength(2)
+  expect(tables).toHaveLength(1)
   expect(within(tables[0]).getByText('$0.22')).toBeVisible()
-  expect(within(tables[1]).getByText('$0.66')).toBeVisible()
+  expect(within(tables[0]).getByText('$0.66')).toBeVisible()
   expect(screen.queryByRole('button', { name: /premium\s*3x/ })).toBeNull()
 })
