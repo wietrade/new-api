@@ -488,12 +488,6 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
     )
   }
 
-  cells.push(
-    <CatalogSpecRow key='type' label={t('Type')}>
-      <ModelBillingModeBadge model={model} />
-    </CatalogSpecRow>
-  )
-
   if (capabilities.length > 0) {
     cells.push(
       <CatalogSpecRow key='capabilities' label={t('Capabilities')}>
@@ -1568,6 +1562,7 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
             )}
             {isDynamic && !simpleTaskPricing && (
               <DynamicPricingBreakdown
+                compact
                 billingExpr={props.model.billing_expr}
                 usageSchema={props.model.billing_usage_schema}
                 taskPriceOptions={{
