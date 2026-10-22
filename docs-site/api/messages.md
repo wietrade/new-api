@@ -10,7 +10,7 @@ curl "$BASE_URL/v1/messages" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "claude-sonnet-5",
+    "model": "<模型ID>",
     "max_tokens": 1024,
     "messages": [{"role": "user", "content": "你好"}]
   }'
@@ -51,7 +51,7 @@ client = anthropic.Anthropic(
 )
 
 msg = client.messages.create(
-    model="claude-sonnet-5",
+    model="<模型ID>",
     max_tokens=1024,
     system="你是一个简洁的助手",
     messages=[{"role": "user", "content": "你好"}],
@@ -63,7 +63,7 @@ print(msg.content[0].text)
 
 ```python
 with client.messages.stream(
-    model="claude-sonnet-5",
+    model="<模型ID>",
     max_tokens=1024,
     messages=[{"role": "user", "content": "写一段 100 字的介绍"}],
 ) as stream:

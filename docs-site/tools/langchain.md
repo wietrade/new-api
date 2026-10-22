@@ -16,7 +16,7 @@ import os
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
-    model="claude-sonnet-5",
+    model="<模型ID>",
     base_url="https://api.nowhub.org/v1",
     api_key=os.environ["NEW_API_KEY"],
     temperature=0.2,
@@ -53,7 +53,7 @@ print(llm.bind_tools([add]).invoke("3 加 5 等于几？"))
 from langchain_openai import OpenAIEmbeddings
 
 emb = OpenAIEmbeddings(
-    model="text-embedding-3-small",
+    model="<向量模型ID>",
     base_url="https://api.nowhub.org/v1",
     api_key=os.environ["NEW_API_KEY"],
 )

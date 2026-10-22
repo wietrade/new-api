@@ -23,6 +23,7 @@
 | [Open WebUI](/tools/desktop#open-webui) | 自托管 | 浏览器 / Docker | OpenAI |
 | [SillyTavern](/tools/desktop#sillytavern) | 角色扮演 | 本地 | OpenAI |
 | [沉浸式翻译](/tools/desktop#沉浸式翻译) | 浏览器扩展 | Chrome / Edge / Safari | OpenAI |
+| [VS Code 内置 BYOK](/tools/vscode#vs-code-内置-byokcopilot-chat) | 编辑器自带 | VS Code | OpenAI 兼容 |
 | [Cline](/tools/vscode#cline) | VS Code 编程助手 | VS Code | OpenAI |
 | [Roo Code](/tools/vscode#roo-code) | VS Code 编程助手 | VS Code | OpenAI |
 | [Continue](/tools/vscode#continue) | 代码补全 + 对话 | VS Code / JetBrains | OpenAI |
@@ -34,6 +35,7 @@
 | [Codex CLI](/tools/codex-cli) | 终端编程助手 | CLI | Responses |
 | [Gemini CLI](/tools/cli#gemini-cli) | 终端编程助手 | CLI | Gemini |
 | [Aider](/tools/cli#aider) | 终端编程助手 | CLI | OpenAI |
+| [OpenCode](/tools/opencode) | 终端编程助手 | CLI | OpenAI 兼容 |
 | [Dify / FastGPT](/tools/desktop#自托管应用) | 应用编排 | 自托管 | OpenAI |
 
 ## 三件套怎么找

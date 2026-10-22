@@ -22,7 +22,7 @@ for m in client.models.list().data:
 {
   "object": "list",
   "data": [
-    { "id": "claude-sonnet-5", "object": "model", "owned_by": "anthropic" }
+    { "id": "<模型ID>", "object": "model", "owned_by": "anthropic" }
   ]
 }
 ```

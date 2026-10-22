@@ -26,6 +26,10 @@ export NEW_API_KEY="sk-..."
 
 ## 3. 发第一个请求
 
+::: tip 关于 `<模型ID>`
+示例里的 `<模型ID>` 都要替换成**模型广场**里的实际 ID。模型清单与单价随时调整，本文不写死任何模型名或价格。
+:::
+
 ::: code-group
 
 ```bash [cURL]
@@ -33,7 +37,7 @@ curl "$BASE_URL/v1/chat/completions" \
   -H "Authorization: Bearer $NEW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "claude-sonnet-5",
+    "model": "<模型ID>",
     "messages": [
       { "role": "user", "content": "用一句话解释什么是 TCP" }
     ]
@@ -51,7 +55,7 @@ client = OpenAI(
 )
 
 resp = client.chat.completions.create(
-    model="claude-sonnet-5",
+    model="<模型ID>",
     messages=[{"role": "user", "content": "用一句话解释什么是 TCP"}],
 )
 print(resp.choices[0].message.content)
@@ -66,7 +70,7 @@ const client = new OpenAI({
 })
 
 const resp = await client.chat.completions.create({
-  model: 'claude-sonnet-5',
+  model: '<模型ID>',
   messages: [{ role: 'user', content: '用一句话解释什么是 TCP' }],
 })
 console.log(resp.choices[0]?.message.content)
@@ -83,7 +87,7 @@ curl -N "$BASE_URL/v1/chat/completions" \
   -H "Authorization: Bearer $NEW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "claude-sonnet-5",
+    "model": "<模型ID>",
     "stream": true,
     "messages": [{ "role": "user", "content": "写一首四行诗" }]
   }'

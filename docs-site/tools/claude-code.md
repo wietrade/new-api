@@ -11,7 +11,7 @@ Claude Code 走 Anthropic Messages 协议，改两个环境变量即可指向本
   "env": {
     "ANTHROPIC_BASE_URL": "https://api.nowhub.org",
     "ANTHROPIC_AUTH_TOKEN": "sk-你的令牌",
-    "ANTHROPIC_MODEL": "claude-sonnet-5",
+    "ANTHROPIC_MODEL": "<模型ID>",
     "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5-20251001"
   }
 }

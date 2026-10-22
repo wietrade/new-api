@@ -13,7 +13,7 @@ export GOOGLE_GEMINI_BASE_URL="https://api.nowhub.org"
 gemini -p "用一句话解释 TCP 三次握手"
 ```
 
-模型通过 `--model` 指定，例如 `gemini -p "..." --model gemini-3-flash`。
+模型通过 `--model` 指定，例如 `gemini -p "..." --model <模型ID>`。
 
 ## Aider
 
@@ -23,7 +23,7 @@ Aider 走 OpenAI 兼容接口：
 export OPENAI_API_BASE="https://api.nowhub.org/v1"
 export OPENAI_API_KEY="sk-你的令牌"
 
-aider --model openai/claude-sonnet-5
+aider --model openai/<模型ID>
 ```
 
 `--model` 里的 `openai/` 前缀表示"用 OpenAI 兼容协议"，后面的名字是站点里的模型 ID。写代码建议用支持工具调用的模型。

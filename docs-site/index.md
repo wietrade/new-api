@@ -81,7 +81,7 @@ curl "$BASE_URL/v1/chat/completions" \
   -H "Authorization: Bearer $NEW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "claude-sonnet-5",
+    "model": "<模型ID>",
     "messages": [{"role": "user", "content": "请只回复：连接成功"}]
   }'
 ```

@@ -68,10 +68,11 @@ export default defineConfig({
         text: '客户端接入',
         items: [
           { text: '客户端总览', link: '/tools/' },
-          { text: 'VS Code（Cline / Roo / Continue）', link: '/tools/vscode' },
+          { text: 'VS Code（内置 BYOK / 插件）', link: '/tools/vscode' },
           { text: 'AI IDE（Cursor / Windsurf / Trae）', link: '/tools/ide' },
           { text: '桌面与网页客户端', link: '/tools/desktop' },
           { text: '终端 CLI', link: '/tools/cli' },
+          { text: 'OpenCode', link: '/tools/opencode' },
           { text: 'Claude Code', link: '/tools/claude-code' },
           { text: 'Codex CLI', link: '/tools/codex-cli' },
           { text: 'LangChain', link: '/tools/langchain' },

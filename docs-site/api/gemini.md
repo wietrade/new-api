@@ -5,7 +5,7 @@
 ## 最小请求
 
 ```bash
-curl "$BASE_URL/v1beta/models/gemini-3-flash:generateContent" \
+curl "$BASE_URL/v1beta/models/<模型ID>:generateContent" \
   -H "x-goog-api-key: $NEW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"contents":[{"parts":[{"text":"你好"}]}]}'
@@ -69,7 +69,7 @@ client = genai.Client(
     http_options={"base_url": "https://api.nowhub.org"},
 )
 
-print(client.models.generate_content(model="gemini-3-flash", contents="你好").text)
+print(client.models.generate_content(model="<模型ID>", contents="你好").text)
 ```
 
 ## 流式
@@ -77,7 +77,7 @@ print(client.models.generate_content(model="gemini-3-flash", contents="你好").
 方法名换成 `streamGenerateContent`：
 
 ```bash
-curl "$BASE_URL/v1beta/models/gemini-3-flash:streamGenerateContent?alt=sse" \
+curl "$BASE_URL/v1beta/models/<模型ID>:streamGenerateContent?alt=sse" \
   -H "x-goog-api-key: $NEW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"contents":[{"parts":[{"text":"写一首四行诗"}]}]}'

@@ -60,7 +60,7 @@ client = anthropic.Anthropic(
 ## Gemini 兼容
 
 ```bash
-curl "https://api.nowhub.org/v1beta/models/gemini-pro:generateContent" \
+curl "https://api.nowhub.org/v1beta/models/<模型ID>:generateContent" \
   -H "x-goog-api-key: sk-..." \
   -H "Content-Type: application/json" \
   -d '{"contents":[{"parts":[{"text":"你好"}]}]}'

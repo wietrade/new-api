@@ -9,7 +9,7 @@ curl "$BASE_URL/v1/chat/completions" \
   -H "Authorization: Bearer $NEW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "claude-sonnet-5",
+    "model": "<模型ID>",
     "messages": [{"role": "user", "content": "你好"}]
   }'
 ```
@@ -56,7 +56,7 @@ from openai import OpenAI
 client = OpenAI(base_url="https://api.nowhub.org/v1", api_key="sk-...")
 
 stream = client.chat.completions.create(
-    model="claude-sonnet-5",
+    model="<模型ID>",
     messages=[{"role": "user", "content": "写一首四行诗"}],
     stream=True,
 )

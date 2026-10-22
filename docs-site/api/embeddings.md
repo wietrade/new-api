@@ -8,7 +8,7 @@
 curl "$BASE_URL/v1/embeddings" \
   -H "Authorization: Bearer $NEW_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"text-embedding-3-small","input":["第一段","第二段"]}'
+  -d '{"model":"<向量模型ID>","input":["第一段","第二段"]}'
 ```
 
 ```python
@@ -16,7 +16,7 @@ from openai import OpenAI
 
 client = OpenAI(base_url="https://api.nowhub.org/v1", api_key="sk-...")
 resp = client.embeddings.create(
-    model="text-embedding-3-small",
+    model="<向量模型ID>",
     input=["第一段文本", "第二段文本"],
 )
 vectors = [d.embedding for d in resp.data]

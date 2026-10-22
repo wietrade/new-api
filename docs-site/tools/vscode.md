@@ -6,6 +6,26 @@ VS Code 里主流的几个 AI 编程插件都支持「OpenAI 兼容」，配置�
 - **API Key**：`sk-...`
 - **Model ID**：模型与价格页里的完整 ID
 
+## VS Code 内置 BYOK（Copilot Chat）
+
+新版 VS Code 的 Chat 自带「自带密钥」能力，不用装插件也能接第三方模型。
+
+1. 打开 Chat 视图，点顶部的**模型选择器**
+2. 选 **Manage Models…**（命令面板里对应 `Chat: Manage Language Models`）
+3. 提供商选 **OpenAI Compatible**
+4. 填写：
+   - 名称：`NowHub`
+   - Base URL：`https://api.nowhub.org/v1`
+   - API Key：你的令牌
+5. VS Code 会请求 `/v1/models` 列出模型，勾选要用的即可；回到 Chat 顶部切换模型
+
+::: tip 使用限制
+- 需要较新版本的 VS Code，旧版本没有该入口
+- 内置 BYOK 拿到的是「对话模型」，Agent 模式、工具调用等能力取决于所选模型是否支持
+- 密钥存在本机密钥库里，不会写进工作区配置
+- 换模型后如果报 404，多半是模型 ID 不在令牌的可用范围内
+:::
+
 ## Cline
 
 1. 安装扩展 **Cline**（原 Claude Dev）
@@ -13,7 +33,7 @@ VS Code 里主流的几个 AI 编程插件都支持「OpenAI 兼容」，配置�
 3. 填写：
    - Base URL：`https://api.nowhub.org/v1`
    - API Key：你的令牌
-   - Model ID：例如 `claude-sonnet-5`
+   - Model ID：例如 `<模型ID>`
 4. 关掉 `Enable streaming` 以外的默认选项，先发一句「你好」验证
 
 ::: tip 工具调用
@@ -42,7 +62,7 @@ Continue 用配置文件，支持 VS Code 与 JetBrains。
     {
       "title": "NowHub",
       "provider": "openai",
-      "model": "claude-sonnet-5",
+      "model": "<模型ID>",
       "apiBase": "https://api.nowhub.org/v1",
       "apiKey": "sk-你的令牌"
     }

@@ -22,6 +22,15 @@
 - 新增「客户端接入」：总览 + VS Code（Cline / Roo Code / Continue / Kilo Code）+ AI IDE（Cursor / Windsurf / Trae）+ 桌面与网页客户端（Cherry Studio / Chatbox / LobeChat / NextChat / Open WebUI / SillyTavern / 沉浸式翻译）+ 终端 CLI（Gemini CLI / Aider）
 - 模型与价格页：价格列改为「查看模型详情」，不再暗示文档内可查单价
 
+## 2026-10-22（去写死）
+
+- 全站示例不再写死模型名：统一用 `<模型ID>`，模型与价格一律以模型广场为准
+- 新增 OpenCode 接入（`opencode.json` 自定义 provider）
+
+## 2026-10-22（VS Code BYOK）
+
+- 补充 VS Code 内置 BYOK 接入（Chat → Manage Models → OpenAI Compatible）
+
 ## 待补充
 
 - 图像 / 视频模型接入

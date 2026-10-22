@@ -7,7 +7,7 @@ Codex CLI 默认走 OpenAI Responses 接口，用自定义 provider 指向本站
 编辑 `~/.codex/config.toml`：
 
 ```toml
-model = "gpt-6-sol"
+model = "<模型ID>"
 model_provider = "nowhub"
 
 [model_providers.nowhub]
