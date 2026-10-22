@@ -58,6 +58,12 @@ export interface PublicHeaderProps {
   className?: string
 }
 
+// 文档站挂在 /docs 下，由 Go 静态服务提供，不属于 SPA 路由：
+// 必须用原生 <a> 跳转，否则 TanStack Router 会去匹配路由并渲染 404。
+function isStaticPath(href: string) {
+  return href === '/docs' || href.startsWith('/docs/')
+}
+
 export function PublicHeader(props: PublicHeaderProps) {
   const {
     navLinks = defaultTopNavLinks,
@@ -226,14 +232,14 @@ export function PublicHeader(props: PublicHeaderProps) {
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground',
                   link.disabled && 'pointer-events-none opacity-50'
                 )
-                if (link.external) {
+                if (link.external || isStaticPath(link.href)) {
                   return (
                     <a
                       key={`${link.title}:${link.href}`}
                       href={link.href}
                       title={t(link.title)}
-                      target='_blank'
-                      rel='noopener noreferrer'
+                      target={link.external ? '_blank' : undefined}
+                      rel={link.external ? 'noopener noreferrer' : undefined}
                       aria-disabled={link.disabled}
                       tabIndex={link.disabled ? -1 : undefined}
                       onClick={(event) => handleNavLinkClick(event, link)}
@@ -331,13 +337,13 @@ export function PublicHeader(props: PublicHeaderProps) {
               const transitionStyle = {
                 transitionDelay: mobileOpen ? `${100 + i * 50}ms` : '0ms',
               }
-              if (link.external) {
+              if (link.external || isStaticPath(link.href)) {
                 return (
                   <a
                     key={`${link.title}:${link.href}`}
                     href={link.href}
-                    target='_blank'
-                    rel='noopener noreferrer'
+                    target={link.external ? '_blank' : undefined}
+                    rel={link.external ? 'noopener noreferrer' : undefined}
                     aria-disabled={link.disabled}
                     tabIndex={link.disabled ? -1 : undefined}
                     onClick={(event) => handleNavLinkClick(event, link, true)}

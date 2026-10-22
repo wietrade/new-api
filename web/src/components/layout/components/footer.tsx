@@ -48,12 +48,17 @@ function FooterLinkItem(props: { link: FooterLink }) {
   const className =
     'inline-flex text-sm text-muted-foreground transition-colors hover:text-foreground'
 
-  if (props.link.href.startsWith('http') || props.link.href.startsWith('mailto')) {
+  const href = props.link.href
+  const isExternal = href.startsWith('http') || href.startsWith('mailto')
+  // /docs 是 Go 静态站，不参与 SPA 路由
+  const isStatic = href === '/docs' || href.startsWith('/docs/')
+
+  if (isExternal || isStatic) {
     return (
       <a
-        href={props.link.href}
-        target='_blank'
-        rel='noopener noreferrer'
+        href={href}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
         className={className}
       >
         {label}
@@ -77,7 +82,7 @@ export function Footer(props: FooterProps) {
   const displayLogo = systemLogo || props.logo || '/logo.png'
   const displayName = systemName || props.name || 'New API'
   const currentYear = new Date().getFullYear()
-  const docsHref = (status?.docs_link as string) || '/docs'
+  const docsHref = (status?.docs_link as string) || '/docs/'
 
   const [nameHead, nameTail] = useMemo(() => {
     const name = displayName || ''

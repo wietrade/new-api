@@ -93,7 +93,7 @@ export function useTopNavLinks(): TopNavLink[] {
       const external = /^https?:\/\//i.test(docsLink)
       links.push({ title: t('Docs'), href: docsLink, external })
     } else {
-      links.push({ title: t('Docs'), href: '/docs' })
+      links.push({ title: t('Docs'), href: '/docs/' })
     }
   }
 
