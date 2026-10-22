@@ -120,7 +120,7 @@ function FilterChip(props: {
       aria-pressed={props.active}
       aria-disabled={props.disabled || undefined}
       className={cn(
-        'h-auto max-w-full gap-1.5 px-2 py-1 text-xs',
+        'h-7 max-w-full gap-1.5 px-2 text-xs',
         props.highlight &&
           'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:border-emerald-400/40 dark:text-emerald-300',
         props.active &&

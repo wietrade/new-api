@@ -1067,7 +1067,7 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
               aria-pressed={active}
               onClick={() => setActiveGroup(candidate)}
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition-colors',
+                'inline-flex h-7 items-center gap-1.5 rounded-md border px-2 text-xs transition-colors',
                 active
                   ? 'border-dynamic-billing/50 bg-dynamic-billing/10 text-dynamic-billing'
                   : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'

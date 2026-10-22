@@ -99,7 +99,7 @@ export function PricingToolbar(props: PricingToolbarProps) {
             variant='outline'
             size='sm'
             onClick={() => setMobileFiltersOpen(true)}
-            className='h-10 gap-1.5 xl:hidden'
+            className='h-8 gap-1.5 xl:hidden'
           >
             <Filter className='size-4' />
             {t('Filter')}
@@ -115,7 +115,7 @@ export function PricingToolbar(props: PricingToolbarProps) {
             onChange={props.onSearchChange}
             onClear={props.onSearchClear}
             placeholder={t('Search model name, provider, endpoint, or tag...')}
-            className='min-w-0 flex-1 max-w-none [&_input]:pl-9 [&_input]:text-sm [&_input]:h-10'
+            className='min-w-0 flex-1 max-w-none [&_input]:pl-9 [&_input]:text-sm [&_input]:h-8'
           />
 
         <div className='flex shrink-0 items-center gap-2'>
@@ -127,7 +127,7 @@ export function PricingToolbar(props: PricingToolbarProps) {
                   type='button'
                   variant='outline'
                   size='sm'
-                  className='h-10 gap-1.5 px-3 text-sm'
+                  className='h-8 gap-1.5 px-2.5 text-sm'
                 />
               }
             >
@@ -158,7 +158,7 @@ export function PricingToolbar(props: PricingToolbarProps) {
           <DataTableViewModeToggle
             value={props.viewMode}
             onChange={props.onViewModeChange}
-            className='h-10'
+            className='h-8'
           />
         </div>
       </div>
