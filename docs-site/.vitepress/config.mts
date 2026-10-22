@@ -1,4 +1,9 @@
 import { defineConfig } from 'vitepress'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const docsRoot = path.resolve(fileURLToPath(new URL('.', import.meta.url)), '..')
 
 // 文档站的访问前缀。构建产物会写进 web/dist/docs，由 new-api 的静态服务
 // 直接对外提供（同域 https://<你的域名>/docs/）。
@@ -41,6 +46,7 @@ export default defineConfig({
         text: '使用',
         items: [
           { text: '模型与分组', link: '/guide/models-and-groups' },
+          { text: '模型与价格', link: '/models' },
           { text: '定价与计费', link: '/guide/pricing' },
           { text: '速率限制', link: '/guide/rate-limits' },
           { text: '接口兼容性', link: '/guide/compatibility' },
@@ -93,4 +99,32 @@ export default defineConfig({
       copyright: 'Copyright © NowHub API',
     },
   },
+  // 每页额外输出同名 .md（供「复制为 Markdown」直接取用），并把全文合并成
+  // llms-full.txt，方便 AI 编程助手一次读完。
+  buildEnd(siteConfig) {
+    const out = path.resolve(siteConfig.outDir)
+    const parts: string[] = []
+
+    const walk = (dir: string) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (['node_modules', '.vitepress', 'public'].includes(entry.name)) continue
+        const full = path.join(dir, entry.name)
+        if (entry.isDirectory()) {
+          walk(full)
+          continue
+        }
+        if (!entry.name.endsWith('.md') || entry.name === 'README.md') continue
+        const body = fs.readFileSync(full, 'utf8')
+        const rel = path.relative(docsRoot, full)
+        const dest = path.join(out, rel)
+        fs.mkdirSync(path.dirname(dest), { recursive: true })
+        fs.writeFileSync(dest, body)
+        parts.push(body.trim())
+      }
+    }
+
+    walk(docsRoot)
+    fs.writeFileSync(path.join(out, 'llms-full.txt'), parts.join('\n\n---\n\n') + '\n')
+  },
+
 })

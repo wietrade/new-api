@@ -43,9 +43,9 @@ hero:
   <span>config.toml 自定义 provider，走 Responses 接口</span>
 </a>
 
-<a class="entry" href="/pricing" target="_blank">
+<a class="entry" href="/docs/models.html">
   <strong>模型与价格</strong>
-  <span>在线模型、分组倍率与实时单价</span>
+  <span>在线模型清单、可用分组与直连详情页</span>
 </a>
 
 </div>
