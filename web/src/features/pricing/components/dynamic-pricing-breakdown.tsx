@@ -582,11 +582,7 @@ export function DynamicPricingBreakdown({
           </div>
           <StaticDataTable
             className='hidden overflow-hidden rounded-md border sm:block'
-            tableClassName={
-              compact
-                ? '[&_td]:text-xs [&_td_*]:text-xs [&_th]:text-xs [&_th_*]:text-xs [&_tbody>tr]:h-auto'
-                : 'text-sm [&_tbody>tr]:h-auto'
-            }
+            tableClassName='text-sm [&_tbody>tr]:h-auto'
             headerRowClassName='hover:bg-transparent'
             data={tiers}
             getRowKey={(_tier, index) => `tier-${index}`}
@@ -608,14 +604,10 @@ export function DynamicPricingBreakdown({
               {
                 id: 'tier',
                 header: usageSchema ? t('Applicable conditions') : t('Tier'),
-                className: cn(
-                  'text-muted-foreground py-2 font-medium',
-                  compact && 'h-8'
-                ),
-                cellClassName: cn(
-                  'align-top whitespace-normal break-words',
-                  compact ? 'py-2' : 'py-2.5'
-                ),
+                className:
+                  'text-muted-foreground py-2 text-xs font-medium whitespace-normal break-words',
+                cellClassName:
+                  'text-dynamic-billing py-2.5 whitespace-normal break-words',
                 cell: (tier) => {
                   const condSummary = formatBreakdownConditionSummary(
                     tier,
@@ -661,14 +653,9 @@ export function DynamicPricingBreakdown({
               ...visiblePriceFields.map((field) => ({
                 id: field.id,
                 header: breakdownPriceFieldLabel(field, t),
-                className: cn(
-                  'text-muted-foreground py-2 text-right font-medium',
-                  compact && 'h-8'
-                ),
-                cellClassName: cn(
-                  'text-right align-top font-mono',
-                  compact ? 'py-2' : 'py-2.5'
-                ),
+                className:
+                  'text-muted-foreground py-2 text-right text-xs font-medium',
+                cellClassName: 'py-2.5 text-right font-mono',
                 cell: (tier: BreakdownTier) => {
                   const value = field.value(tier)
                   return value > 0 ||
