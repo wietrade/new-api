@@ -9,8 +9,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "claude-fable-5-1",
@@ -19,8 +28,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "claude-haiku-4-5-20251001",
@@ -29,8 +47,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,200K",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 200000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "claude-opus-4-8",
@@ -39,8 +66,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "claude-opus-5",
@@ -49,8 +85,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "claude-opus-5-5",
@@ -59,8 +104,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "claude-sonnet-5",
@@ -69,8 +123,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "claude-sonnet-5-5",
@@ -79,8 +142,17 @@
       "icon": "Claude.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "gpt-5.6-sol",
@@ -89,8 +161,17 @@
       "icon": "OpenAI",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1.1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "gpt-6-astra",
@@ -99,8 +180,17 @@
       "icon": "OpenAI",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1.1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "gpt-6-sol",
@@ -109,8 +199,17 @@
       "icon": "OpenAI",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1.1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0
     },
     {
       "model_name": "gpt-6.1-sol",
@@ -119,8 +218,17 @@
       "icon": "OpenAI",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,文件,多模态,1.1M",
-      "endpoints": null
+      "tags": "推理,工具,文件,多模态",
+      "endpoints": null,
+      "capabilities": [
+        "chat",
+        "reasoning",
+        "tools",
+        "vision",
+        "files"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0
     }
   ]
 }
