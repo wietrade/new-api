@@ -1,6 +1,8 @@
 {
   "success": true,
   "message": "ok",
+  "price_kind": "aggregator_reference",
+  "notice": "aggregator list prices (models.dev / openrouter); NOT vendor official list prices",
   "currency": "USD",
   "unit": "per_1m_tokens",
   "sources": [
@@ -11,6 +13,8 @@
     {
       "model_name": "claude-fable-5",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "claude-fable-5",
       "currency": "USD",
@@ -23,6 +27,8 @@
     {
       "model_name": "claude-fable-5-1",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "anthropic/claude-fable-5-1",
       "currency": "USD",
@@ -35,6 +41,8 @@
     {
       "model_name": "claude-haiku-4-5-20251001",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "claude-haiku-4-5-20251001",
       "currency": "USD",
@@ -47,6 +55,8 @@
     {
       "model_name": "claude-opus-4-8",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "claude-opus-4-8",
       "currency": "USD",
@@ -59,6 +69,8 @@
     {
       "model_name": "claude-opus-5",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "anthropic/claude-opus-5",
       "currency": "USD",
@@ -71,6 +83,8 @@
     {
       "model_name": "claude-opus-5-5",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "anthropic/claude-opus-5-5",
       "currency": "USD",
@@ -83,6 +97,8 @@
     {
       "model_name": "claude-sonnet-5",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "claude-sonnet-5",
       "currency": "USD",
@@ -95,6 +111,8 @@
     {
       "model_name": "claude-sonnet-5-5",
       "vendor_name": "Anthropic",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "anthropic/claude-sonnet-5-5",
       "currency": "USD",
@@ -107,6 +125,8 @@
     {
       "model_name": "deepseek-v4-pro",
       "vendor_name": "DeepSeek",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "openrouter",
       "source_model_id": "deepseek/deepseek-v4-pro",
       "currency": "USD",
@@ -118,6 +138,8 @@
     {
       "model_name": "gemini-3-pro-image",
       "vendor_name": "Google",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "google/gemini-3-pro-image",
       "currency": "USD",
@@ -128,6 +150,8 @@
     {
       "model_name": "gemini-3-pro-image-preview",
       "vendor_name": "Google",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "google/gemini-3-pro-image-preview",
       "currency": "USD",
@@ -138,6 +162,8 @@
     {
       "model_name": "gemini-3.1-flash-image",
       "vendor_name": "Google",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "google/gemini-3.1-flash-image",
       "currency": "USD",
@@ -148,6 +174,8 @@
     {
       "model_name": "gemini-3.1-flash-image-preview",
       "vendor_name": "Google",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "gemini-3.1-flash-image-preview",
       "currency": "USD",
@@ -158,6 +186,8 @@
     {
       "model_name": "kimi-k3",
       "vendor_name": "Moonshot AI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "moonshotai/kimi-k3",
       "currency": "USD",
@@ -170,6 +200,8 @@
     {
       "model_name": "gpt-5.4",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "gpt-5.4",
       "currency": "USD",
@@ -181,6 +213,8 @@
     {
       "model_name": "gpt-5.5",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "gpt-5.5",
       "currency": "USD",
@@ -192,6 +226,8 @@
     {
       "model_name": "gpt-5.6-luna",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "openai/gpt-5.6-luna",
       "currency": "USD",
@@ -204,6 +240,8 @@
     {
       "model_name": "gpt-5.6-sol",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "openai/gpt-5.6-sol",
       "currency": "USD",
@@ -216,6 +254,8 @@
     {
       "model_name": "gpt-5.6-terra",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "openai/gpt-5.6-terra",
       "currency": "USD",
@@ -228,6 +268,8 @@
     {
       "model_name": "gpt-6-astra",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "openai/gpt-6-astra",
       "currency": "USD",
@@ -240,6 +282,8 @@
     {
       "model_name": "gpt-6-sol",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "openai/gpt-6-sol",
       "currency": "USD",
@@ -252,6 +296,8 @@
     {
       "model_name": "gpt-6.1-sol",
       "vendor_name": "OpenAI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "models.dev",
       "source_model_id": "openai/gpt-6.1-sol",
       "currency": "USD",
@@ -264,6 +310,8 @@
     {
       "model_name": "glm-5",
       "vendor_name": "Z.AI",
+      "price_kind": "aggregator_reference",
+      "source_kind": "aggregator",
       "source": "openrouter",
       "source_model_id": "z-ai/glm-5",
       "currency": "USD",

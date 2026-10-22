@@ -390,6 +390,8 @@ def price_records(existing, index):
         row = {
             "model_name": name,
             "vendor_name": record.get("vendor_name") or model.vendor_name,
+            "price_kind": "aggregator_reference",
+            "source_kind": "aggregator",
             "source": model.source,
             "source_model_id": model.source_id,
             "currency": "USD",

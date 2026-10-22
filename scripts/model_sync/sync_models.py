@@ -288,6 +288,8 @@ def main(argv=None):
         pricing_envelope = {
             "success": True,
             "message": "ok",
+            "price_kind": "aggregator_reference",
+            "notice": "aggregator list prices (models.dev / openrouter); NOT vendor official list prices",
             "currency": "USD",
             "unit": "per_1m_tokens",
             "sources": source_names,
