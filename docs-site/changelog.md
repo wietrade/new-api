@@ -36,6 +36,13 @@
 - Kilo Code 扩写：完整配置、与 Cline/Roo Code 的差异对照、常见报错
 - 新增 cc-switch：多 provider 切换、直连与代理两种模式、六个坑
 
+## 2026-10-22（复查）
+
+- 修掉两处漏改的写死模型名（Claude Code 的小模型、函数调用示例）
+- Gemini Python SDK 改用 `types.HttpOptions(base_url=...)`
+- Claude Code 补充新版 `ANTHROPIC_DEFAULT_HAIKU_MODEL` 说明
+- 新增：图片与多模态、网络与代理、Token 估算与成本预估
+
 ## 待补充
 
 - 图像 / 视频模型接入

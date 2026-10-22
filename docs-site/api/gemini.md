@@ -63,10 +63,11 @@ curl "$BASE_URL/v1beta/models/<模型ID>:generateContent" \
 
 ```python
 from google import genai
+from google.genai import types
 
 client = genai.Client(
     api_key="sk-...",
-    http_options={"base_url": "https://api.nowhub.org"},
+    http_options=types.HttpOptions(base_url="https://api.nowhub.org"),
 )
 
 print(client.models.generate_content(model="<模型ID>", contents="你好").text)

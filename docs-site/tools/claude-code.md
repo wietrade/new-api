@@ -12,7 +12,7 @@ Claude Code 走 Anthropic Messages 协议，改两个环境变量即可指向本
     "ANTHROPIC_BASE_URL": "https://api.nowhub.org",
     "ANTHROPIC_AUTH_TOKEN": "sk-你的令牌",
     "ANTHROPIC_MODEL": "<模型ID>",
-    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5-20251001"
+    "ANTHROPIC_SMALL_FAST_MODEL": "<小模型ID>"
   }
 }
 ```
@@ -20,6 +20,7 @@ Claude Code 走 Anthropic Messages 协议，改两个环境变量即可指向本
 - `ANTHROPIC_BASE_URL` **不带** `/v1`，Claude Code 自己拼 `/v1/messages`
 - 用 `ANTHROPIC_AUTH_TOKEN` 而不是 `ANTHROPIC_API_KEY`，避免它去走官方登录
 - 小模型（用于生成标题、摘要）也要填成站点里有的模型，否则会 404
+- 新版 Claude Code 也可以用 `ANTHROPIC_DEFAULT_HAIKU_MODEL` / `ANTHROPIC_DEFAULT_SONNET_MODEL` 指定默认模型，含义相同，填站点里的 ID 即可
 
 ## 验证
 

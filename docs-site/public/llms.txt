@@ -26,6 +26,7 @@
 - [Chat Completions](https://nowhub.org/docs/api/chat-completions.html)：POST /v1/chat/completions
 - [Anthropic Messages](https://nowhub.org/docs/api/messages.html)：POST /v1/messages
 - [Gemini generateContent](https://nowhub.org/docs/api/gemini.html)：POST /v1beta/models/{model}:generateContent
+- [图片与多模态](https://nowhub.org/docs/api/vision.html)：image_url / image block / inlineData
 - [Models](https://nowhub.org/docs/api/models.html)：GET /v1/models
 - [Embeddings](https://nowhub.org/docs/api/embeddings.html)：POST /v1/embeddings
 - [函数调用](https://nowhub.org/docs/api/function-calling.html)：tools / tool_result / functionResponse
@@ -50,6 +51,8 @@
 - [超时](https://nowhub.org/docs/faq/timeout.html)
 - [max_tokens](https://nowhub.org/docs/faq/max-tokens.html)
 - [缓存与计费](https://nowhub.org/docs/faq/cache.html)
+- [网络与代理](https://nowhub.org/docs/faq/network.html)
+- [Token 估算](https://nowhub.org/docs/faq/token-estimate.html)
 
 ## 约定
 

@@ -6,7 +6,7 @@
 
 ```json
 {
-  "model": "gpt-6-sol",
+  "model": "<模型ID>",
   "messages": [{ "role": "user", "content": "北京现在几点？" }],
   "tools": [{
     "type": "function",

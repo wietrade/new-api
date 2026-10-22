@@ -33,7 +33,7 @@ VS Code 里主流的几个 AI 编程插件都支持「OpenAI 兼容」，配置�
 3. 填写：
    - Base URL：`https://api.nowhub.org/v1`
    - API Key：你的令牌
-   - Model ID：例如 `<模型ID>`
+   - Model ID：模型广场里的模型 ID
 4. 关掉 `Enable streaming` 以外的默认选项，先发一句「你好」验证
 
 ::: tip 工具调用
