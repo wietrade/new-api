@@ -206,20 +206,16 @@ describe('pricing controls', () => {
     }
   })
 
-  it('switches to table view with the keyboard and exposes the selected view', async () => {
+  it('shows a decorative card-view icon without any view switch control', () => {
     const props = toolbarProps()
-    const user = userEvent.setup()
-    const { rerender } = render(<PricingToolbar {...props} />)
-    const tableButton = screen.getByRole('button', { name: 'Table view' })
-    tableButton.focus()
-    await user.keyboard('{Enter}')
-    expect(props.onViewModeChange).toHaveBeenCalledWith('table')
-    rerender(<PricingToolbar {...props} viewMode='table' />)
-    expect(tableButton).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: 'Card view' })).toHaveAttribute(
-      'aria-pressed',
-      'false'
-    )
+    render(<PricingToolbar {...props} />)
+    expect(
+      screen.queryByRole('button', { name: 'Table view' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Card view' })
+    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'View mode' })).not.toBeInTheDocument()
   })
 
   it('selects price sorting from the shared dropdown', async () => {

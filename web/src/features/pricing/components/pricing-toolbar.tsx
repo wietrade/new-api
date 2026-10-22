@@ -16,11 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { ArrowUpDown, Check, Filter } from 'lucide-react'
+import { ArrowUpDown, Check, Filter, Grid2X2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { DataTableViewModeToggle } from '@/components/data-table'
 import {
   sideDrawerContentClassName,
   sideDrawerFormClassName,
@@ -155,11 +154,15 @@ export function PricingToolbar(props: PricingToolbarProps) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DataTableViewModeToggle
-            value={props.viewMode}
-            onChange={props.onViewModeChange}
-            className='h-8'
-          />
+          {/* 仅作装饰：模型广场只提供卡片视图 */}
+          <div
+            aria-hidden='true'
+            className='bg-muted/60 inline-flex h-8 items-center rounded-lg border p-0.5'
+          >
+            <span className='bg-primary text-primary-foreground inline-flex h-full w-7 items-center justify-center rounded-md'>
+              <Grid2X2 className='size-3.5' />
+            </span>
+          </div>
         </div>
       </div>
 
