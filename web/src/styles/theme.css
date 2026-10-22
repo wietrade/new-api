@@ -154,33 +154,13 @@ For commercial licensing, please contact support@quantumnous.com
   --skeleton-base: #f6f8fa;
   --skeleton-highlight: #ffffff;
   --table-row: var(--background);
-  --table-header: color-mix(
-    in oklch,
-    var(--foreground) 1.5%,
-    var(--background)
-  );
-  --table-header-hover: color-mix(
-    in oklch,
-    var(--foreground) 3%,
-    var(--background)
-  );
-  /* Disabled rows: kept subtle so they read as "quiet", not as a colored
-     alert state. */
-  --table-disabled: color-mix(
-    in oklch,
-    var(--foreground) 3%,
-    var(--background)
-  );
-  --table-disabled-hover: color-mix(
-    in oklch,
-    var(--foreground) 4.5%,
-    var(--background)
-  );
-  --table-disabled-border: color-mix(
-    in oklch,
-    var(--foreground) 16%,
-    var(--background)
-  );
+  /* Explicit neutrals: color-mix(... oklch) with a greyscale foreground
+     resolves to hue `none` and the browser then paints it as red. */
+  --table-header: #f6f8fa;
+  --table-header-hover: #eef1f4;
+  --table-disabled: #f6f8fa;
+  --table-disabled-hover: #eef1f4;
+  --table-disabled-border: #d0d7de;
 }
 
 .dark {
@@ -232,25 +212,9 @@ For commercial licensing, please contact support@quantumnous.com
   --skeleton-base: #161b22;
   --skeleton-highlight: #21262d;
   --table-row: var(--background);
-  --table-header: color-mix(in oklch, var(--foreground) 6%, var(--background));
-  --table-header-hover: color-mix(
-    in oklch,
-    var(--foreground) 9%,
-    var(--background)
-  );
-  --table-disabled: color-mix(
-    in oklch,
-    var(--foreground) 7%,
-    var(--background)
-  );
-  --table-disabled-hover: color-mix(
-    in oklch,
-    var(--foreground) 9.5%,
-    var(--background)
-  );
-  --table-disabled-border: color-mix(
-    in oklch,
-    var(--foreground) 24%,
-    var(--background)
-  );
+  --table-header: #161b22;
+  --table-header-hover: #1c2430;
+  --table-disabled: #151a21;
+  --table-disabled-hover: #1a212a;
+  --table-disabled-border: #30363d;
 }

@@ -574,6 +574,7 @@ function SupportedParametersSection(props: { model: PricingModel }) {
       <SectionTitle icon={Sigma}>{t('Supported parameters')}</SectionTitle>
       <StaticDataTable
         className={tableStyles.sectionContainer}
+        tableClassName='[&_tbody>tr]:h-auto [&_td]:align-middle'
         headerRowClassName={tableStyles.mutedHeaderRow}
         data={params}
         getRowKey={(param) => param.name}
@@ -684,6 +685,7 @@ function RateLimitsSection(props: { model: PricingModel }) {
       <SectionTitle icon={Gauge}>{t('Rate limits')}</SectionTitle>
       <StaticDataTable
         className={tableStyles.sectionContainer}
+        tableClassName='[&_tbody>tr]:h-auto [&_td]:align-middle'
         headerRowClassName={tableStyles.mutedHeaderRow}
         data={limits}
         getRowKey={(limit) => limit.group}
