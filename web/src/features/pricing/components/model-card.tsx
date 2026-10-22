@@ -86,6 +86,17 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   }
   const badges = Array.from(badgeMap, ([key, label]) => ({ key, label }))
   const groups = props.model.enable_groups || []
+  const groupRatios = props.model.group_ratio ?? {}
+  const highlightedGroup = props.selectedGroup
+    ? props.selectedGroup
+    : groups.reduce(
+        (best, group) =>
+          (groupRatios[group] ?? 1) < (groupRatios[best] ?? 1) ? group : best,
+        groups[0] ?? ''
+      )
+  const highlightedGroupRatio = highlightedGroup
+    ? (groupRatios[highlightedGroup] ?? 1)
+    : 1
   const endpoints = props.model.supported_endpoint_types || []
   const modelIconKey = props.model.icon || props.model.vendor_icon
   const modelIcon = modelIconKey ? getLobeIcon(modelIconKey, 28) : null
@@ -398,20 +409,15 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
             {groups.length > 0 && (
               <div className='flex min-w-0 items-baseline gap-1.5'>
                 <dt className='text-muted-foreground shrink-0'>
-                  {t('Groups')}
+                  {t('Lowest price group')}
                 </dt>
                 <dd className='flex min-w-0 items-baseline gap-1'>
                   <span className='truncate' title={groups.join(', ')}>
-                    {groups[0]}
+                    {highlightedGroup}
                   </span>
-                  {groups.length > 1 && (
-                    <span
-                      className='text-muted-foreground shrink-0'
-                      title={groups.slice(1).join(', ')}
-                    >
-                      +{groups.length - 1}
-                    </span>
-                  )}
+                  <span className='text-muted-foreground shrink-0 font-mono'>
+                    {highlightedGroupRatio}x
+                  </span>
                 </dd>
               </div>
             )}
@@ -455,6 +461,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           <Button
             variant='ghost'
             size='sm'
+            aria-label={`${props.model.model_name} · ${t('Details')}`}
             onClick={() => props.onClick(props.model.model_name || '')}
           >
             {t('Details')}

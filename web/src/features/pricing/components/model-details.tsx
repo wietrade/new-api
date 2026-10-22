@@ -1117,6 +1117,11 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
             cell: (row: (typeof rows)[number]) => (
               <div className='space-y-0.5'>
                 <div className='text-foreground'>{row.label}</div>
+                {row.key === officialRow.key && (
+                  <div className='text-muted-foreground text-xs'>
+                    {t('Vendor list price (ratio 1)')}
+                  </div>
+                )}
                 {showTier && (
                   <div className='text-muted-foreground text-xs'>
                     {describeTier(row.tier)}

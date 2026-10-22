@@ -544,7 +544,7 @@ describe('task dynamic pricing', () => {
 
     assert.ok(example)
     assert.equal(example.label, '720p · 5s')
-    assert.match(example.formatted, /1[.,]0584/)
+    assert.match(example.formatted, /1[.,]06/)
   })
 
   test('returns null when the expression is not canonical or examples are missing', () => {

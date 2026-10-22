@@ -151,7 +151,7 @@ describe('model cards', () => {
     await user.click(screen.getByRole('button', { name: 'Copy model name' }))
     expect(await navigator.clipboard.readText()).toBe(name)
     expect(onClick).not.toHaveBeenCalled()
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: /Details/ }))
     expect(onClick).toHaveBeenCalledOnce()
     expect(onClick).toHaveBeenCalledWith(name)
   })
@@ -171,7 +171,7 @@ describe('model cards', () => {
     expect(statusStrip).toHaveTextContent('—')
     expect(statusStrip.querySelectorAll('[aria-hidden]')).toHaveLength(0)
     expect(screen.getByText('No description available.')).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Details' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /Details/ })).toBeEnabled()
   })
 
   it('uses fixed spacing between available status samples', () => {
@@ -255,7 +255,7 @@ describe('model cards', () => {
     expect(within(idle).getByText('—t/s')).toBeVisible()
   })
 
-  it('keeps group, endpoint and capability overflow counts with their own metadata', () => {
+  it('keeps group, endpoint and capability metadata with their own labels', () => {
     const groups = ['default-with-a-long-group-name', 'premium', 'internal']
     const endpoints = ['openai-response', 'openai', 'claude', 'gemini', 'jina']
     const inputModalities: PricingModel['input_modalities'] = [
@@ -280,7 +280,7 @@ describe('model cards', () => {
       />
     )
 
-    const groupField = screen.getByText('Groups').parentElement
+    const groupField = screen.getByText('Lowest price group').parentElement
     const endpointField = screen.getByText('API Protocol').parentElement
     if (!groupField || !endpointField) {
       throw new Error('Expected labeled group and endpoint fields')
@@ -289,10 +289,7 @@ describe('model cards', () => {
       name: 'Model Types',
     })
     expect(within(groupField).getByText(groups[0])).toBeVisible()
-    expect(within(groupField).getByText('+2')).toHaveAttribute(
-      'title',
-      groups.slice(1).join(', ')
-    )
+    expect(within(groupField).getByText(/x$/)).toBeVisible()
     expect(
       within(endpointField).getByText('OpenAI Responses, OpenAI Chat')
     ).toHaveAttribute(
@@ -635,7 +632,7 @@ describe('model cards', () => {
       ).getAllByText(/^—/)
     ).toHaveLength(4)
     const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: /Details/ }))
     expect(onModelClick).toHaveBeenCalledWith('example-model')
   })
 

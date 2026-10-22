@@ -217,7 +217,7 @@ export function formatDynamicUnitPrice(
 
   return formatBillingCurrencyFromUSD(displayPrice, {
     showSymbol: options.showCurrencySymbol ?? true,
-    digitsLarge: 4,
+    digitsLarge: 2,
     digitsSmall: 6,
     abbreviate: false,
   })
@@ -240,7 +240,7 @@ export function formatTaskUsageUnitPrice(
 
   return formatBillingCurrencyFromUSD(displayPrice, {
     showSymbol: options.showCurrencySymbol ?? true,
-    digitsLarge: 4,
+    digitsLarge: 2,
     digitsSmall: 6,
     abbreviate: false,
   })

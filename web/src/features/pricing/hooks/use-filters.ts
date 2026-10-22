@@ -24,8 +24,6 @@ import { useDebounce } from '@/hooks/use-debounce'
 import {
   SORT_OPTIONS,
   DEFAULT_TOKEN_UNIT,
-  VIEW_MODES,
-  type ViewMode,
 } from '../constants'
 import { filterAndSortModels } from '../lib/filters'
 import type { PricingModel, TokenUnit } from '../types'
@@ -41,7 +39,6 @@ type FilterState = {
   context?: string[]
   priceTier?: string[]
   tokenUnit?: TokenUnit
-  view?: ViewMode
   rechargePrice?: boolean
 }
 
@@ -66,13 +63,6 @@ function toggleValue(list: string[], value: string): string[] {
     : [...list, value]
 }
 
-function normalizeViewMode(value: unknown): ViewMode {
-  if (value === VIEW_MODES.TABLE) {
-    return VIEW_MODES.TABLE
-  }
-  return VIEW_MODES.CARD
-}
-
 export function useFilters(models: PricingModel[]) {
   const search = useSearch({ from: '/pricing/' })
   const [filterState, setFilterState] = useState<FilterState>(() => ({
@@ -86,7 +76,6 @@ export function useFilters(models: PricingModel[]) {
     context: parseList(search.context),
     priceTier: parseList(search.priceTier),
     tokenUnit: search.tokenUnit,
-    view: search.view,
     rechargePrice: search.rechargePrice,
   }))
 
@@ -102,7 +91,6 @@ export function useFilters(models: PricingModel[]) {
   const priceTierFilter = filterState.priceTier ?? []
   const tokenUnit: TokenUnit =
     filterState.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
-  const viewMode = normalizeViewMode(filterState.view)
   const showRechargePrice = filterState.rechargePrice === true
 
   const updateFilters = useCallback((updates: Record<string, unknown>) => {
@@ -134,11 +122,6 @@ export function useFilters(models: PricingModel[]) {
   const setTokenUnit = useCallback(
     (v: TokenUnit) =>
       updateFilters({ tokenUnit: v === DEFAULT_TOKEN_UNIT ? undefined : v }),
-    [updateFilters]
-  )
-  const setViewMode = useCallback(
-    (v: ViewMode) =>
-      updateFilters({ view: v === VIEW_MODES.CARD ? undefined : v }),
     [updateFilters]
   )
   const setShowRechargePrice = useCallback(
@@ -276,7 +259,6 @@ export function useFilters(models: PricingModel[]) {
     contextFilter,
     priceTierFilter,
     tokenUnit,
-    viewMode,
     showRechargePrice,
     setSearchInput,
     setSortBy,
@@ -288,7 +270,6 @@ export function useFilters(models: PricingModel[]) {
     setContextFilter,
     setPriceTierFilter,
     setTokenUnit,
-    setViewMode,
     setShowRechargePrice,
     filteredModels,
     hasActiveFilters,
