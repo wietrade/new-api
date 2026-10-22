@@ -30,8 +30,11 @@ function Table({
   const table = (
     <table
       data-slot='table'
+      // Cells flatten their descendants to one size/weight so table bodies stay
+      // calm; elements that intentionally carry their own typography (mono
+      // prices, 12px labels) opt out with `data-typo`.
       className={cn(
-        'w-full caption-bottom text-sm tabular-nums [font-family:var(--font-body)] [&_td]:text-sm [&_td]:font-medium [&_th]:text-sm [&_:is(th,td)_*]:[font-family:inherit] [&_:is(th,td)_*]:[font-size:inherit] [&_:is(th,td)_*]:[font-weight:inherit]',
+        'w-full caption-bottom text-sm tabular-nums [font-family:var(--font-body)] [&_td]:text-sm [&_td]:font-medium [&_th]:text-sm [&_:is(th,td)_*:not([data-typo])]:[font-family:inherit] [&_:is(th,td)_*:not([data-typo])]:[font-size:inherit] [&_:is(th,td)_*:not([data-typo])]:[font-weight:inherit]',
         '[&_[data-table-text=secondary]]:text-xs [&_[data-table-text=secondary]]:font-normal',
         className
       )}

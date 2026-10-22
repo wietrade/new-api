@@ -244,12 +244,14 @@ export function ModelPriceCell(props: {
             className='flex min-w-0 flex-col items-start gap-y-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-1.5'
           >
             <span
+              data-typo
               className='text-muted-foreground min-w-0 truncate text-xs font-normal'
               title={metric.label}
             >
               {metric.label}
             </span>
             <span
+              data-typo
               className='min-w-0 font-mono text-sm break-words whitespace-normal tabular-nums'
               title={metric.value}
             >
@@ -259,6 +261,7 @@ export function ModelPriceCell(props: {
         ))}
       </span>
       <span
+        data-typo
         className='text-muted-foreground block text-xs font-normal break-words whitespace-normal sm:truncate'
         title={caption}
       >

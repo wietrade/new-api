@@ -100,18 +100,18 @@ export function CachedPriceCell(props: {
             className='flex flex-wrap items-baseline gap-x-1'
           >
             {(cacheEntries.length > 1 || entry.field === 'imageCachePrice') && (
-              <span className='text-muted-foreground text-xs'>
+              <span data-typo className='text-muted-foreground text-xs'>
                 {entry.field === 'imageCachePrice'
                   ? t('Image Cache')
                   : t('Cache Read')}
               </span>
             )}
-            <span className='font-mono text-sm tabular-nums'>
+            <span data-typo className='font-mono text-sm tabular-nums'>
               {stripTrailingZeros(entry.formatted)}
             </span>
           </div>
         ))}
-        <div className='text-muted-foreground text-[11px]'>
+        <div data-typo className='text-muted-foreground text-[11px]'>
           / {tokenUnitLabel}
         </div>
       </div>
@@ -142,8 +142,10 @@ export function CachedPriceCell(props: {
 
   return (
     <div className='max-w-full min-w-0'>
-      <span className='font-mono text-sm tabular-nums'>{cachedPrice}</span>
-      <div className='text-muted-foreground text-[11px]'>
+      <span data-typo className='font-mono text-sm tabular-nums'>
+        {cachedPrice}
+      </span>
+      <div data-typo className='text-muted-foreground text-[11px]'>
         / {tokenUnitLabel}
       </div>
     </div>
