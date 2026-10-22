@@ -61,7 +61,7 @@ import { requireServerSuccess } from '@/lib/server-error-message'
 import { cn } from '@/lib/utils'
 import { useSystemConfigStore } from '@/stores/system-config-store'
 
-import { DEFAULT_TOKEN_UNIT } from '../constants'
+import { DEFAULT_TOKEN_UNIT, getProtocolLabel } from '../constants'
 import { useBillingTime } from '../hooks/use-billing-time'
 import { usePricingData } from '../hooks/use-pricing-data'
 import type { ParsedTaskTier } from '../lib/billing-expr'
@@ -111,7 +111,7 @@ import { ModelDetailsPerformance } from './model-details-performance'
 
 function SectionTitle(props: { children: React.ReactNode }) {
   return (
-    <h2 className='text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase'>
+    <h2 className='text-muted-foreground mb-3 text-xs font-semibold'>
       {props.children}
     </h2>
   )
@@ -404,7 +404,7 @@ function ModelBackendQuickStats(props: { model: PricingModel }) {
         <span className='inline-flex items-center gap-1'>
           <ModalityLabels items={inputModalities} />
           {inputModalities.length > 0 && outputModalities.length > 0 && (
-            <span className='text-muted-foreground/40'>→</span>
+            <span className='text-muted-foreground/70'>→</span>
           )}
           <ModalityLabels items={outputModalities} />
         </span>
@@ -441,7 +441,7 @@ function ModelBackendQuickStats(props: { model: PricingModel }) {
             key={stat.key}
             className='bg-background flex min-w-0 flex-col gap-0.5 px-3 py-2.5'
           >
-            <span className='text-muted-foreground inline-flex min-w-0 items-center gap-1 text-[10px] font-medium tracking-wider uppercase'>
+            <span className='text-muted-foreground inline-flex min-w-0 items-center gap-1 text-[11px] font-medium'>
               <Icon className='size-3 shrink-0' />
               <span className='truncate'>{stat.label}</span>
             </span>
@@ -449,7 +449,7 @@ function ModelBackendQuickStats(props: { model: PricingModel }) {
               {stat.value}
             </span>
             {stat.hint && (
-              <span className='text-muted-foreground/60 truncate text-[10px]'>
+              <span className='text-muted-foreground truncate text-[11px]'>
                 {stat.hint}
               </span>
             )}
@@ -463,59 +463,24 @@ function ModelBackendQuickStats(props: { model: PricingModel }) {
 function ModelBackendSignalsSection(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const capabilities = normalizeCatalogItems(props.model.capabilities)
-  const inputModalities = normalizeCatalogItems(props.model.input_modalities)
-  const outputModalities = normalizeCatalogItems(props.model.output_modalities)
 
-  if (
-    capabilities.length === 0 &&
-    inputModalities.length === 0 &&
-    outputModalities.length === 0
-  ) {
+  // Modalities are already shown in the QuickStats row above.
+  if (capabilities.length === 0) {
     return null
   }
 
   return (
     <section>
-      <SectionTitle>
-        {t('Capabilities')} / {t('Supported modalities')}
-      </SectionTitle>
-      <div className='grid gap-3 rounded-xl border p-3 @2xl/details:grid-cols-[minmax(0,1.5fr)_minmax(260px,1fr)]'>
-        {capabilities.length > 0 ? (
-          <CatalogPillList
-            items={capabilities.map((capability) =>
-              t(
-                CAPABILITY_LABEL_KEYS[capability as ModelCapability] ??
-                  capability
-              )
-            )}
-          />
-        ) : (
-          <div />
-        )}
-        {(inputModalities.length > 0 || outputModalities.length > 0) && (
-          <div className='grid gap-2 sm:grid-cols-2'>
-            {inputModalities.length > 0 && (
-              <div className='flex items-center justify-between gap-3 rounded-lg border px-3 py-2'>
-                <span className='text-muted-foreground text-xs font-medium'>
-                  {t('Input')}
-                </span>
-                <CatalogTextValue>
-                  <ModalityLabels items={inputModalities} />
-                </CatalogTextValue>
-              </div>
-            )}
-            {outputModalities.length > 0 && (
-              <div className='flex items-center justify-between gap-3 rounded-lg border px-3 py-2'>
-                <span className='text-muted-foreground text-xs font-medium'>
-                  {t('Output')}
-                </span>
-                <CatalogTextValue>
-                  <ModalityLabels items={outputModalities} />
-                </CatalogTextValue>
-              </div>
-            )}
-          </div>
-        )}
+      <SectionTitle>{t('Capabilities')}</SectionTitle>
+      <div className='rounded-xl border p-3'>
+        <CatalogPillList
+          items={capabilities.map((capability) =>
+            t(
+              CAPABILITY_LABEL_KEYS[capability as ModelCapability] ??
+                capability
+            )
+          )}
+        />
       </div>
     </section>
   )
@@ -553,8 +518,10 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
 
   if (endpoints.length > 0) {
     cells.push(
-      <CatalogInfoCell key='endpoints' label={t('Endpoints')}>
-        <CatalogPillList items={endpoints} />
+      <CatalogInfoCell key='endpoints' label={t('API Protocol')}>
+        <CatalogPillList
+          items={endpoints.map((endpoint) => getProtocolLabel(t, endpoint))}
+        />
       </CatalogInfoCell>
     )
   }
@@ -942,12 +909,12 @@ function AutoGroupChain(props: { model: PricingModel; autoGroups: string[] }) {
   return (
     <div className='text-muted-foreground mb-3 flex flex-wrap items-center gap-1 text-xs'>
       <span className='font-medium'>{t('Auto Group Chain')}</span>
-      <span className='text-muted-foreground/40'>→</span>
+      <span className='text-muted-foreground/70'>→</span>
       {autoChain.map((g, idx) => (
         <span key={g} className='flex items-center gap-1'>
           <GroupBadge group={g} size='sm' className='text-dynamic-billing' />
           {idx < autoChain.length - 1 && (
-            <span className='text-muted-foreground/40'>→</span>
+            <span className='text-muted-foreground/70'>→</span>
           )}
         </span>
       ))}
@@ -1112,8 +1079,7 @@ function ProviderGroupPricingSection(
   }
 
   const thClass = cn(
-    'text-muted-foreground py-2 text-xs font-medium whitespace-normal break-words',
-    !props.model.billing_usage_schema && 'tracking-wider uppercase'
+    'text-muted-foreground py-2 text-xs font-medium whitespace-normal break-words'
   )
 
   if (isDynamicPricingModel(props.model)) {
@@ -1335,7 +1301,7 @@ function ProviderGroupPricingSection(
               </div>
             )
           })}
-          <p className='text-muted-foreground/40 mt-1.5 text-[10px]'>
+          <p className='text-muted-foreground mt-1.5 text-[11px]'>
             {dynamicTiers.some(
               (tier) => 'unitPrices' in tier || tier.billingUnit === 'request'
             )
@@ -1444,7 +1410,7 @@ function ProviderGroupPricingSection(
       />
       <div className='-mx-4 sm:mx-0'>
         {isTokenBased && (
-          <p className='text-muted-foreground/40 mt-1.5 px-4 text-[10px] sm:px-0'>
+          <p className='text-muted-foreground mt-1.5 px-4 text-[11px] sm:px-0'>
             {t('Prices shown per {{unit}} tokens', { unit: tokenUnitLabel })}
           </p>
         )}
@@ -1490,10 +1456,12 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
     props.model.billing_expr,
     props.model.billing_usage_schema
   )
+  // A dynamic pricing model already lists its base prices in the tier table.
   const showBasePrices =
-    !props.model.billing_usage_schema ||
-    simpleTaskPricing ||
-    taskTiers.length === 0
+    !(isDynamic && !simpleTaskPricing) &&
+    (!props.model.billing_usage_schema ||
+      simpleTaskPricing ||
+      taskTiers.length === 0)
 
   return (
     <div className='@container/details space-y-4'>
@@ -1519,7 +1487,7 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
         <TabsContent value='overview' className='space-y-6 outline-none'>
           <OverviewSummaryGrid model={props.model} />
 
-          <section className='bg-card/60 space-y-5 rounded-xl border p-4 shadow-sm'>
+          <section className='bg-card/60 space-y-4 rounded-xl border p-3 shadow-sm sm:space-y-5 sm:p-4'>
             <SectionTitle>{t('Pricing')}</SectionTitle>
             {showBasePrices && (
               <PriceSection

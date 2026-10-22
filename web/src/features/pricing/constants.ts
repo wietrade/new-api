@@ -332,9 +332,26 @@ const PROTOCOL_LABEL_KEYS: Record<string, string> = {
   'openai-video': 'Video',
 }
 
+const PROTOCOL_WORD_CASE: Record<string, string> = {
+  openai: 'OpenAI',
+  api: 'API',
+  gpt: 'GPT',
+}
+
+function humanizeProtocolKey(key: string): string {
+  return key
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => {
+      const fixed = PROTOCOL_WORD_CASE[part.toLowerCase()]
+      return fixed ?? part.charAt(0).toUpperCase() + part.slice(1)
+    })
+    .join(' ')
+}
+
 export function getProtocolLabel(t: TFunction, key: string): string {
   const labelKey = PROTOCOL_LABEL_KEYS[key]
-  return labelKey ? t(labelKey) : key
+  return labelKey ? t(labelKey) : humanizeProtocolKey(key)
 }
 
 /** Maximum number of tags to display in model row */

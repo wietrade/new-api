@@ -59,6 +59,8 @@ type FilterSectionProps = {
   /** Selected option values; an empty array means "no restriction". */
   value: string[]
   options: FilterOption[]
+  /** Dim options that no model currently matches (keeps the layout stable). */
+  dimEmpty?: boolean
   onChange: (value: string) => void
 }
 
@@ -99,6 +101,8 @@ function FilterChip(props: {
   active: boolean
   /** Real selection (not the "all" chip) gets the green treatment. */
   highlight?: boolean
+  /** No model matches this option right now. */
+  disabled?: boolean
   onClick: () => void
 }) {
   return (
@@ -106,15 +110,18 @@ function FilterChip(props: {
       type='button'
       variant='outline'
       size='sm'
-      onClick={props.onClick}
+      onClick={props.disabled ? undefined : props.onClick}
       aria-pressed={props.active}
+      aria-disabled={props.disabled || undefined}
       className={cn(
         'h-auto max-w-full gap-1.5 px-2 py-1 text-xs',
         props.highlight &&
           'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:border-emerald-400/40 dark:text-emerald-300',
         props.active &&
           !props.highlight &&
-          'bg-muted/60 text-foreground'
+          'bg-muted/60 text-foreground',
+        props.disabled &&
+          'text-muted-foreground/60 cursor-not-allowed opacity-60 hover:bg-background'
       )}
       title={props.option.label}
     >
@@ -139,6 +146,7 @@ function FilterChip(props: {
 }
 
 function FilterSection(props: FilterSectionProps) {
+
   return (
     <Collapsible
       defaultOpen
@@ -160,6 +168,7 @@ function FilterSection(props: FilterSectionProps) {
                 option={option}
                 active={active}
                 highlight={active}
+                disabled={props.dimEmpty === true && (option.count ?? 0) === 0}
                 onClick={() => props.onChange(option.value)}
               />
             )
@@ -173,6 +182,8 @@ function FilterSection(props: FilterSectionProps) {
 export const PricingSidebar = memo(function PricingSidebar(
   props: PricingSidebarProps
 ) {
+  const hasModels = props.models.length > 0
+
   const { t } = useTranslation()
   const counts = useMemo(() => {
     const vendors = new Map<string, number>()
@@ -326,30 +337,35 @@ export const PricingSidebar = memo(function PricingSidebar(
       <div className='space-y-1'>
         <FilterSection
           title={t('Model Types')}
+          dimEmpty={hasModels}
           value={props.modelTypeFilter}
           options={modelTypeOptions}
           onChange={props.onModelTypeChange}
         />
         <FilterSection
           title={t('Input Types')}
+          dimEmpty={hasModels}
           value={props.inputTypeFilter}
           options={inputTypeOptions}
           onChange={props.onInputTypeChange}
         />
         <FilterSection
           title={t('Context Length')}
+          dimEmpty={hasModels}
           value={props.contextFilter}
           options={contextOptions}
           onChange={props.onContextChange}
         />
         <FilterSection
           title={t('Price')}
+          dimEmpty={hasModels}
           value={props.priceTierFilter}
           options={priceTierOptions}
           onChange={props.onPriceTierChange}
         />
         <FilterSection
           title={t('Pricing Type')}
+          dimEmpty={hasModels}
           value={props.quotaTypeFilter}
           options={quotaOptions}
           onChange={props.onQuotaTypeChange}

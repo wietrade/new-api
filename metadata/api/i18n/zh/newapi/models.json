@@ -1,0 +1,306 @@
+{
+  "success": true,
+  "message": "ok",
+  "data": [
+    {
+      "model_name": "claude-fable-5",
+      "vendor_name": "Anthropic",
+      "description": "面向创意写作、分析与可控智能体工作流的 Claude 模型",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-fable-5-1",
+      "vendor_name": "Anthropic",
+      "description": "面向高难度推理与长程智能体任务的 Claude 模型",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-haiku-4-5-20251001",
+      "vendor_name": "Anthropic",
+      "description": "快速型 Claude 模型，面向即时响应、分类与轻量智能体",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 200000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-opus-4-8",
+      "vendor_name": "Anthropic",
+      "description": "顶级 Claude Opus 档位，面向最高难度推理、编程与长程智能体",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-opus-5",
+      "vendor_name": "Anthropic",
+      "description": "最强的 Claude Opus 模型，面向编程、智能体与专业工作",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-opus-5-5",
+      "vendor_name": "Anthropic",
+      "description": "用于长期运行智能体编码与知识工作的 Claude 模型",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-sonnet-5",
+      "vendor_name": "Anthropic",
+      "description": "日常使用的 Claude 智能体模型，面向编程、规划与通用工作",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "claude-sonnet-5-5",
+      "vendor_name": "Anthropic",
+      "description": "用于日常编码、智能体与知识工作的快速 Claude 模型",
+      "icon": "Claude.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-5.6-sol",
+      "vendor_name": "OpenAI",
+      "description": "前沿 GPT-5.6 模型，面向复杂专业工作、编程与智能体工作流",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-6-astra",
+      "vendor_name": "OpenAI",
+      "description": "GPT-6 Astra 是能力最强的 GPT 模型，面向复杂推理、编程、计算机操作与研究",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-6-sol",
+      "vendor_name": "OpenAI",
+      "description": "GPT-6 高效档，面向日常编程与智能体任务",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    },
+    {
+      "model_name": "gpt-6.1-sol",
+      "vendor_name": "OpenAI",
+      "description": "GPT-6.1 高效档，面向日常编程与智能体任务",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1100000,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null
+    }
+  ]
+}

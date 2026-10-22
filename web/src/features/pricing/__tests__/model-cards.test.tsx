@@ -297,7 +297,7 @@ describe('model cards', () => {
       within(endpointField).getByText('OpenAI Responses, OpenAI Chat')
     ).toHaveAttribute(
       'title',
-      'OpenAI Responses, OpenAI Chat, claude, Gemini generateContent, jina'
+      'OpenAI Responses, OpenAI Chat, Claude, Gemini generateContent, Jina'
     )
     expect(within(endpointField).getByText('+3')).toBeVisible()
     expect(within(capabilityField).getByText('Text')).toBeVisible()
