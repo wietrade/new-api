@@ -95,6 +95,7 @@ export type PricingModel = {
    */
   context_length?: number
   max_output_tokens?: number
+  is_free?: boolean
   knowledge_cutoff?: string
   release_date?: string
   parameter_count?: string

@@ -39,8 +39,10 @@ function toolbarProps(): PricingToolbarProps {
     showRechargePrice: false,
     viewMode: 'card',
     quotaTypeFilter: 'all',
-    capabilityFilter: 'all',
+    modelTypeFilter: 'all',
+    inputTypeFilter: 'all',
     contextFilter: 'all',
+    priceTierFilter: 'all',
     vendorFilter: 'all',
     groupFilter: 'all',
     onSortChange: vi.fn(),
@@ -48,8 +50,10 @@ function toolbarProps(): PricingToolbarProps {
     onRechargePriceChange: vi.fn(),
     onViewModeChange: vi.fn(),
     onQuotaTypeChange: vi.fn(),
-    onCapabilityChange: vi.fn(),
+    onModelTypeChange: vi.fn(),
+    onInputTypeChange: vi.fn(),
     onContextChange: vi.fn(),
+    onPriceTierChange: vi.fn(),
     onVendorChange: vi.fn(),
     onGroupChange: vi.fn(),
     vendors: [],
@@ -63,7 +67,7 @@ function toolbarProps(): PricingToolbarProps {
 }
 
 describe('pricing controls', () => {
-  it('counts each model once per structured filter and updates counts on catalog change', () => {
+  it('derives model types, input types, context buckets and price tiers from structured data', () => {
     const props = toolbarProps()
     const base: PricingModel = {
       id: 1,
@@ -73,8 +77,11 @@ describe('pricing controls', () => {
       model_ratio: 1,
       completion_ratio: 1,
       enable_groups: ['default'],
-      capabilities: ['chat'],
+      capabilities: ['reasoning', 'tools'],
+      input_modalities: ['text', 'image', 'file'],
+      output_modalities: ['text'],
       context_length: 200_000,
+      is_free: false,
       supported_endpoint_types: ['openai'],
     }
     const models: PricingModel[] = [
@@ -84,18 +91,21 @@ describe('pricing controls', () => {
         id: 2,
         model_name: 'image-model',
         quota_type: 1,
-        capabilities: ['chat', 'image_generation'],
+        capabilities: ['tools'],
+        input_modalities: ['text'],
+        output_modalities: ['image'],
         context_length: 1_000_000,
-        supported_endpoint_types: ['image-generation'],
+        is_free: true,
       },
       {
         ...base,
         id: 3,
-        model_name: 'task-model',
+        model_name: 'video-model',
         vendor_name: 'Vendor B',
-        capabilities: ['chat', 'video_generation'],
+        capabilities: [],
+        input_modalities: ['text', 'video'],
+        output_modalities: ['video'],
         context_length: 20_000,
-        supported_endpoint_types: ['openai-video'],
         billing_usage_schema: { seconds: { type: 'number', unit: 'second' } },
       },
     ]
@@ -116,24 +126,30 @@ describe('pricing controls', () => {
     expect(screen.getByRole('button', { name: /^Vendor A\s*2$/ })).toBeVisible()
     expect(screen.getByRole('button', { name: /^Vendor B\s*1$/ })).toBeVisible()
 
-    // Capability counts are computed from structured `capabilities`, not tags.
-    expect(screen.getByRole('button', { name: /^Chat\s*3$/ })).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: /^Image Generation\s*1$/ })
-    ).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: /^Video Generation\s*1$/ })
-    ).toBeVisible()
-    expect(
-      screen.queryByRole('button', { name: /^Tools\s*\d+$/ })
-    ).toBeNull()
+    // `Text` / `Image` / `Video` labels exist in both the model-type and the
+    // input-type section, so each count is asserted as "at least one chip".
+    const chip = (name: RegExp) =>
+      screen.getAllByRole('button', { name }).length
+    expect(chip(/^Text\s*1$/)).toBeGreaterThan(0)
+    expect(chip(/^Image\s*1$/)).toBeGreaterThan(0)
+    expect(chip(/^Video\s*1$/)).toBeGreaterThan(0)
+    expect(chip(/^Audio\s*0$/)).toBeGreaterThan(0)
+    expect(chip(/^Embeddings\s*0$/)).toBe(1)
+    expect(chip(/^Rerank\s*0$/)).toBe(1)
+    expect(chip(/^Files\s*1$/)).toBe(1)
 
-    // Context window buckets keep their own counts.
+    // Context buckets.
     expect(
       screen.getByRole('button', { name: /^200K - 1M\s*1$/ })
     ).toBeVisible()
     expect(screen.getByRole('button', { name: /^≥ 1M\s*1$/ })).toBeVisible()
     expect(screen.getByRole('button', { name: /^< 200K\s*1$/ })).toBeVisible()
+
+    // Price tiers.
+    expect(
+      screen.getByRole('button', { name: /^Free of charge\s*1$/ })
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: /^Paid\s*2$/ })).toBeVisible()
 
     expect(
       screen.getByRole('button', { name: /^Token-based\s*1$/ })
@@ -149,18 +165,15 @@ describe('pricing controls', () => {
     expect(
       screen.getByRole('button', { name: /^All Vendors\s*1$/ })
     ).toBeVisible()
-    expect(screen.getByRole('button', { name: /^Vendor A\s*1$/ })).toBeVisible()
-    expect(screen.queryByRole('button', { name: /^Vendor B\s*1$/ })).toBeNull()
-    expect(screen.getByRole('button', { name: /^Chat\s*1$/ })).toBeVisible()
-    // Zero-count capabilities are hidden instead of rendered as empty chips.
     expect(
-      screen.queryByRole('button', { name: /^Video Generation/ })
+      screen.queryByRole('button', { name: /^Vendor B\s*1$/ })
     ).toBeNull()
     expect(
-      screen.getByRole('button', { name: /^Token-based\s*0$/ })
-    ).toBeVisible()
+      screen.getAllByRole('button', { name: /^Image\s*1$/ }).length
+    ).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: /^Text\s*0$/ })).toBeVisible()
     expect(
-      screen.getByRole('button', { name: /^Task billing\s*0$/ })
+      screen.getByRole('button', { name: /^Free of charge\s*1$/ })
     ).toBeVisible()
   })
 

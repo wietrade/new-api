@@ -59,8 +59,10 @@ export function Pricing() {
     vendorFilter,
     groupFilter,
     quotaTypeFilter,
-    capabilityFilter,
+    modelTypeFilter,
+    inputTypeFilter,
     contextFilter,
+    priceTierFilter,
     tokenUnit,
     viewMode,
     showRechargePrice,
@@ -69,8 +71,10 @@ export function Pricing() {
     setVendorFilter,
     setGroupFilter,
     setQuotaTypeFilter,
-    setCapabilityFilter,
+    setModelTypeFilter,
+    setInputTypeFilter,
     setContextFilter,
+    setPriceTierFilter,
     setTokenUnit,
     setViewMode,
     setShowRechargePrice,
@@ -187,13 +191,17 @@ export function Pricing() {
           <div className='grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)]'>
             <PricingSidebar
               quotaTypeFilter={quotaTypeFilter}
-              capabilityFilter={capabilityFilter}
+              modelTypeFilter={modelTypeFilter}
+              inputTypeFilter={inputTypeFilter}
               contextFilter={contextFilter}
+              priceTierFilter={priceTierFilter}
               vendorFilter={vendorFilter}
               groupFilter={groupFilter}
               onQuotaTypeChange={setQuotaTypeFilter}
-              onCapabilityChange={setCapabilityFilter}
+              onModelTypeChange={setModelTypeFilter}
+              onInputTypeChange={setInputTypeFilter}
               onContextChange={setContextFilter}
+              onPriceTierChange={setPriceTierFilter}
               onVendorChange={setVendorFilter}
               onGroupChange={setGroupFilter}
               vendors={vendors || []}
@@ -221,13 +229,17 @@ export function Pricing() {
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
                 quotaTypeFilter={quotaTypeFilter}
-                capabilityFilter={capabilityFilter}
+                modelTypeFilter={modelTypeFilter}
+                inputTypeFilter={inputTypeFilter}
                 contextFilter={contextFilter}
+                priceTierFilter={priceTierFilter}
                 vendorFilter={vendorFilter}
                 groupFilter={groupFilter}
                 onQuotaTypeChange={setQuotaTypeFilter}
-                onCapabilityChange={setCapabilityFilter}
+                onModelTypeChange={setModelTypeFilter}
+                onInputTypeChange={setInputTypeFilter}
                 onContextChange={setContextFilter}
+                onPriceTierChange={setPriceTierFilter}
                 onVendorChange={setVendorFilter}
                 onGroupChange={setGroupFilter}
                 vendors={vendors || []}

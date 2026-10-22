@@ -34,14 +34,20 @@ import {
   CONTEXT_RANGES,
   CONTEXT_RANGE_ORDER,
   FILTER_ALL,
-  MODEL_CAPABILITY_ORDER,
+  INPUT_TYPES,
+  INPUT_TYPE_ORDER,
+  MODEL_TYPES,
+  MODEL_TYPE_ORDER,
+  PRICE_TIERS,
   QUOTA_TYPES,
-  getCapabilityLabel,
   getContextRangeLabels,
+  getInputTypeLabels,
+  getModelTypeLabels,
+  getPriceTierLabels,
   getQuotaTypeLabels,
 } from '../constants'
 import { hasTaskUsageSchema } from '../lib/dynamic-price'
-import { getContextRangeOf, getModelCapabilities } from '../lib/filters'
+import { getContextRangeOf, getModelTypes } from '../lib/filters'
 import type { PricingModel, PricingVendor } from '../types'
 
 type FilterOption = {
@@ -61,13 +67,17 @@ type FilterSectionProps = {
 
 export interface PricingSidebarProps {
   quotaTypeFilter: string
-  capabilityFilter: string
+  modelTypeFilter: string
+  inputTypeFilter: string
   contextFilter: string
+  priceTierFilter: string
   vendorFilter: string
   groupFilter: string
   onQuotaTypeChange: (value: string) => void
-  onCapabilityChange: (value: string) => void
+  onModelTypeChange: (value: string) => void
+  onInputTypeChange: (value: string) => void
   onContextChange: (value: string) => void
+  onPriceTierChange: (value: string) => void
   onVendorChange: (value: string) => void
   onGroupChange: (value: string) => void
   vendors: PricingVendor[]
@@ -156,8 +166,10 @@ export const PricingSidebar = memo(function PricingSidebar(
   const { t } = useTranslation()
   const counts = useMemo(() => {
     const vendors = new Map<string, number>()
-    const capabilities = new Map<string, number>()
+    const modelTypes = new Map<string, number>()
+    const inputTypes = new Map<string, number>()
     const contexts = new Map<string, number>()
+    const priceTiers = { free: 0, paid: 0 }
     const quotas = { token: 0, request: 0, task: 0 }
     for (const model of props.models) {
       if (model.vendor_name) {
@@ -166,12 +178,21 @@ export const PricingSidebar = memo(function PricingSidebar(
           (vendors.get(model.vendor_name) ?? 0) + 1
         )
       }
-      for (const capability of new Set(getModelCapabilities(model))) {
-        capabilities.set(capability, (capabilities.get(capability) ?? 0) + 1)
+      for (const type of new Set(getModelTypes(model))) {
+        modelTypes.set(type, (modelTypes.get(type) ?? 0) + 1)
+      }
+      for (const input of new Set(model.input_modalities ?? [])) {
+        const key = input.toLowerCase()
+        inputTypes.set(key, (inputTypes.get(key) ?? 0) + 1)
       }
       const range = getContextRangeOf(model)
       if (range) {
         contexts.set(range, (contexts.get(range) ?? 0) + 1)
+      }
+      if (model.is_free) {
+        priceTiers.free++
+      } else {
+        priceTiers.paid++
       }
       if (hasTaskUsageSchema(model)) {
         quotas.task++
@@ -181,11 +202,14 @@ export const PricingSidebar = memo(function PricingSidebar(
         quotas.request++
       }
     }
-    return { vendors, capabilities, contexts, quotas }
+    return { vendors, modelTypes, inputTypes, contexts, priceTiers, quotas }
   }, [props.models])
 
   const quotaTypeLabels = getQuotaTypeLabels(t)
+  const modelTypeLabels = getModelTypeLabels(t)
+  const inputTypeLabels = getInputTypeLabels(t)
   const contextRangeLabels = getContextRangeLabels(t)
+  const priceTierLabels = getPriceTierLabels(t)
 
   const vendorOptions: FilterOption[] = [
     {
@@ -238,19 +262,29 @@ export const PricingSidebar = memo(function PricingSidebar(
     },
   ]
 
-  // Only surface capabilities that at least one listed model declares.
-  const capabilityOptions: FilterOption[] = [
+  const modelTypeOptions: FilterOption[] = [
     {
-      value: FILTER_ALL,
-      label: t('All Capabilities'),
+      value: MODEL_TYPES.ALL,
+      label: modelTypeLabels[MODEL_TYPES.ALL],
       count: props.models.length,
     },
-    ...MODEL_CAPABILITY_ORDER.filter(
-      (capability) => (counts.capabilities.get(capability) ?? 0) > 0
-    ).map((capability) => ({
-      value: capability,
-      label: getCapabilityLabel(t, capability),
-      count: counts.capabilities.get(capability) ?? 0,
+    ...MODEL_TYPE_ORDER.map((type) => ({
+      value: type,
+      label: modelTypeLabels[type],
+      count: counts.modelTypes.get(type) ?? 0,
+    })),
+  ]
+
+  const inputTypeOptions: FilterOption[] = [
+    {
+      value: INPUT_TYPES.ALL,
+      label: inputTypeLabels[INPUT_TYPES.ALL],
+      count: props.models.length,
+    },
+    ...INPUT_TYPE_ORDER.map((type) => ({
+      value: type,
+      label: inputTypeLabels[type],
+      count: counts.inputTypes.get(type) ?? 0,
     })),
   ]
 
@@ -267,13 +301,31 @@ export const PricingSidebar = memo(function PricingSidebar(
     })),
   ]
 
+  const priceTierOptions: FilterOption[] = [
+    {
+      value: PRICE_TIERS.ALL,
+      label: priceTierLabels[PRICE_TIERS.ALL],
+      count: props.models.length,
+    },
+    {
+      value: PRICE_TIERS.FREE,
+      label: priceTierLabels[PRICE_TIERS.FREE],
+      count: counts.priceTiers.free,
+    },
+    {
+      value: PRICE_TIERS.PAID,
+      label: priceTierLabels[PRICE_TIERS.PAID],
+      count: counts.priceTiers.paid,
+    },
+  ]
+
   return (
     <aside className={cn('bg-card rounded-xl border p-3', props.className)}>
       <div className='mb-2.5 flex items-center justify-between gap-2'>
         <div>
           <h2 className='text-foreground text-sm font-bold'>{t('Filter')}</h2>
           <p className='text-muted-foreground mt-1 text-xs'>
-            {t('Refine models by capability, context length, vendor and group.')}
+            {t('Refine models by type, input, context length and price.')}
           </p>
         </div>
         <Button
@@ -297,22 +349,34 @@ export const PricingSidebar = memo(function PricingSidebar(
 
       <div className='space-y-1'>
         <FilterSection
-          title={t('Pricing Type')}
-          value={props.quotaTypeFilter}
-          options={quotaOptions}
-          onChange={props.onQuotaTypeChange}
+          title={t('Model Types')}
+          value={props.modelTypeFilter}
+          options={modelTypeOptions}
+          onChange={props.onModelTypeChange}
         />
         <FilterSection
-          title={t('Model Capabilities')}
-          value={props.capabilityFilter}
-          options={capabilityOptions}
-          onChange={props.onCapabilityChange}
+          title={t('Input Types')}
+          value={props.inputTypeFilter}
+          options={inputTypeOptions}
+          onChange={props.onInputTypeChange}
         />
         <FilterSection
           title={t('Context Length')}
           value={props.contextFilter}
           options={contextOptions}
           onChange={props.onContextChange}
+        />
+        <FilterSection
+          title={t('Price')}
+          value={props.priceTierFilter}
+          options={priceTierOptions}
+          onChange={props.onPriceTierChange}
+        />
+        <FilterSection
+          title={t('Pricing Type')}
+          value={props.quotaTypeFilter}
+          options={quotaOptions}
+          onChange={props.onQuotaTypeChange}
         />
         <FilterSection
           title={t('All Vendors')}

@@ -37,7 +37,7 @@ func lockMetadataMutation(tx *gorm.DB) error {
 
 var ErrMetadataSyncConflict = errors.New("metadata changed; preview again before applying")
 
-var MetadataSyncFields = []string{"description", "icon", "tags", "capabilities", "context_length", "max_output_tokens", "vendor", "endpoints", "name_rule", "status"}
+var MetadataSyncFields = []string{"description", "icon", "tags", "capabilities", "input_modalities", "output_modalities", "context_length", "max_output_tokens", "is_free", "vendor", "endpoints", "name_rule", "status"}
 
 // MetadataCapabilityVocabulary is the closed set of structured capability keys.
 // Keep it in sync with web/src/features/pricing/constants.ts (MODEL_CAPABILITIES).
@@ -54,6 +54,33 @@ var MetadataCapabilityVocabulary = map[string]bool{
 	"rerank":           true,
 	"web_search":       true,
 	"code_interpreter": true,
+}
+
+// BoolToInt normalizes JSON boolean flags onto the 0/1 storage convention.
+func BoolToInt(value bool) int {
+	if value {
+		return 1
+	}
+	return 0
+}
+
+// MetadataModalityVocabulary is the closed set of input/output modalities.
+// Keep it in sync with web/src/features/pricing/constants.ts (MODALITIES).
+var MetadataModalityVocabulary = map[string]bool{
+	"text":  true,
+	"image": true,
+	"audio": true,
+	"video": true,
+	"file":  true,
+}
+
+func ValidateModelModalities(raw string) error {
+	for _, item := range SplitMetadataList(raw) {
+		if !MetadataModalityVocabulary[item] {
+			return fmt.Errorf("unsupported model modality: %s", item)
+		}
+	}
+	return nil
 }
 
 // SplitMetadataList splits the comma-separated list columns (tags, capabilities)
@@ -104,16 +131,19 @@ func ValidateModelCapabilities(raw string) error {
 }
 
 type MetadataValues struct {
-	Description     string `json:"description"`
-	Icon            string `json:"icon"`
-	Tags            string `json:"tags"`
-	Capabilities    string `json:"capabilities"`
-	ContextLength   int    `json:"context_length"`
-	MaxOutputTokens int    `json:"max_output_tokens"`
-	Vendor          string `json:"vendor"`
-	Endpoints       string `json:"endpoints"`
-	NameRule        int    `json:"name_rule"`
-	Status          int    `json:"status"`
+	Description      string `json:"description"`
+	Icon             string `json:"icon"`
+	Tags             string `json:"tags"`
+	Capabilities     string `json:"capabilities"`
+	InputModalities  string `json:"input_modalities"`
+	OutputModalities string `json:"output_modalities"`
+	ContextLength    int    `json:"context_length"`
+	MaxOutputTokens  int    `json:"max_output_tokens"`
+	IsFree           int    `json:"is_free"`
+	Vendor           string `json:"vendor"`
+	Endpoints        string `json:"endpoints"`
+	NameRule         int    `json:"name_rule"`
+	Status           int    `json:"status"`
 }
 
 type MetadataSyncSelection struct {
@@ -166,6 +196,9 @@ func ValidateMetadataValues(values MetadataValues) error {
 	if values.Status != 0 && values.Status != 1 {
 		return errors.New("invalid catalog visibility")
 	}
+	if values.IsFree != 0 && values.IsFree != 1 {
+		return errors.New("is_free must be 0 or 1")
+	}
 	if values.ContextLength < 0 || values.MaxOutputTokens < 0 {
 		return errors.New("context_length and max_output_tokens must not be negative")
 	}
@@ -173,6 +206,12 @@ func ValidateMetadataValues(values MetadataValues) error {
 		return errors.New("max_output_tokens must not exceed context_length")
 	}
 	if err := ValidateModelCapabilities(values.Capabilities); err != nil {
+		return err
+	}
+	if err := ValidateModelModalities(values.InputModalities); err != nil {
+		return err
+	}
+	if err := ValidateModelModalities(values.OutputModalities); err != nil {
 		return err
 	}
 	return ValidateModelEndpoints(values.Endpoints)
@@ -299,10 +338,16 @@ func ApplyMetadataSync(updates []MetadataSyncUpdate, upstreamVendors map[string]
 					fields[field] = update.Values.Tags
 				case "capabilities":
 					fields[field] = update.Values.Capabilities
+				case "input_modalities":
+					fields[field] = update.Values.InputModalities
+				case "output_modalities":
+					fields[field] = update.Values.OutputModalities
 				case "context_length":
 					fields[field] = update.Values.ContextLength
 				case "max_output_tokens":
 					fields[field] = update.Values.MaxOutputTokens
+				case "is_free":
+					fields[field] = update.Values.IsFree
 				case "endpoints":
 					fields[field] = update.Values.Endpoints
 				case "name_rule":

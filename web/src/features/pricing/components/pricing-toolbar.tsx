@@ -64,13 +64,17 @@ export interface PricingToolbarProps {
   viewMode: ViewMode
   onViewModeChange: (value: ViewMode) => void
   quotaTypeFilter: string
-  capabilityFilter: string
+  modelTypeFilter: string
+  inputTypeFilter: string
   contextFilter: string
+  priceTierFilter: string
   vendorFilter: string
   groupFilter: string
   onQuotaTypeChange: (value: string) => void
-  onCapabilityChange: (value: string) => void
+  onModelTypeChange: (value: string) => void
+  onInputTypeChange: (value: string) => void
   onContextChange: (value: string) => void
+  onPriceTierChange: (value: string) => void
   onVendorChange: (value: string) => void
   onGroupChange: (value: string) => void
   vendors: PricingVendor[]
@@ -167,19 +171,23 @@ export function PricingToolbar(props: PricingToolbarProps) {
           <SheetHeader className={sideDrawerHeaderClassName()}>
             <SheetTitle>{t('Filter')}</SheetTitle>
             <SheetDescription>
-              {t('Filter models by capability, context length, vendor and group.')}
+              {t('Filter models by type, input, context length and price.')}
             </SheetDescription>
           </SheetHeader>
           <div className={sideDrawerFormClassName('gap-0')}>
             <PricingSidebar
               quotaTypeFilter={props.quotaTypeFilter}
-              capabilityFilter={props.capabilityFilter}
+              modelTypeFilter={props.modelTypeFilter}
+              inputTypeFilter={props.inputTypeFilter}
               contextFilter={props.contextFilter}
+              priceTierFilter={props.priceTierFilter}
               vendorFilter={props.vendorFilter}
               groupFilter={props.groupFilter}
               onQuotaTypeChange={props.onQuotaTypeChange}
-              onCapabilityChange={props.onCapabilityChange}
+              onModelTypeChange={props.onModelTypeChange}
+              onInputTypeChange={props.onInputTypeChange}
               onContextChange={props.onContextChange}
+              onPriceTierChange={props.onPriceTierChange}
               onVendorChange={props.onVendorChange}
               onGroupChange={props.onGroupChange}
               vendors={props.vendors}

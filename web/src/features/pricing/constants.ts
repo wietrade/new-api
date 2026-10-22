@@ -109,9 +109,10 @@ export function getEndpointTypeLabels(
 
 /** Filter section keys */
 export const FILTER_SECTIONS = {
-  PRICING_TYPE: 'pricingType',
-  CAPABILITY: 'capability',
+  MODEL_TYPE: 'modelType',
+  INPUT_TYPE: 'inputType',
   CONTEXT: 'context',
+  PRICE_TIER: 'priceTier',
   VENDOR: 'vendor',
   GROUP: 'group',
 } as const
@@ -218,6 +219,122 @@ export function formatContextLength(tokens?: number | null): string | undefined 
   if (tokens >= 1_000_000) return format(tokens / 1_000_000, 'M')
   if (tokens >= 1_000) return format(tokens / 1_000, 'K')
   return String(tokens)
+}
+
+/**
+ * Task-level model types. Derived from output modalities plus the
+ * `embedding` / `rerank` capability markers, mirroring how ModelGo groups
+ * its catalog (Text / Image / Video / Audio / Embedding / Rerank).
+ */
+export const MODEL_TYPES = {
+  ALL: 'all',
+  TEXT: 'text',
+  IMAGE: 'image',
+  VIDEO: 'video',
+  AUDIO: 'audio',
+  EMBEDDING: 'embedding',
+  RERANK: 'rerank',
+} as const
+
+export type ModelTypeOption = (typeof MODEL_TYPES)[keyof typeof MODEL_TYPES]
+
+export const MODEL_TYPE_ORDER: Exclude<ModelTypeOption, 'all'>[] = [
+  MODEL_TYPES.TEXT,
+  MODEL_TYPES.IMAGE,
+  MODEL_TYPES.VIDEO,
+  MODEL_TYPES.AUDIO,
+  MODEL_TYPES.EMBEDDING,
+  MODEL_TYPES.RERANK,
+]
+
+export function getModelTypeLabels(
+  t: TFunction
+): Record<ModelTypeOption, string> {
+  return {
+    [MODEL_TYPES.ALL]: t('All Models'),
+    [MODEL_TYPES.TEXT]: t('Text'),
+    [MODEL_TYPES.IMAGE]: t('Image'),
+    [MODEL_TYPES.VIDEO]: t('Video'),
+    [MODEL_TYPES.AUDIO]: t('Audio'),
+    [MODEL_TYPES.EMBEDDING]: t('Embeddings'),
+    [MODEL_TYPES.RERANK]: t('Rerank'),
+  }
+}
+
+export function getModelTypeLabel(t: TFunction, key: string): string {
+  return getModelTypeLabels(t)[key as ModelTypeOption] ?? key
+}
+
+/** Input modalities a model accepts. */
+export const INPUT_TYPES = {
+  ALL: 'all',
+  TEXT: 'text',
+  IMAGE: 'image',
+  AUDIO: 'audio',
+  VIDEO: 'video',
+  FILE: 'file',
+} as const
+
+export type InputTypeOption = (typeof INPUT_TYPES)[keyof typeof INPUT_TYPES]
+
+export const INPUT_TYPE_ORDER: Exclude<InputTypeOption, 'all'>[] = [
+  INPUT_TYPES.TEXT,
+  INPUT_TYPES.IMAGE,
+  INPUT_TYPES.AUDIO,
+  INPUT_TYPES.VIDEO,
+  INPUT_TYPES.FILE,
+]
+
+export function getInputTypeLabels(
+  t: TFunction
+): Record<InputTypeOption, string> {
+  return {
+    [INPUT_TYPES.ALL]: t('All Input Types'),
+    [INPUT_TYPES.TEXT]: t('Text'),
+    [INPUT_TYPES.IMAGE]: t('Image'),
+    [INPUT_TYPES.AUDIO]: t('Audio'),
+    [INPUT_TYPES.VIDEO]: t('Video'),
+    [INPUT_TYPES.FILE]: t('Files'),
+  }
+}
+
+export function getInputTypeLabel(t: TFunction, key: string): string {
+  return getInputTypeLabels(t)[key as InputTypeOption] ?? key
+}
+
+/** Free / paid tier. */
+export const PRICE_TIERS = {
+  ALL: 'all',
+  FREE: 'free',
+  PAID: 'paid',
+} as const
+
+export type PriceTierOption = (typeof PRICE_TIERS)[keyof typeof PRICE_TIERS]
+
+export function getPriceTierLabels(t: TFunction): Record<PriceTierOption, string> {
+  return {
+    [PRICE_TIERS.ALL]: t('All Prices'),
+    [PRICE_TIERS.FREE]: t('Free of charge'),
+    [PRICE_TIERS.PAID]: t('Paid'),
+  }
+}
+
+/** Human-readable API protocol names for endpoint type keys. */
+const PROTOCOL_LABEL_KEYS: Record<string, string> = {
+  openai: 'OpenAI Chat',
+  'openai-response': 'OpenAI Responses',
+  'openai-response-compact': 'OpenAI Responses Compact',
+  anthropic: 'Anthropic Messages',
+  gemini: 'Gemini generateContent',
+  'jina-rerank': 'Rerank',
+  'image-generation': 'Image Generation',
+  embeddings: 'Embeddings',
+  'openai-video': 'Video',
+}
+
+export function getProtocolLabel(t: TFunction, key: string): string {
+  const labelKey = PROTOCOL_LABEL_KEYS[key]
+  return labelKey ? t(labelKey) : key
 }
 
 /** Maximum number of tags to display in model row */

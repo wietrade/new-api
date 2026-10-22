@@ -60,17 +60,20 @@ type upstreamEnvelope[T any] struct {
 }
 
 type upstreamModel struct {
-	Capabilities    []string        `json:"capabilities"`
-	ContextLength   int             `json:"context_length"`
-	Description     string          `json:"description"`
-	Endpoints       json.RawMessage `json:"endpoints"`
-	Icon            string          `json:"icon"`
-	MaxOutputTokens int             `json:"max_output_tokens"`
-	ModelName       string          `json:"model_name"`
-	NameRule        int             `json:"name_rule"`
-	Status          int             `json:"status"`
-	Tags            string          `json:"tags"`
-	VendorName      string          `json:"vendor_name"`
+	Capabilities     []string        `json:"capabilities"`
+	ContextLength    int             `json:"context_length"`
+	InputModalities  []string        `json:"input_modalities"`
+	OutputModalities []string        `json:"output_modalities"`
+	Description      string          `json:"description"`
+	Endpoints        json.RawMessage `json:"endpoints"`
+	Icon             string          `json:"icon"`
+	MaxOutputTokens  int             `json:"max_output_tokens"`
+	IsFree           bool            `json:"is_free"`
+	ModelName        string          `json:"model_name"`
+	NameRule         int             `json:"name_rule"`
+	Status           int             `json:"status"`
+	Tags             string          `json:"tags"`
+	VendorName       string          `json:"vendor_name"`
 }
 
 type upstreamVendor struct {
@@ -304,16 +307,19 @@ func fetchMetadataCatalog(c *gin.Context, locale string) (metadataSyncSource, ma
 			}
 		}
 		values := model.MetadataValues{
-			Description:     item.Description,
-			Icon:            item.Icon,
-			Tags:            item.Tags,
-			Capabilities:    strings.Join(model.NormalizeCapabilities(item.Capabilities), ","),
-			ContextLength:   item.ContextLength,
-			MaxOutputTokens: item.MaxOutputTokens,
-			Vendor:          strings.TrimSpace(item.VendorName),
-			Endpoints:       endpoints,
-			NameRule:        item.NameRule,
-			Status:          item.Status,
+			Description:      item.Description,
+			Icon:             item.Icon,
+			Tags:             item.Tags,
+			Capabilities:     strings.Join(model.NormalizeCapabilities(item.Capabilities), ","),
+			InputModalities:  strings.Join(model.NormalizeCapabilities(item.InputModalities), ","),
+			OutputModalities: strings.Join(model.NormalizeCapabilities(item.OutputModalities), ","),
+			ContextLength:    item.ContextLength,
+			MaxOutputTokens:  item.MaxOutputTokens,
+			IsFree:           model.BoolToInt(item.IsFree),
+			Vendor:           strings.TrimSpace(item.VendorName),
+			Endpoints:        endpoints,
+			NameRule:         item.NameRule,
+			Status:           item.Status,
 		}
 		if err := model.ValidateMetadataValues(values); err != nil {
 			return source, nil, nil, fmt.Errorf("model %s: %w", item.ModelName, err)
@@ -405,15 +411,18 @@ func SyncUpstreamPreview(c *gin.Context) {
 		if local != nil {
 			candidate.Kind = "update"
 			localValues = model.MetadataValues{
-				Description:     local.Description,
-				Icon:            local.Icon,
-				Tags:            local.Tags,
-				Capabilities:    local.Capabilities,
-				ContextLength:   local.ContextLength,
-				MaxOutputTokens: local.MaxOutputTokens,
-				Endpoints:       local.Endpoints,
-				NameRule:        local.NameRule,
-				Status:          local.Status,
+				Description:      local.Description,
+				Icon:             local.Icon,
+				Tags:             local.Tags,
+				Capabilities:     local.Capabilities,
+				InputModalities:  local.InputModalities,
+				OutputModalities: local.OutputModalities,
+				ContextLength:    local.ContextLength,
+				MaxOutputTokens:  local.MaxOutputTokens,
+				IsFree:           local.IsFree,
+				Endpoints:        local.Endpoints,
+				NameRule:         local.NameRule,
+				Status:           local.Status,
 			}
 			if localVendor != nil {
 				localValues.Vendor = localVendor.Name

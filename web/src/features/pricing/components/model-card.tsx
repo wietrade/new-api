@@ -30,7 +30,10 @@ import { useSystemConfigStore } from '@/stores/system-config-store'
 import {
   DEFAULT_TOKEN_UNIT,
   formatContextLength,
-  getCapabilityLabel,
+  getInputTypeLabel,
+  getModelTypeLabel,
+  getProtocolLabel,
+  MODEL_TYPES,
 } from '../constants'
 import { useBillingTime } from '../hooks/use-billing-time'
 import {
@@ -40,7 +43,7 @@ import {
   getDynamicPricingSummary,
   isUnconfiguredTaskUsageModel,
 } from '../lib/dynamic-price'
-import { getModelCapabilities } from '../lib/filters'
+import { getModelTypes } from '../lib/filters'
 import { isTokenBasedModel } from '../lib/model-helpers'
 import { formatPrice, formatRequestPrice } from '../lib/price'
 import { taskPriceLabel, taskUsageUnitLabel } from '../lib/task-price-display'
@@ -67,8 +70,21 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   const showRechargePrice = props.showRechargePrice ?? false
   const isTokenBased = isTokenBasedModel(props.model)
   const tokenUnitLabel = tokenUnit === 'K' ? '1K' : '1M'
-  const capabilities = getModelCapabilities(props.model)
   const contextLabel = formatContextLength(props.model.context_length)
+  // One badge per modality: model types first, then input-only modalities.
+  const badgeMap = new Map<string, string>()
+  for (const type of getModelTypes(props.model)) {
+    if (type !== MODEL_TYPES.TEXT) {
+      badgeMap.set(type, getModelTypeLabel(t, type))
+    }
+  }
+  for (const input of props.model.input_modalities ?? []) {
+    const key = input.toLowerCase()
+    if (!badgeMap.has(key)) {
+      badgeMap.set(key, getInputTypeLabel(t, key))
+    }
+  }
+  const badges = Array.from(badgeMap, ([key, label]) => ({ key, label }))
   const groups = props.model.enable_groups || []
   const endpoints = props.model.supported_endpoint_types || []
   const modelIconKey = props.model.icon || props.model.vendor_icon
@@ -312,29 +328,29 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           <p className='text-muted-foreground line-clamp-2 text-[13px] leading-5 break-words'>
             {props.model.description || t('No description available.')}
           </p>
-          {(capabilities.length > 0 || contextLabel) && (
+          {(badges.length > 0 || contextLabel) && (
             <div
               role='group'
-              aria-label={t('Model Capabilities')}
+              aria-label={t('Model Types')}
               className='flex min-w-0 flex-wrap items-center gap-1.5 text-xs'
             >
-              {capabilities.slice(0, 4).map((capability) => (
+              {badges.slice(0, 4).map((badge) => (
                 <span
-                  key={capability}
+                  key={badge.key}
                   className='bg-muted text-muted-foreground rounded px-1.5 py-0.5'
                 >
-                  {getCapabilityLabel(t, capability)}
+                  {badge.label}
                 </span>
               ))}
-              {capabilities.length > 4 && (
+              {badges.length > 4 && (
                 <span
                   className='text-muted-foreground'
-                  title={capabilities
+                  title={badges
                     .slice(4)
-                    .map((capability) => getCapabilityLabel(t, capability))
+                    .map((badge) => badge.label)
                     .join(', ')}
                 >
-                  +{capabilities.length - 4}
+                  +{badges.length - 4}
                 </span>
               )}
               {contextLabel && (
@@ -354,6 +370,11 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           className='mt-auto flex min-w-0 flex-col gap-1.5'
         >
           <ModelBillingModeBadge model={props.model} appearance='caption' />
+          {props.model.is_free && (
+            <span className='w-fit rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400'>
+              {t('Free of charge')}
+            </span>
+          )}
           {dynamicSummary?.providerCount && (
             <span className='text-muted-foreground text-xs break-words'>
               {t('{{count}} providers', {
@@ -397,16 +418,25 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
             {endpoints.length > 0 && (
               <div className='flex min-w-0 items-baseline gap-1.5'>
                 <dt className='text-muted-foreground shrink-0'>
-                  {t('Endpoints')}
+                  {t('API Protocol')}
                 </dt>
                 <dd className='flex min-w-0 items-baseline gap-1'>
-                  <span className='truncate' title={endpoints.join(', ')}>
-                    {endpoints.slice(0, 2).join(', ')}
+                  <span
+                    className='truncate'
+                    title={endpoints.map((ep) => getProtocolLabel(t, ep)).join(', ')}
+                  >
+                    {endpoints
+                      .slice(0, 2)
+                      .map((ep) => getProtocolLabel(t, ep))
+                      .join(', ')}
                   </span>
                   {endpoints.length > 2 && (
                     <span
                       className='text-muted-foreground shrink-0'
-                      title={endpoints.slice(2).join(', ')}
+                      title={endpoints
+                        .slice(2)
+                        .map((ep) => getProtocolLabel(t, ep))
+                        .join(', ')}
                     >
                       +{endpoints.length - 2}
                     </span>

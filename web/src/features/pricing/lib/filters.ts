@@ -24,6 +24,9 @@ import {
   ENDPOINT_TYPES,
   CONTEXT_RANGES,
   CONTEXT_RANGE_BOUNDS,
+  MODEL_TYPES,
+  INPUT_TYPES,
+  PRICE_TIERS,
   type ContextRange,
   type SortOption,
 } from '../constants'
@@ -116,19 +119,63 @@ export function filterByEndpointType(
   )
 }
 
-/** Normalized capability keys declared by the backend catalog. */
-export function getModelCapabilities(model: PricingModel): string[] {
-  return (model.capabilities ?? []).map((item) => item.toLowerCase())
+/**
+ * Task-level types a model belongs to. A model can belong to several
+ * (e.g. Claude is both Text and Image because it understands images).
+ */
+export function getModelTypes(model: PricingModel): string[] {
+  const input = new Set((model.input_modalities ?? []).map((v) => v.toLowerCase()))
+  const output = new Set(
+    (model.output_modalities ?? []).map((v) => v.toLowerCase())
+  )
+  const capabilities = new Set(
+    (model.capabilities ?? []).map((v) => v.toLowerCase())
+  )
+  const types: string[] = []
+  if (capabilities.has('embedding')) types.push(MODEL_TYPES.EMBEDDING)
+  if (capabilities.has('rerank')) types.push(MODEL_TYPES.RERANK)
+  if (output.has('image')) types.push(MODEL_TYPES.IMAGE)
+  if (output.has('video')) types.push(MODEL_TYPES.VIDEO)
+  if (output.has('audio') || input.has('audio')) types.push(MODEL_TYPES.AUDIO)
+  if (
+    output.has('text') &&
+    !capabilities.has('embedding') &&
+    !capabilities.has('rerank')
+  ) {
+    types.push(MODEL_TYPES.TEXT)
+  }
+  return types
 }
 
-/** Filter models by a structured capability key. */
-export function filterByCapability(
+/** Filter models by task-level type. */
+export function filterByModelType(
   models: PricingModel[],
-  capability: string
+  modelType: string
 ): PricingModel[] {
-  if (!capability || capability === FILTER_ALL) return models
-  const key = capability.toLowerCase()
-  return models.filter((m) => getModelCapabilities(m).includes(key))
+  if (!modelType || modelType === MODEL_TYPES.ALL) return models
+  return models.filter((m) => getModelTypes(m).includes(modelType))
+}
+
+/** Filter models by accepted input modality. */
+export function filterByInputType(
+  models: PricingModel[],
+  inputType: string
+): PricingModel[] {
+  if (!inputType || inputType === INPUT_TYPES.ALL) return models
+  const key = inputType.toLowerCase()
+  return models.filter((m) =>
+    (m.input_modalities ?? []).some((v) => v.toLowerCase() === key)
+  )
+}
+
+/** Filter models by free / paid tier. */
+export function filterByPriceTier(
+  models: PricingModel[],
+  tier: string
+): PricingModel[] {
+  if (!tier || tier === PRICE_TIERS.ALL) return models
+  if (tier === PRICE_TIERS.FREE) return models.filter((m) => m.is_free === true)
+  return models.filter((m) => m.is_free !== true)
 }
 
 /** Bucket a model by its declared context window; undefined when unknown. */
@@ -262,8 +309,10 @@ export function filterAndSortModels(
     vendor: string
     group: string
     quotaType: string
-    capability: string
+    modelType: string
+    inputType: string
     context: string
+    priceTier: string
     sortBy: string
   }
 ): PricingModel[] {
@@ -271,8 +320,10 @@ export function filterAndSortModels(
   result = filterByVendor(result, filters.vendor)
   result = filterByGroup(result, filters.group)
   result = filterByQuotaType(result, filters.quotaType)
-  result = filterByCapability(result, filters.capability)
+  result = filterByModelType(result, filters.modelType)
+  result = filterByInputType(result, filters.inputType)
   result = filterByContextRange(result, filters.context)
+  result = filterByPriceTier(result, filters.priceTier)
   result = sortModels(result, filters.sortBy, filters.group)
 
   return result

@@ -28,8 +28,8 @@ import { GroupBadge } from '@/components/group-badge'
 import { StatusBadge } from '@/components/status-badge'
 import { getLobeIcon } from '@/lib/lobe-icon'
 
-import { formatContextLength, getCapabilityLabel } from '../constants'
-import { getModelCapabilities } from '../lib/filters'
+import { formatContextLength, getModelTypeLabel } from '../constants'
+import { getModelTypes } from '../lib/filters'
 import type { PricingModel } from '../types'
 import { CachedPriceCell } from './cached-price-cell'
 import { ModelBillingModeBadge } from './model-billing-mode-badge'
@@ -135,21 +135,21 @@ export function usePricingColumns(
       enableSorting: false,
     },
 
-    // Capabilities column (structured catalog data, not free-form tags)
+    // Model type column (derived from modalities + capability markers)
     {
-      accessorKey: 'capabilities',
-      header: t('Model Capabilities'),
+      accessorKey: 'model_type',
+      header: t('Model Types'),
       cell: ({ row }) => {
-        const capabilities = getModelCapabilities(row.original)
+        const types = getModelTypes(row.original)
         const contextLabel = formatContextLength(row.original.context_length)
         return (
           <BadgeListCell
             items={[
-              ...capabilities.map((capability) => (
+              ...types.map((type) => (
                 <StatusBadge
-                  key={capability}
-                  label={getCapabilityLabel(t, capability)}
-                  autoColor={capability}
+                  key={type}
+                  label={getModelTypeLabel(t, type)}
+                  autoColor={type}
                   size='sm'
                   copyable={false}
                 />
