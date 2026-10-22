@@ -72,6 +72,14 @@ def write_if_changed(path, text):
     return True
 
 
+def load_json(path, default=None):
+    try:
+        with open(path, encoding="utf-8") as handle:
+            return json.load(handle)
+    except FileNotFoundError:
+        return default if default is not None else {}
+
+
 def parse_args(argv):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
@@ -82,17 +90,20 @@ def parse_args(argv):
     )
     parser.add_argument(
         "--sources",
-        default=",".join(DEFAULT_SOURCES),
-        help="comma separated aggregator list, priority order (default: %(default)s)",
+        default=None,
+        help="comma separated aggregator list, priority order (default: config or %s)"
+        % ",".join(DEFAULT_SOURCES),
     )
     parser.add_argument(
         "--vendors",
-        default=",".join(DEFAULT_VENDORS),
-        help="comma separated provider keys (default: %(default)s)",
+        default=None,
+        help="comma separated provider keys (default: config or %s)"
+        % ",".join(DEFAULT_VENDORS),
     )
     parser.add_argument(
         "--official",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
+        default=None,
         help="also query vendor APIs when OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY exist",
     )
     parser.add_argument(
@@ -112,6 +123,11 @@ def parse_args(argv):
     )
     parser.add_argument("--timeout", type=int, default=30, help="HTTP timeout seconds")
     parser.add_argument("--root", default=repo_root_from_script(), help="repository root")
+    parser.add_argument(
+        "--config",
+        default=None,
+        help="sync config JSON (default: <root>/metadata/api/newapi/sync.config.json)",
+    )
     parser.add_argument("--dry-run", action="store_true", help="print changes, write nothing")
     parser.add_argument(
         "--check",
@@ -133,6 +149,20 @@ def main(argv=None):
     if not os.path.exists(models_path):
         print("error: %s not found (wrong --root?)" % models_path, file=sys.stderr)
         return 2
+
+    config_path = args.config or os.path.join(api_dir, "newapi", "sync.config.json")
+    config = load_json(config_path, {})
+
+    if args.vendors is None:
+        args.vendors = ",".join(config.get("vendors") or DEFAULT_VENDORS)
+    if args.sources is None:
+        args.sources = ",".join(config.get("sources") or DEFAULT_SOURCES)
+    if args.official is None:
+        args.official = bool(config.get("official", False))
+    if not args.allow_new and config.get("allow_new"):
+        args.allow_new = True
+    if not args.allow_new_models and config.get("allow_new_models"):
+        args.allow_new_models = ",".join(config["allow_new_models"])
 
     vendors = [item.strip() for item in args.vendors.split(",") if item.strip()]
     source_names = [item.strip() for item in args.sources.split(",") if item.strip()]
@@ -162,7 +192,7 @@ def main(argv=None):
     pending = []
 
     if args.only in ("metadata", "all"):
-        models, changes, added, ambiguous, missing = merge.merge_metadata(
+        models, changes, added, ambiguous, missing, tie_broken = merge.merge_metadata(
             models,
             index,
             allow_new=args.allow_new,
@@ -174,6 +204,12 @@ def main(argv=None):
             }
             or None,
             skip_fields=skip_fields,
+            tie_break=config.get("tie_break") or None,
+        )
+        override_path = os.path.join(root, config.get("overrides") or "")
+        overrides = load_json(override_path, {}) if config.get("overrides") else {}
+        override_applied, override_missing = merge.apply_overrides(
+            models, overrides, changes
         )
         vendor_added = merge.ensure_vendors(vendor_records, models)
 
@@ -210,11 +246,23 @@ def main(argv=None):
             for name in added:
                 print("  + %s" % name)
             for name in ambiguous:
-                print("  ? ambiguous: %s" % name)
+                print("  ? source conflict: %s" % name)
+            for item in tie_broken:
+                print(
+                    "  ~ tie-break %s.%s <- %s"
+                    % (item["model"], item["field"], item["source"])
+                )
             for name in missing:
                 print("  - not in sources: %s" % name)
             for name in vendor_added:
                 print("  + vendor %s" % name)
+            if override_applied or override_missing:
+                print(
+                    "overrides: %d applied, %d target model(s) missing"
+                    % (override_applied, len(override_missing))
+                )
+                for name in override_missing:
+                    print("  ! override target not found: %s" % name)
             for change in changes:
                 print(
                     "  ~ %s.%s: %s -> %s"

@@ -491,7 +491,7 @@
         "text"
       ],
       "context_length": 1048576,
-      "max_output_tokens": 0,
+      "max_output_tokens": 384000,
       "is_free": false,
       "endpoints": null
     },
@@ -504,7 +504,8 @@
       "status": 1,
       "tags": "",
       "capabilities": [
-        "reasoning"
+        "reasoning",
+        "tools"
       ],
       "input_modalities": [
         "text",
@@ -514,7 +515,7 @@
         "text",
         "image"
       ],
-      "context_length": 0,
+      "context_length": 131072,
       "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null
@@ -538,7 +539,7 @@
         "text",
         "image"
       ],
-      "context_length": 0,
+      "context_length": 65536,
       "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null
@@ -556,9 +557,7 @@
       ],
       "input_modalities": [
         "text",
-        "image",
-        "video",
-        "file"
+        "image"
       ],
       "output_modalities": [
         "text",
@@ -582,15 +581,14 @@
       ],
       "input_modalities": [
         "text",
-        "image",
-        "file"
+        "image"
       ],
       "output_modalities": [
         "text",
         "image"
       ],
       "context_length": 65536,
-      "max_output_tokens": 0,
+      "max_output_tokens": 58982,
       "is_free": false,
       "endpoints": null
     },
@@ -615,7 +613,7 @@
         "text"
       ],
       "context_length": 1048576,
-      "max_output_tokens": 0,
+      "max_output_tokens": 943718,
       "is_free": false,
       "endpoints": null
     }

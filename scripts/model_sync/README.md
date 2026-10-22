@@ -101,3 +101,33 @@ python3 -m unittest discover -s scripts/model_sync/tests -t . -v
 - 有差异时推到固定分支 `chore/model-metadata-sync` 并开/更新 PR，
   由人审阅 diff 后合并；**不会**直接推到 `main`
 - Fork 仓库需要先在 Actions 页面启用 workflow，并按需配置上述三个 API key secret
+
+## 配置文件
+
+`metadata/api/newapi/sync.config.json`（CLI 与 CI 共用，保证本地/线上一致）：
+
+| 字段 | 含义 |
+|:---|:---|
+| `vendors` | 要跟踪的厂商 key（anthropic / openai / google / deepseek / moonshotai / z-ai） |
+| `sources` | 聚合源优先级，默认 `models.dev, openrouter` |
+| `tie_break` | 源冲突时的裁决源，当前 `openrouter`（它限制的是实际服务上限） |
+| `official` | 是否用厂商 API（有 key 才生效） |
+| `allow_new` / `allow_new_models` | 是否允许新增、以及新增白名单 |
+| `overrides` | 人工核对值文件路径 |
+
+`metadata/api/newapi/overrides.json`：
+
+```json
+{
+  "models": [
+    {
+      "model_name": "gemini-3-pro-image",
+      "fields": { "context_length": 131072 },
+      "source": "https://ai.google.dev/gemini-api/docs/pricing",
+      "note": "official docs, checked 2026-10-23"
+    }
+  ]
+}
+```
+
+覆盖值优先级最高，会在输出里标注 `via: override`；目标模型不存在会被报警而不会静默忽略。

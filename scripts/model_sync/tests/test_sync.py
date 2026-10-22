@@ -100,7 +100,7 @@ class MergeTest(unittest.TestCase):
                 )
             ]
         )
-        records, changes, added, ambiguous, missing = merge.merge_metadata(
+        records, changes, added, ambiguous, missing, _tie = merge.merge_metadata(
             self.existing, index
         )
         record = records[0]
@@ -262,6 +262,67 @@ class MergeTest(unittest.TestCase):
         self.assertEqual(
             [change for change in changes if change["field"] == "context_length"], []
         )
+
+    def test_overrides_win_over_every_source(self):
+        index, _ = merge.index_incoming([source("gemini-3-pro-image")])
+        records, changes, *_ = merge.merge_metadata(
+            [], index, allow_new=True, allowed_new={"gemini-3-pro-image"}
+        )
+        self.assertEqual(records[0]["context_length"], 0)
+
+        overrides = {
+            "models": [
+                {
+                    "model_name": "gemini-3-pro-image",
+                    "fields": {"context_length": 131072, "unknown_field": 1},
+                    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+                }
+            ]
+        }
+        applied, missing = merge.apply_overrides(records, overrides, changes)
+        self.assertEqual(applied, 1)
+        self.assertEqual(records[0]["context_length"], 131072)
+        self.assertNotIn("unknown_field", records[0])
+        self.assertEqual(missing, [])
+        self.assertEqual(changes[-1]["via"], "override")
+
+    def test_tie_break_source_fills_conflicts(self):
+        """OpenRouter limits are what actually gets enforced, so it ties breaks."""
+        index, _ = merge.index_incoming(
+            [
+                source("kimi-k3", source="models.dev", context_length=1048576,
+                       max_output_tokens=1048576),
+                source("kimi-k3", source="openrouter", context_length=1048576,
+                       max_output_tokens=943718),
+            ]
+        )
+        records, _, _, ambiguous, _, tie = merge.merge_metadata(
+            [], index, allow_new=True, allowed_new={"kimi-k3"}, tie_break="openrouter"
+        )
+        self.assertEqual(records[0]["max_output_tokens"], 943718)
+        self.assertEqual(ambiguous, [])
+        self.assertEqual(tie, [{"model": "kimi-k3", "field": "max_output_tokens",
+                                "source": "openrouter"}])
+
+    def test_conflict_without_tie_break_stays_unknown(self):
+        index, _ = merge.index_incoming(
+            [
+                source("kimi-k3", source="models.dev", max_output_tokens=1048576),
+                source("kimi-k3", source="openrouter", max_output_tokens=943718),
+            ]
+        )
+        records, *_rest = merge.merge_metadata(
+            [], index, allow_new=True, allowed_new={"kimi-k3"}
+        )
+        self.assertEqual(records[0]["max_output_tokens"], 0)
+
+    def test_override_target_must_exist(self):
+        applied, missing = merge.apply_overrides(
+            list(self.existing),
+            {"models": [{"model_name": "does-not-exist", "fields": {"context_length": 1}}]},
+        )
+        self.assertEqual(applied, 0)
+        self.assertEqual(missing, ["does-not-exist"])
 
 
 if __name__ == "__main__":

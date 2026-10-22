@@ -15,7 +15,9 @@ Merge policy (deliberate, keeps hand-maintained content alive):
 
 from __future__ import annotations
 
-from .normalize import normalize_key
+from .normalize import CAPABILITY_ORDER, normalize_key
+
+MODALITY_ORDER = ("text", "image", "file", "audio", "video")
 
 FACTUAL_FIELDS = (
     "vendor_name",
@@ -126,8 +128,9 @@ def _incoming_values(model):
     }
 
 
-def _new_record(model, name=None, skip=None):
+def _new_record(model, name=None, values=None, skip=None):
     skip = skip or set()
+    values = values or _incoming_values(model)
     record = {
         "model_name": name or model.model_name,
         "vendor_name": model.vendor_name,
@@ -136,14 +139,18 @@ def _new_record(model, name=None, skip=None):
         "name_rule": DEFAULT_MODEL["name_rule"],
         "status": DEFAULT_MODEL["status"],
         "tags": DEFAULT_MODEL["tags"],
-        "capabilities": list(model.capabilities or []),
-        "input_modalities": list(model.input_modalities or []),
-        "output_modalities": list(model.output_modalities or []),
+        "capabilities": _ordered_list("capabilities", values.get("capabilities") or ()),
+        "input_modalities": _ordered_list(
+            "input_modalities", values.get("input_modalities") or ()
+        ),
+        "output_modalities": _ordered_list(
+            "output_modalities", values.get("output_modalities") or ()
+        ),
         "context_length": 0 if (model.key, "context_length") in skip
-        else int(model.context_length or 0),
+        else int(values.get("context_length") or 0),
         "max_output_tokens": 0 if (model.key, "max_output_tokens") in skip
-        else int(model.max_output_tokens or 0),
-        "is_free": bool(model.is_free),
+        else int(values.get("max_output_tokens") or 0),
+        "is_free": bool(values.get("is_free")),
         "endpoints": None,
     }
     return record
@@ -157,24 +164,72 @@ def _refresh(record, model, changes, skip=None, skipped=None):
     """
     skip = skip or set()
     values = _incoming_values(model)
+    _apply_values(record, values, model.key, changes, skip, skipped)
+
+
+def _meaningful(field, value):
+    """Normalize a candidate value; ``None`` means "source has no opinion"."""
+    if field == "is_free":
+        return None if value is None else bool(value)
+    if field in ("context_length", "max_output_tokens"):
+        number = int(value or 0)
+        return number if number > 0 else None
+    if isinstance(value, (list, tuple)):
+        return tuple(sorted(value)) if value else None
+    return value or None
+
+
+def _ordered_list(field, values):
+    """Restore a deterministic order after set-based comparison."""
+    if field == "capabilities":
+        return [cap for cap in CAPABILITY_ORDER if cap in values]
+    if field in ("input_modalities", "output_modalities"):
+        return [mod for mod in MODALITY_ORDER if mod in values]
+    return list(values)
+
+
+def agreed_values(candidates):
+    """Per-field values that every candidate agrees on.
+
+    Dated snapshots of one model (``deepseek-v4-pro-20260813`` and
+    ``...-20260423``) often agree on the context window but not on max output;
+    taking field-level agreement keeps the trustworthy half instead of
+    discarding the whole model.
+    """
+    agreed = {}
+    conflicts = set()
+    prepared = [_incoming_values(candidate) for candidate in candidates]
     for field in FACTUAL_FIELDS:
-        if (model.key, field) in skip:
-            if skipped is not None and record.get(field) is not None:
+        seen = {}
+        for values in prepared:
+            value = _meaningful(field, values[field])
+            if value is not None:
+                seen[value] = True
+        if len(seen) == 1:
+            agreed[field] = next(iter(seen))
+        elif len(seen) > 1:
+            conflicts.add(field)
+    return agreed, conflicts
+
+
+def _apply_values(record, values, model_key, changes, skip, skipped=None):
+    for field in FACTUAL_FIELDS:
+        if (model_key, field) in skip:
+            if skipped is not None and record.get(field) not in (None, 0, [], "", False):
                 skipped.append({"model": record.get("model_name", ""), "field": field})
             continue
-        new = values[field]
+        new = _meaningful(field, values.get(field))
         old = record.get(field)
-
-        if new is None or new == "" or new == []:
+        if new is None:
             continue
-        if field in ("context_length", "max_output_tokens") and new <= 0:
-            continue
-
         if field == "max_output_tokens":
             context = record.get("context_length") or 0
             if context and new > context:
                 new = context
-
+        if field == "is_free":
+            new = bool(new)
+        elif isinstance(new, tuple):
+            new = _ordered_list(field, new)
         if old != new:
             changes.append(
                 {
@@ -187,8 +242,48 @@ def _refresh(record, model, changes, skip=None, skipped=None):
             record[field] = new
 
 
+def resolve_values(candidates, tie_break=None, model_name=""):
+    """Resolve one model's fact values from all candidate records.
+
+    Agreement wins; when sources disagree, ``tie_break`` (usually
+    ``openrouter``, whose limits are the ones actually enforced in serving)
+    provides the value and the field is reported as tie-broken. Conflicts with
+    no usable tie-break value stay unknown.
+    """
+    if len(candidates) == 1:
+        return _incoming_values(candidates[0]), set(), {}
+    values, conflicts = agreed_values(candidates)
+    tie_broken = {}
+    if tie_break:
+        def rank(candidate):
+            if candidate.model_name == model_name:
+                return 0
+            if model_name and (
+                candidate.source_id == model_name
+                or candidate.source_id.endswith("/" + model_name)
+            ):
+                return 1
+            return 2
+
+        prepared = [
+            (c, _incoming_values(c))
+            for c in sorted(candidates, key=rank)
+        ]
+        for field in sorted(conflicts):
+            for candidate, candidate_values in prepared:
+                if candidate.source != tie_break:
+                    continue
+                value = _meaningful(field, candidate_values[field])
+                if value is not None:
+                    values[field] = value
+                    tie_broken[field] = tie_break
+                    break
+        conflicts -= set(tie_broken)
+    return values, conflicts, tie_broken
+
+
 def merge_metadata(existing, index, allow_new=False, min_release_date="",
-                   allowed_new=None, skip_fields=None):
+                   allowed_new=None, skip_fields=None, tie_break=None):
     """Return (records, changes, added, ambiguous, missing).
 
     ``allowed_new`` restricts creation to an explicit set of model names, so
@@ -199,6 +294,7 @@ def merge_metadata(existing, index, allow_new=False, min_release_date="",
     changes = []
     added = []
     ambiguous = []
+    tie_broken = []
     matched_keys = set()
     skip_fields = set(skip_fields or ())
 
@@ -207,16 +303,26 @@ def merge_metadata(existing, index, allow_new=False, min_release_date="",
 
     for record in existing:
         name = str(record.get("model_name", ""))
-        candidates = index.get(normalize_key(name)) or []
+        model_key = normalize_key(name)
+        candidates = index.get(model_key) or []
         if not candidates:
             continue
-        model = pick_incoming(candidates, name)
-        ambiguous_names = {c.model_name for c in candidates}
-        if len(ambiguous_names) > 1 and model.model_name != name:
-            ambiguous.append(name)
-            continue
-        matched_keys.add(model.key)
-        _refresh(record, model, changes, skip=skip_fields)
+        if len(candidates) == 1:
+            values = _incoming_values(candidates[0])
+            conflicts = set()
+        else:
+            values, conflicts, resolved = resolve_values(candidates, tie_break, name)
+            for field, source in resolved.items():
+                tie_broken.append({"model": name, "field": field, "source": source})
+            if conflicts:
+                ambiguous.append(
+                    "%s (%s)" % (name, ",".join(sorted(conflicts)))
+                )
+        conflict_fields = conflicts | {
+            field for (key, field) in skip_fields if key == model_key
+        }
+        matched_keys.add(model_key)
+        _apply_values(record, values, model_key, changes, conflict_fields)
 
     if allow_new:
         pending = {
@@ -240,7 +346,21 @@ def merge_metadata(existing, index, allow_new=False, min_release_date="",
             name = desired or model.model_name
             if not name:
                 continue
-            existing.append(_new_record(model, name, skip_fields))
+            if len(candidates) == 1:
+                values = _incoming_values(candidates[0])
+                conflicts = set()
+            else:
+                values, conflicts, resolved = resolve_values(
+                    candidates, tie_break, name or ""
+                )
+                for field, source in resolved.items():
+                    tie_broken.append(
+                        {"model": name, "field": field, "source": source}
+                    )
+            conflict_fields = conflicts | {
+                field for (candidate_key, field) in skip_fields if candidate_key == key
+            }
+            existing.append(_new_record(model, name, values, conflict_fields))
             existing_names.add(name)
             added.append(name)
             matched_keys.add(key)
@@ -250,7 +370,7 @@ def merge_metadata(existing, index, allow_new=False, min_release_date="",
         for name in by_name
         if normalize_key(name) not in index
     )
-    return existing, changes, added, ambiguous, missing
+    return existing, changes, added, ambiguous, missing, tie_broken
 
 
 def price_records(existing, index):
@@ -283,6 +403,52 @@ def price_records(existing, index):
 
     rows.sort(key=lambda item: (item["vendor_name"], item["model_name"]))
     return rows
+
+
+OVERRIDABLE_FIELDS = set(FACTUAL_FIELDS) | {
+    "description",
+    "icon",
+    "tags",
+    "endpoints",
+    "name_rule",
+    "status",
+}
+
+
+def apply_overrides(records, overrides, changes=None):
+    """Apply human-verified values on top of every automatic source.
+
+    ``overrides.json`` exists so a conflict between aggregators can be settled
+    once, with a link to the vendor doc and the date it was checked, instead of
+    leaving the field unknown forever.
+    """
+    changes = changes if changes is not None else []
+    by_name = {str(record.get("model_name", "")): record for record in records}
+    applied = 0
+    missing = []
+    for item in (overrides or {}).get("models", []):
+        name = str(item.get("model_name") or "")
+        record = by_name.get(name)
+        if record is None:
+            missing.append(name)
+            continue
+        for field, value in (item.get("fields") or {}).items():
+            if field not in OVERRIDABLE_FIELDS:
+                continue
+            if record.get(field) == value:
+                continue
+            changes.append(
+                {
+                    "model": name,
+                    "field": field,
+                    "from": record.get(field),
+                    "to": value,
+                    "via": "override",
+                }
+            )
+            record[field] = value
+            applied += 1
+    return applied, missing
 
 
 def ensure_vendors(vendors, models):

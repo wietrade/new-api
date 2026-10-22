@@ -81,3 +81,22 @@ jsDelivr 备选 `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`，�
 - `tags` 不再承载上下文长度或能力；能力写 `capabilities`，类型写 `modalities`
 - `max_output_tokens` 必须 ≤ `context_length`（双方都非 0 时校验）
 - 新增能力 / 模态词需三处同步：本文件、`model/model_metadata_sync.go`、`web/src/features/pricing/constants.ts`
+
+## 本仓库即官方元数据库
+
+`metadata/` 由本仓库自行维护并发布到 GitHub，new-api 从这里同步，不再依赖单一上游项目：
+
+```
+厂商官方 API（可选 key）┐
+models.dev              ├─► scripts/model_sync ─► overrides.json ─► metadata/api/newapi/*.json ─► GitHub ─► new-api 同步
+openrouter（tie-break）  ┘
+```
+
+- 事实字段（上下文 / 最大输出 / 模态 / 能力 / 免费标记）由多源合并；源下不一致时用
+  `metadata/api/newapi/sync.config.json` 的 `tie_break`（当前 `openrouter`）裁决，裁决结果会打印在同步日志里。
+- 人工核对过的值写入 `metadata/api/newapi/overrides.json`，优先级最高（请附官方文档链接与核对日期）。
+- 发布地址（new-api 通过 `SYNC_UPSTREAM_BASE` 读取）：
+  - `https://raw.githubusercontent.com/wietrade/new-api/main/metadata`
+  - `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`（约 12h 缓存）
+- `api/newapi/pricing.json` 只是价格快照，**不参与** new-api 自动写库；后台能直接写库的仍是“上游倍率预设”与“models.dev 价格预设”两个虚拟渠道。
+- 每日 02:17 UTC 的 GitHub Actions 会自动跑一遍并开 PR；合并前请重点看新增模型与价格涨跌。
