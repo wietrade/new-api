@@ -581,7 +581,7 @@ export function DynamicPricingBreakdown({
             })}
           </div>
           <StaticDataTable
-            className='hidden rounded-none border-0 sm:block'
+            className='hidden overflow-hidden rounded-md border sm:block'
             tableClassName={
               compact
                 ? '[&_td]:text-xs [&_td_*]:text-xs [&_th]:text-xs [&_th_*]:text-xs [&_tbody>tr]:h-auto'
@@ -636,12 +636,9 @@ export function DynamicPricingBreakdown({
                     <>
                       <div className='flex flex-wrap items-center gap-1.5'>
                         {!usageSchema && (
-                          <Badge
-                            variant='secondary'
-                            className='bg-dynamic-billing/15 text-dynamic-billing dark:bg-dynamic-billing/20 dark:text-dynamic-billing'
-                          >
+                          <span className='text-dynamic-billing font-medium'>
                             {tier.label || t('Default')}
-                          </Badge>
+                          </span>
                         )}
                         {isMatched && (
                           <Badge
