@@ -474,8 +474,17 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const model = props.model
   const endpoints = normalizeCatalogItems(model.supported_endpoint_types)
-  const tags = parseTags(model.tags)
   const capabilities = normalizeCatalogItems(model.capabilities)
+  const capabilityLabels = capabilities.map((capability) =>
+    t(CAPABILITY_LABEL_KEYS[capability as ModelCapability] ?? capability)
+  )
+  // 标签与能力重复时只保留能力，避免同一信息出现两次
+  const visibleTags = parseTags(model.tags).filter(
+    (tag) =>
+      !capabilityLabels.some(
+        (label) => label.toLowerCase() === tag.toLowerCase()
+      )
+  )
   const cells: React.ReactNode[] = []
 
   if (model.vendor_name) {
@@ -486,16 +495,10 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
     )
   }
 
-  if (capabilities.length > 0) {
+  if (capabilityLabels.length > 0) {
     cells.push(
       <CatalogSpecRow key='capabilities' label={t('Capabilities')}>
-        <CatalogPillList
-          items={capabilities.map((capability) =>
-            t(
-              CAPABILITY_LABEL_KEYS[capability as ModelCapability] ?? capability
-            )
-          )}
-        />
+        <CatalogPillList items={capabilityLabels} />
       </CatalogSpecRow>
     )
   }
@@ -523,10 +526,10 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
     )
   }
 
-  if (tags.length > 0) {
+  if (visibleTags.length > 0) {
     cells.push(
       <CatalogSpecRow key='tags' label={t('Tags')}>
-        <CatalogPillList items={tags} />
+        <CatalogPillList items={visibleTags} />
       </CatalogSpecRow>
     )
   }
