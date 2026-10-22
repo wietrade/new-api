@@ -473,7 +473,6 @@ function ModelBackendQuickStats(props: { model: PricingModel }) {
 function ModelBackendProviderSection(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const model = props.model
-  const groups = normalizeCatalogItems(model.enable_groups)
   const endpoints = normalizeCatalogItems(model.supported_endpoint_types)
   const tags = parseTags(model.tags)
   const capabilities = normalizeCatalogItems(model.capabilities)
@@ -497,14 +496,6 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
             )
           )}
         />
-      </CatalogSpecRow>
-    )
-  }
-
-  if (groups.length > 0) {
-    cells.push(
-      <CatalogSpecRow key='groups' label={t('Groups')}>
-        <CatalogPillList items={groups} />
       </CatalogSpecRow>
     )
   }
