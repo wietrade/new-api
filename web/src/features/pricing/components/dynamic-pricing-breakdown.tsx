@@ -358,7 +358,7 @@ export function DynamicPricingBreakdown({
             </div>
           </div>
         )}
-        <div className='text-muted-foreground mb-1 text-[10px] font-medium tracking-wider uppercase'>
+        <div className='text-muted-foreground mb-1 text-[11px] font-medium'>
           {t('Raw expression')}
         </div>
         <code className='text-muted-foreground block text-xs break-all'>

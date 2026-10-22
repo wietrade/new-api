@@ -664,3 +664,41 @@ it('shows provider count, price range and missing-price status in both list and 
   expect(screen.getByText('0.4 – 0.8/s')).toBeVisible()
   expect(screen.getByText('$0.4 – $0.8')).toBeVisible()
 })
+
+it('shows a single group table and switches groups instead of stacking them', async () => {
+  vi.spyOn(api, 'get').mockResolvedValue({ data: { data: { groups: [] } } })
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+  clients.push(client)
+  const grouped: PricingModel = {
+    ...model,
+    enable_groups: ['default', 'premium'],
+  }
+  render(
+    <QueryClientProvider client={client}>
+      <ModelDetailsContent
+        model={grouped}
+        groupRatio={{ default: 1, premium: 3 }}
+        usableGroup={{
+          default: { desc: '', ratio: 1 },
+          premium: { desc: '', ratio: 3 },
+        }}
+        endpointMap={{}}
+        autoGroups={[]}
+        priceRate={1}
+        usdExchangeRate={1}
+        tokenUnit='M'
+      />
+    </QueryClientProvider>
+  )
+  const user = userEvent.setup()
+  const tables = screen.getAllByRole('table')
+  expect(tables).toHaveLength(1)
+  const table = tables[0]
+  expect(within(table).getByText('$0.22')).toBeVisible()
+
+  await user.click(screen.getByRole('button', { name: /premium\s*3x/ }))
+  expect(within(table).getByText('$0.66')).toBeVisible()
+  expect(within(table).queryByText('$0.22')).not.toBeInTheDocument()
+})

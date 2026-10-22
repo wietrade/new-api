@@ -54,14 +54,20 @@ type FilterOption = {
   icon?: ReactNode
 }
 
-type FilterSectionProps = {
-  title: string
-  /** Selected option values; an empty array means "no restriction". */
+type FilterRow = {
   value: string[]
   options: FilterOption[]
+  onChange: (value: string) => void
+  /** Inline caption shown above the row (omitted for the primary row). */
+  label?: string
   /** Dim options that no model currently matches (keeps the layout stable). */
   dimEmpty?: boolean
-  onChange: (value: string) => void
+}
+
+type FilterSectionProps = FilterRow & {
+  title: string
+  /** Extra chip rows grouped under the same title. */
+  rows?: FilterRow[]
 }
 
 export interface PricingSidebarProps {
@@ -145,8 +151,34 @@ function FilterChip(props: {
   )
 }
 
-function FilterSection(props: FilterSectionProps) {
+function FilterChipRow(props: FilterRow) {
+  return (
+    <div className='space-y-1.5'>
+      {props.label && (
+        <div className='text-muted-foreground text-[11px] font-medium'>
+          {props.label}
+        </div>
+      )}
+      <div className='flex flex-wrap gap-1.5'>
+        {props.options.map((option) => {
+          const active = props.value.includes(option.value)
+          return (
+            <FilterChip
+              key={option.value}
+              option={option}
+              active={active}
+              highlight={active}
+              disabled={props.dimEmpty === true && (option.count ?? 0) === 0}
+              onClick={() => props.onChange(option.value)}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
+function FilterSection(props: FilterSectionProps) {
   return (
     <Collapsible
       defaultOpen
@@ -159,20 +191,11 @@ function FilterSection(props: FilterSectionProps) {
         <ChevronDown className='text-muted-foreground size-4 transition-transform group-data-[panel-open]:rotate-180' />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className='flex flex-wrap gap-1.5'>
-          {props.options.map((option) => {
-            const active = props.value.includes(option.value)
-            return (
-              <FilterChip
-                key={option.value}
-                option={option}
-                active={active}
-                highlight={active}
-                disabled={props.dimEmpty === true && (option.count ?? 0) === 0}
-                onClick={() => props.onChange(option.value)}
-              />
-            )
-          })}
+        <div className='space-y-2.5'>
+          <FilterChipRow {...props} />
+          {props.rows?.map((row, index) => (
+            <FilterChipRow key={row.label ?? index} {...row} />
+          ))}
         </div>
       </CollapsibleContent>
     </Collapsible>
@@ -362,13 +385,15 @@ export const PricingSidebar = memo(function PricingSidebar(
           value={props.priceTierFilter}
           options={priceTierOptions}
           onChange={props.onPriceTierChange}
-        />
-        <FilterSection
-          title={t('Pricing Type')}
-          dimEmpty={hasModels}
-          value={props.quotaTypeFilter}
-          options={quotaOptions}
-          onChange={props.onQuotaTypeChange}
+          rows={[
+            {
+              label: t('Pricing Type'),
+              value: props.quotaTypeFilter,
+              options: quotaOptions,
+              onChange: props.onQuotaTypeChange,
+              dimEmpty: hasModels,
+            },
+          ]}
         />
         <FilterSection
           title={t('Vendors')}
