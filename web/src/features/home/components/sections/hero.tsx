@@ -79,7 +79,7 @@ export function Hero(props: HeroProps) {
             {chips.map((chip) => (
               <span
                 key={chip}
-                className='border-border bg-card text-muted-foreground inline-flex min-w-0 items-center gap-2 rounded-[6px] border px-3 py-2 text-xs font-medium'
+                className='border-border bg-card text-muted-foreground inline-flex min-w-0 items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium'
               >
                 <Check className='text-muted-foreground/70 size-3.5 shrink-0' />
                 <span className='truncate'>{chip}</span>
@@ -91,7 +91,7 @@ export function Hero(props: HeroProps) {
             {props.isAuthenticated ? (
               <Link
                 to='/dashboard'
-                className='bg-foreground text-background hover:bg-foreground/90 inline-flex h-11 items-center justify-center gap-2 rounded-[6px] px-6 text-sm font-semibold transition-colors'
+                className='bg-foreground text-background hover:bg-foreground/90 inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-semibold transition-colors'
               >
                 {t('Go to Dashboard')}
                 <ArrowRight className='size-4' />
@@ -99,7 +99,7 @@ export function Hero(props: HeroProps) {
             ) : (
               <Link
                 to='/sign-up'
-                className='bg-foreground text-background hover:bg-foreground/90 inline-flex h-11 items-center justify-center gap-2 rounded-[6px] px-6 text-sm font-semibold transition-colors'
+                className='bg-foreground text-background hover:bg-foreground/90 inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-semibold transition-colors'
               >
                 {t('Start for free')}
                 <ArrowRight className='size-4' />
@@ -107,7 +107,7 @@ export function Hero(props: HeroProps) {
             )}
             <Link
               to='/pricing'
-              className='border-border bg-card text-foreground hover:border-foreground/25 inline-flex h-11 items-center justify-center gap-2 rounded-[6px] border px-6 text-sm font-semibold transition-colors'
+              className='border-border bg-card text-foreground hover:border-foreground/25 inline-flex h-11 items-center justify-center gap-2 rounded-md border px-6 text-sm font-semibold transition-colors'
             >
               {t('Explore models')}
             </Link>
@@ -124,7 +124,7 @@ export function Hero(props: HeroProps) {
                   {host}
                 </span>
               </div>
-              <span className='bg-muted text-muted-foreground rounded-[6px] px-2 py-1 font-mono text-[11px]'>
+              <span className='bg-muted text-muted-foreground rounded-md px-2 py-1 font-mono text-[11px]'>
                 GET /v1/models
               </span>
             </div>
@@ -138,9 +138,9 @@ export function Hero(props: HeroProps) {
                 {providerLogos.map((provider) => (
                   <div
                     key={provider.name}
-                    className='border-card bg-card rounded-[6px] border p-0.5'
+                    className='border-card bg-card rounded-md border p-0.5'
                   >
-                    <span className='inline-flex size-7 items-center justify-center rounded-[6px] border border-zinc-200 bg-white'>
+                    <span className='inline-flex size-7 items-center justify-center rounded-md border border-zinc-200 bg-white'>
                       <img
                         src={provider.src}
                         alt={provider.name}

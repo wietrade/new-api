@@ -33,7 +33,7 @@ export function HowItWorks() {
       title: t('Create an account'),
       desc: t('Sign up for free and get API access right away.'),
       visual: (
-        <div className='border-border bg-muted/50 text-muted-foreground rounded-[6px] border px-3 py-2 font-mono text-[11px]'>
+        <div className='border-border bg-muted/50 text-muted-foreground rounded-md border px-3 py-2 font-mono text-[11px]'>
           {t('Free sign-up')}
         </div>
       ),
@@ -43,7 +43,7 @@ export function HowItWorks() {
       title: t('Create an API key'),
       desc: t('Generate a key in the console — one key unlocks every model.'),
       visual: (
-        <div className='border-border bg-muted/50 text-muted-foreground rounded-[6px] border px-3 py-2 font-mono text-[11px]'>
+        <div className='border-border bg-muted/50 text-muted-foreground rounded-md border px-3 py-2 font-mono text-[11px]'>
           sk-••••••••••••
         </div>
       ),
@@ -53,7 +53,7 @@ export function HowItWorks() {
       title: t('Make your first call'),
       desc: t('Use any OpenAI SDK or HTTP client with the base URL pointed at the gateway.'),
       visual: (
-        <div className='border-border bg-muted/50 text-muted-foreground truncate rounded-[6px] border px-3 py-2 font-mono text-[11px]'>
+        <div className='border-border bg-muted/50 text-muted-foreground truncate rounded-md border px-3 py-2 font-mono text-[11px]'>
           base_url: {baseUrl}
         </div>
       ),
@@ -79,7 +79,7 @@ export function HowItWorks() {
               key={step.num}
               className='border-border/70 bg-card flex flex-col rounded-lg border p-5'
             >
-              <span className='border-border text-muted-foreground inline-flex size-7 items-center justify-center rounded-[6px] border text-xs font-semibold'>
+              <span className='border-border text-muted-foreground inline-flex size-7 items-center justify-center rounded-md border text-xs font-semibold'>
                 {step.num}
               </span>
               <h3 className='mt-4 text-base font-semibold tracking-tight'>

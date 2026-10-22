@@ -46,7 +46,7 @@ export function CTA(props: CTAProps) {
         </div>
         <Link
           to='/sign-up'
-          className='bg-foreground text-background hover:bg-foreground/90 inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[6px] px-6 text-sm font-semibold transition-colors'
+          className='bg-foreground text-background hover:bg-foreground/90 inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-md px-6 text-sm font-semibold transition-colors'
         >
           {t('Start for free')}
           <ArrowRight className='size-4' />

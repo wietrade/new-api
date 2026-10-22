@@ -54,7 +54,7 @@ export function Features(_props: FeaturesProps) {
           {providers.map((provider) => (
             <span
               key={provider.name}
-              className='inline-flex size-9 items-center justify-center rounded-[6px] border border-zinc-200 bg-white'
+              className='inline-flex size-9 items-center justify-center rounded-md border border-zinc-200 bg-white'
             >
               <img
                 src={provider.src}
@@ -74,7 +74,7 @@ export function Features(_props: FeaturesProps) {
           {['简体中文', 'English'].map((lang) => (
             <span
               key={lang}
-              className='border-border bg-muted/50 text-muted-foreground rounded-[6px] border px-2.5 py-1.5 text-xs font-medium'
+              className='border-border bg-muted/50 text-muted-foreground rounded-md border px-2.5 py-1.5 text-xs font-medium'
             >
               {lang}
             </span>
@@ -93,7 +93,7 @@ export function Features(_props: FeaturesProps) {
             (item) => (
               <span
                 key={item}
-                className='border-border bg-muted/50 text-muted-foreground rounded-[6px] border px-2.5 py-1.5 text-xs font-medium'
+                className='border-border bg-muted/50 text-muted-foreground rounded-md border px-2.5 py-1.5 text-xs font-medium'
               >
                 {item}
               </span>
@@ -106,7 +106,7 @@ export function Features(_props: FeaturesProps) {
       title: t('Security controls'),
       desc: t('API keys, account controls and clear usage records. Your data is never used for training.'),
       visual: (
-        <div className='border-border bg-muted/50 inline-flex size-11 items-center justify-center rounded-[8px] border'>
+        <div className='border-border bg-muted/50 inline-flex size-11 items-center justify-center rounded-md border'>
           <ShieldCheck className='text-muted-foreground size-5' />
         </div>
       ),

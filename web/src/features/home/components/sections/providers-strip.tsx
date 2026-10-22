@@ -40,9 +40,9 @@ export function ProvidersStrip() {
           {providers.map((provider) => (
             <div
               key={provider.name}
-              className='border-border/70 bg-card flex items-center justify-center gap-2 rounded-[6px] border px-3 py-3'
+              className='border-border/70 bg-card flex items-center justify-center gap-2 rounded-md border px-3 py-3'
             >
-              <span className='inline-flex size-6 items-center justify-center rounded-[5px] border border-zinc-200 bg-white'>
+              <span className='inline-flex size-6 items-center justify-center rounded-md border border-zinc-200 bg-white'>
                 <img
                   src={provider.src}
                   alt={provider.name}

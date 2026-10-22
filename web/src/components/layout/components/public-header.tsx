@@ -105,24 +105,24 @@ export function PublicHeader(props: PublicHeaderProps) {
       src={systemLogo}
       loading={loading}
       logoLoaded={logoLoaded}
-      className='size-8 rounded-[6px] object-contain'
+      className='size-8 rounded-md object-contain'
     />
   )
   if (customLogo) logoContent = customLogo
-  if (loading) logoContent = <Skeleton className='size-8 rounded-[6px]' />
+  if (loading) logoContent = <Skeleton className='size-8 rounded-md' />
 
   let authContent = (
     <div className='flex items-center gap-3'>
       <Link
         to='/sign-up'
-        className='bg-foreground text-background hover:bg-foreground/90 inline-flex items-center justify-center rounded-[6px] px-4 py-1.5 text-sm font-medium shadow-sm transition-colors'
+        className='bg-foreground text-background hover:bg-foreground/90 inline-flex items-center justify-center rounded-md px-4 py-1.5 text-sm font-medium shadow-sm transition-colors'
       >
         {t('Get Started')}
       </Link>
     </div>
   )
   if (isAuthenticated) authContent = <ProfileDropdown />
-  if (loading) authContent = <Skeleton className='h-8 w-24 rounded-[6px]' />
+  if (loading) authContent = <Skeleton className='h-8 w-24 rounded-md' />
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
@@ -200,7 +200,7 @@ export function PublicHeader(props: PublicHeaderProps) {
           <div className='flex h-14 items-center justify-between'>
             {/* 品牌：32px 方标 + 18px 半粗站点名 */}
             <Link to={homeUrl} className='group flex items-center gap-2.5'>
-              <div className='flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[6px]'>
+              <div className='flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-md'>
                 {logoContent}
               </div>
               <span className='text-[18px] leading-none font-semibold tracking-tight'>
@@ -220,7 +220,7 @@ export function PublicHeader(props: PublicHeaderProps) {
               {links.map((link) => {
                 const isActive = pathname === link.href
                 const linkClassName = cn(
-                  'rounded-[6px] px-3 py-1.5 text-[13px] font-medium transition-colors',
+                  'rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors',
                   isActive
                     ? 'text-foreground'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground',

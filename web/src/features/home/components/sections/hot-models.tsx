@@ -111,7 +111,7 @@ export function HotModels() {
                 >
                   <div className='flex items-center gap-2'>
                     {vendorLogo(model.vendor) ? (
-                      <span className='inline-flex size-5 items-center justify-center rounded-[4px] border border-zinc-200 bg-white'>
+                      <span className='inline-flex size-5 items-center justify-center rounded-md border border-zinc-200 bg-white'>
                         <img
                           src={vendorLogo(model.vendor)}
                           alt={model.vendor}
@@ -119,7 +119,7 @@ export function HotModels() {
                         />
                       </span>
                     ) : (
-                      <span className='bg-muted size-4 rounded-[4px]' />
+                      <span className='bg-muted size-4 rounded-md' />
                     )}
                     <span className='text-muted-foreground truncate text-xs'>
                       {model.vendor}
