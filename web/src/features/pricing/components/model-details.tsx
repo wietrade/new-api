@@ -65,6 +65,7 @@ import { DEFAULT_TOKEN_UNIT, getProtocolLabel } from '../constants'
 import { useBillingTime } from '../hooks/use-billing-time'
 import { usePricingData } from '../hooks/use-pricing-data'
 import type { ParsedTaskTier } from '../lib/billing-expr'
+import { getBillingModeLabelKey } from '../lib/billing-mode'
 import { formatBillingCondition } from '../lib/billing-expression/condition-display'
 import {
   formatTaskUsageUnitPrice,
@@ -101,7 +102,6 @@ import type {
   TokenUnit,
 } from '../types'
 import { DynamicPricingBreakdown } from './dynamic-pricing-breakdown'
-import { ModelBillingModeBadge } from './model-billing-mode-badge'
 import { ModelDetailsApi } from './model-details-api'
 import { ModelDetailsPerformance } from './model-details-performance'
 
@@ -583,13 +583,6 @@ function ModelHeader(props: { model: PricingModel }) {
           successTooltip={t('Copied!')}
           aria-label={t('Copy model name')}
         />
-      </div>
-      <div className='mt-1 flex flex-wrap items-center gap-1.5 text-xs'>
-        {model.vendor_name && (
-          <span className='text-muted-foreground'>{model.vendor_name}</span>
-        )}
-        <span className='text-muted-foreground/30'>·</span>
-        <ModelBillingModeBadge model={model} />
       </div>
       {description && (
         <p className='text-muted-foreground mt-2 text-sm leading-relaxed'>
@@ -1550,7 +1543,22 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
         <TabsContent value='overview' className='outline-none'>
           <div className='grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] xl:items-start'>
             <section className='bg-card/60 space-y-4 rounded-xl border p-3 shadow-sm sm:space-y-5 sm:p-4'>
-            <SectionTitle>{t('Pricing')}</SectionTitle>
+            <SectionTitle>
+              {t('Pricing')}
+              <span className='ml-1.5 font-normal'>
+                {props.model.vendor_name && (
+                  <>
+                    <span className='text-muted-foreground'>
+                      {props.model.vendor_name}
+                    </span>
+                    <span className='text-muted-foreground/50'> {'·'} </span>
+                  </>
+                )}
+                <span className='text-dynamic-billing'>
+                  {t(getBillingModeLabelKey(props.model))}
+                </span>
+              </span>
+            </SectionTitle>
             {showBasePrices && (
               <PriceSection
                 model={props.model}
