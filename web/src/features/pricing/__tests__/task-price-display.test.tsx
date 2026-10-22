@@ -665,7 +665,7 @@ it('shows provider count, price range and missing-price status in both list and 
   expect(screen.getByText('$0.4 – $0.8')).toBeVisible()
 })
 
-it('shows a single group table and switches groups instead of stacking them', async () => {
+it('lists a price table for every group without switching', async () => {
   vi.spyOn(api, 'get').mockResolvedValue({ data: { data: { groups: [] } } })
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -692,13 +692,9 @@ it('shows a single group table and switches groups instead of stacking them', as
       />
     </QueryClientProvider>
   )
-  const user = userEvent.setup()
   const tables = screen.getAllByRole('table')
-  expect(tables).toHaveLength(1)
-  const table = tables[0]
-  expect(within(table).getByText('$0.22')).toBeVisible()
-
-  await user.click(screen.getByRole('button', { name: /premium\s*3x/ }))
-  expect(within(table).getByText('$0.66')).toBeVisible()
-  expect(within(table).queryByText('$0.22')).not.toBeInTheDocument()
+  expect(tables).toHaveLength(2)
+  expect(within(tables[0]).getByText('$0.22')).toBeVisible()
+  expect(within(tables[1]).getByText('$0.66')).toBeVisible()
+  expect(screen.queryByRole('button', { name: /premium\s*3x/ })).toBeNull()
 })
