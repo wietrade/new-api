@@ -31,12 +31,8 @@ import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
 
 import {
-  CONTEXT_RANGES,
   CONTEXT_RANGE_ORDER,
-  FILTER_ALL,
-  INPUT_TYPES,
   INPUT_TYPE_ORDER,
-  MODEL_TYPES,
   MODEL_TYPE_ORDER,
   PRICE_TIERS,
   QUOTA_TYPES,
@@ -60,9 +56,8 @@ type FilterOption = {
 
 type FilterSectionProps = {
   title: string
-  /** Selected option values; empty means "all". */
+  /** Selected option values; an empty array means "no restriction". */
   value: string[]
-  allValue: string
   options: FilterOption[]
   onChange: (value: string) => void
 }
@@ -158,16 +153,13 @@ function FilterSection(props: FilterSectionProps) {
       <CollapsibleContent>
         <div className='flex flex-wrap gap-1.5'>
           {props.options.map((option) => {
-            const isAll = option.value === props.allValue
-            const active = isAll
-              ? props.value.length === 0
-              : props.value.includes(option.value)
+            const active = props.value.includes(option.value)
             return (
               <FilterChip
                 key={option.value}
                 option={option}
                 active={active}
-                highlight={active && !isAll}
+                highlight={active}
                 onClick={() => props.onChange(option.value)}
               />
             )
@@ -230,11 +222,6 @@ export const PricingSidebar = memo(function PricingSidebar(
   const priceTierLabels = getPriceTierLabels(t)
 
   const vendorOptions: FilterOption[] = [
-    {
-      value: FILTER_ALL,
-      label: t('All Vendors'),
-      count: props.models.length,
-    },
     ...props.vendors
       .map((vendor) => ({
         value: vendor.name,
@@ -246,10 +233,6 @@ export const PricingSidebar = memo(function PricingSidebar(
   ]
 
   const groupOptions: FilterOption[] = [
-    {
-      value: FILTER_ALL,
-      label: t('All Groups'),
-    },
     ...props.groups.map((group) => ({
       value: group,
       label: group,
@@ -258,11 +241,6 @@ export const PricingSidebar = memo(function PricingSidebar(
   ]
 
   const quotaOptions: FilterOption[] = [
-    {
-      value: QUOTA_TYPES.ALL,
-      label: quotaTypeLabels[QUOTA_TYPES.ALL],
-      count: props.models.length,
-    },
     {
       value: QUOTA_TYPES.TOKEN,
       label: quotaTypeLabels[QUOTA_TYPES.TOKEN],
@@ -281,11 +259,6 @@ export const PricingSidebar = memo(function PricingSidebar(
   ]
 
   const modelTypeOptions: FilterOption[] = [
-    {
-      value: MODEL_TYPES.ALL,
-      label: modelTypeLabels[MODEL_TYPES.ALL],
-      count: props.models.length,
-    },
     ...MODEL_TYPE_ORDER.map((type) => ({
       value: type,
       label: modelTypeLabels[type],
@@ -294,11 +267,6 @@ export const PricingSidebar = memo(function PricingSidebar(
   ]
 
   const inputTypeOptions: FilterOption[] = [
-    {
-      value: INPUT_TYPES.ALL,
-      label: inputTypeLabels[INPUT_TYPES.ALL],
-      count: props.models.length,
-    },
     ...INPUT_TYPE_ORDER.map((type) => ({
       value: type,
       label: inputTypeLabels[type],
@@ -307,11 +275,6 @@ export const PricingSidebar = memo(function PricingSidebar(
   ]
 
   const contextOptions: FilterOption[] = [
-    {
-      value: CONTEXT_RANGES.ALL,
-      label: contextRangeLabels[CONTEXT_RANGES.ALL],
-      count: props.models.length,
-    },
     ...CONTEXT_RANGE_ORDER.map((range) => ({
       value: range,
       label: contextRangeLabels[range],
@@ -320,11 +283,6 @@ export const PricingSidebar = memo(function PricingSidebar(
   ]
 
   const priceTierOptions: FilterOption[] = [
-    {
-      value: PRICE_TIERS.ALL,
-      label: priceTierLabels[PRICE_TIERS.ALL],
-      count: props.models.length,
-    },
     {
       value: PRICE_TIERS.FREE,
       label: priceTierLabels[PRICE_TIERS.FREE],
@@ -369,49 +327,42 @@ export const PricingSidebar = memo(function PricingSidebar(
         <FilterSection
           title={t('Model Types')}
           value={props.modelTypeFilter}
-          allValue={MODEL_TYPES.ALL}
           options={modelTypeOptions}
           onChange={props.onModelTypeChange}
         />
         <FilterSection
           title={t('Input Types')}
           value={props.inputTypeFilter}
-          allValue={INPUT_TYPES.ALL}
           options={inputTypeOptions}
           onChange={props.onInputTypeChange}
         />
         <FilterSection
           title={t('Context Length')}
           value={props.contextFilter}
-          allValue={CONTEXT_RANGES.ALL}
           options={contextOptions}
           onChange={props.onContextChange}
         />
         <FilterSection
           title={t('Price')}
           value={props.priceTierFilter}
-          allValue={PRICE_TIERS.ALL}
           options={priceTierOptions}
           onChange={props.onPriceTierChange}
         />
         <FilterSection
           title={t('Pricing Type')}
           value={props.quotaTypeFilter}
-          allValue={QUOTA_TYPES.ALL}
           options={quotaOptions}
           onChange={props.onQuotaTypeChange}
         />
         <FilterSection
-          title={t('All Vendors')}
+          title={t('Vendors')}
           value={props.vendorFilter}
-          allValue={FILTER_ALL}
           options={vendorOptions}
           onChange={props.onVendorChange}
         />
         <FilterSection
           title={t('Groups')}
           value={props.groupFilter}
-          allValue={FILTER_ALL}
           options={groupOptions}
           onChange={props.onGroupChange}
         />

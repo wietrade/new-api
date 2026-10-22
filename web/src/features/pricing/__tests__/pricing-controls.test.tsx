@@ -139,8 +139,10 @@ describe('pricing controls', () => {
       <PricingSidebar {...sidebarProps} models={models} />
     )
 
-    // Chips show the label only.
-    expect(chip('All Vendors').textContent).toBe('All Vendors')
+    // Chips show the label only; there is no "all" chip per section.
+    expect(chips('All Vendors')).toHaveLength(0)
+    expect(chips('All Models')).toHaveLength(0)
+    expect(chips('All Groups')).toHaveLength(0)
     expect(chip('Vendor A').textContent).toBe('Vendor A')
     expect(chip('Vendor B').textContent).toBe('Vendor B')
     expect(chip('Files').textContent).toBe('Files')
