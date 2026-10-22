@@ -14,6 +14,10 @@ on:
         description: 'With allow_new: ignore models released before this date (YYYY-MM-DD)'
         type: string
         default: ''
+      direct_commit:
+        description: 'Commit straight to the default branch instead of opening a PR'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -58,15 +62,29 @@ jobs:
       - name: Detect changes
         id: diff
         run: |
-          if git diff --quiet -- metadata; then
+          # git diff misses newly created files (pricing.json on first run)
+          if [ -z "$(git status --porcelain -- metadata)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager status --short -- metadata
             git --no-pager diff --stat -- metadata
           fi
 
+      - name: Commit directly
+        if: steps.diff.outputs.changed == 'true' && inputs.direct_commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add metadata
+          git commit -m "chore(metadata): sync official model metadata and prices"
+          git push origin "HEAD:${{ github.event.repository.default_branch }}"
+
       - name: Open or update pull request
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.diff.outputs.changed == 'true' && !inputs.direct_commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -79,16 +97,20 @@ jobs:
           git commit -m "chore(metadata): sync official model metadata and prices"
           git push --force origin "$branch"
 
+          cat > /tmp/pr-body.md <<'BODY'
+          自动同步（厂商 API / models.dev / OpenRouter，配置见 metadata/api/newapi/sync.config.json）。
+
+          请 review：
+          - metadata/api/newapi/models.json：上下文、最大输出、模态、能力的刷新；新增模型需确认后再合并。
+          - metadata/api/newapi/pricing.json：价格为参考价快照（聚合源，非厂商官方牌价），合并本 PR 不会自动改价。
+
+          合并后到后台「同步资料」预览并应用，才会写入模型库。
+          BODY
+
           if [ -z "$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')" ]; then
-            gh pr create --base main --head "$branch" \
+            gh pr create --base "${{ github.event.repository.default_branch }}" --head "$branch" \
               --title "chore(metadata): sync official model metadata and prices" \
-              --body "自动同步（models.dev / openrouter / 厂商官方 API）。
-
-请 review 以下两类 diff：
-- \`metadata/api/**/models.json\`：上下文、最大输出、模态、能力的刷新；新模型需人工确认后再合并。
-- \`metadata/api/newapi/pricing.json\`：官方列表价。**合并本 PR 不会自动改价**，需人工据此调整 \`model_ratio\`。
-
-模型元数据在 new-api 侧仍需「模型元数据同步」预览后应用。"
+              --body-file /tmp/pr-body.md
           else
             echo "PR already open, branch updated."
           fi
