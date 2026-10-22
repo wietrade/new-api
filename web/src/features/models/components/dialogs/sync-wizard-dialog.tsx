@@ -58,6 +58,12 @@ const FIELD_LABELS: Record<MetadataSyncField, string> = {
   endpoints: 'Custom endpoints',
   name_rule: 'Match Type',
   status: 'Model square visibility',
+  capabilities: 'Capabilities',
+  input_modalities: 'Input modalities',
+  output_modalities: 'Output modalities',
+  context_length: 'Context Length',
+  max_output_tokens: 'Max output tokens',
+  is_free: 'Free',
 }
 const REASON_LABELS = {
   create: 'New metadata',

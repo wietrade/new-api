@@ -175,6 +175,12 @@ export type MetadataSyncField =
   | 'endpoints'
   | 'name_rule'
   | 'status'
+  | 'capabilities'
+  | 'input_modalities'
+  | 'output_modalities'
+  | 'context_length'
+  | 'max_output_tokens'
+  | 'is_free'
 export type MetadataSyncValues = {
   description: string
   icon: string
@@ -183,6 +189,12 @@ export type MetadataSyncValues = {
   endpoints: string
   name_rule: number
   status: number
+  capabilities: string
+  input_modalities: string
+  output_modalities: string
+  context_length: number
+  max_output_tokens: number
+  is_free: boolean
 }
 export type MetadataSyncCandidate = {
   model_name: string
