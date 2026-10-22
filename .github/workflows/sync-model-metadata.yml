@@ -1,0 +1,94 @@
+name: sync-model-metadata
+
+on:
+  schedule:
+    # daily at 02:17 UTC
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+    inputs:
+      allow_new:
+        description: 'Also create newly released models'
+        type: boolean
+        default: false
+      min_release_date:
+        description: 'With allow_new: ignore models released before this date (YYYY-MM-DD)'
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-model-metadata
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest discover -s scripts/model_sync/tests -t . -v
+
+      - name: Sync metadata and prices
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          flags=""
+          if [ "${{ inputs.allow_new }}" = "true" ]; then
+            flags="--allow-new"
+            if [ -n "${{ inputs.min_release_date }}" ]; then
+              flags="$flags --min-release-date ${{ inputs.min_release_date }}"
+            fi
+          fi
+          python scripts/model_sync/sync_models.py --only metadata --official $flags
+          python scripts/model_sync/sync_models.py --only pricing
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet -- metadata; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --stat -- metadata
+          fi
+
+      - name: Open or update pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          branch="chore/model-metadata-sync"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add metadata
+          git commit -m "chore(metadata): sync official model metadata and prices"
+          git push --force origin "$branch"
+
+          if [ -z "$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')" ]; then
+            gh pr create --base main --head "$branch" \
+              --title "chore(metadata): sync official model metadata and prices" \
+              --body "自动同步（models.dev / openrouter / 厂商官方 API）。
+
+请 review 以下两类 diff：
+- \`metadata/api/**/models.json\`：上下文、最大输出、模态、能力的刷新；新模型需人工确认后再合并。
+- \`metadata/api/newapi/pricing.json\`：官方列表价。**合并本 PR 不会自动改价**，需人工据此调整 \`model_ratio\`。
+
+模型元数据在 new-api 侧仍需「模型元数据同步」预览后应用。"
+          else
+            echo "PR already open, branch updated."
+          fi

@@ -64,10 +64,17 @@ type ChannelSelectorDialogProps = {
 
 // Synthesized presets from `controller/ratio_sync.go` always carry stable
 // negative IDs, so matching by ID alone is reliable and self-documenting.
-function isOfficialChannel(channel: UpstreamChannel): boolean {
+// Both are built in, but only the upstream ratio_config preset is "official";
+// models.dev is a third-party aggregator and must not carry the same badge
+// (it used to render two indistinguishable "Official" rows).
+function isBuiltinPreset(channel: UpstreamChannel): boolean {
   return (
     channel.id === OFFICIAL_CHANNEL_ID || channel.id === MODELS_DEV_PRESET_ID
   )
+}
+
+function isOfficialChannel(channel: UpstreamChannel): boolean {
+  return channel.id === OFFICIAL_CHANNEL_ID
 }
 
 export function ChannelSelectorDialog({
@@ -292,10 +299,10 @@ export function ChannelSelectorDialog({
 
   const sortedChannels = useMemo(() => {
     return [...filteredChannels].sort((a, b) => {
-      const aIsOfficial = isOfficialChannel(a)
-      const bIsOfficial = isOfficialChannel(b)
-      if (aIsOfficial && !bIsOfficial) return -1
-      if (!aIsOfficial && bIsOfficial) return 1
+      const aIsPreset = isBuiltinPreset(a)
+      const bIsPreset = isBuiltinPreset(b)
+      if (aIsPreset && !bIsPreset) return -1
+      if (!aIsPreset && bIsPreset) return 1
       return 0
     })
   }, [filteredChannels])
