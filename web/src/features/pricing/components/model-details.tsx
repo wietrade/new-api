@@ -331,13 +331,13 @@ function CatalogTextValue(props: { children: React.ReactNode }) {
   )
 }
 
-function CatalogInfoCell(props: { label: string; children: React.ReactNode }) {
+function CatalogSpecRow(props: { label: string; children: React.ReactNode }) {
   return (
-    <div className='bg-card flex min-w-0 flex-col gap-1 px-3 py-2.5'>
-      <span className='text-muted-foreground text-[11px] font-medium'>
+    <div className='grid grid-cols-[88px_minmax(0,1fr)] items-start gap-3 px-3 py-2.5 sm:grid-cols-[104px_minmax(0,1fr)]'>
+      <span className='text-muted-foreground text-xs leading-5'>
         {props.label}
       </span>
-      {props.children}
+      <div className='min-w-0 text-sm leading-5'>{props.children}</div>
     </div>
   )
 }
@@ -433,13 +433,13 @@ function ModelBackendQuickStats(props: { model: PricingModel }) {
   if (stats.length === 0) return null
 
   return (
-    <div className='bg-muted/20 grid grid-cols-2 gap-px overflow-hidden rounded-lg border @md/details:grid-cols-3 @2xl/details:grid-cols-5'>
+    <div className='bg-muted/20 flex flex-wrap overflow-hidden rounded-lg border'>
       {stats.map((stat) => {
         const Icon = stat.icon
         return (
           <div
             key={stat.key}
-            className='bg-background flex min-w-0 flex-col gap-0.5 px-3 py-2.5'
+            className='bg-background border-border/60 flex min-w-0 flex-1 basis-40 flex-col gap-0.5 border-r px-3 py-2.5 last:border-r-0'
           >
             <span className='text-muted-foreground inline-flex min-w-0 items-center gap-1 text-[11px] font-medium'>
               <Icon className='size-3 shrink-0' />
@@ -460,85 +460,74 @@ function ModelBackendQuickStats(props: { model: PricingModel }) {
   )
 }
 
-function ModelBackendSignalsSection(props: { model: PricingModel }) {
-  const { t } = useTranslation()
-  const capabilities = normalizeCatalogItems(props.model.capabilities)
-
-  // Modalities are already shown in the QuickStats row above.
-  if (capabilities.length === 0) {
-    return null
-  }
-
-  return (
-    <section>
-      <SectionTitle>{t('Capabilities')}</SectionTitle>
-      <div className='rounded-xl border p-3'>
-        <CatalogPillList
-          items={capabilities.map((capability) =>
-            t(
-              CAPABILITY_LABEL_KEYS[capability as ModelCapability] ??
-                capability
-            )
-          )}
-        />
-      </div>
-    </section>
-  )
-}
-
 function ModelBackendProviderSection(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const model = props.model
   const groups = normalizeCatalogItems(model.enable_groups)
   const endpoints = normalizeCatalogItems(model.supported_endpoint_types)
   const tags = parseTags(model.tags)
+  const capabilities = normalizeCatalogItems(model.capabilities)
   const cells: React.ReactNode[] = []
 
   if (model.vendor_name) {
     cells.push(
-      <CatalogInfoCell key='provider' label={t('Provider')}>
+      <CatalogSpecRow key='provider' label={t('Provider')}>
         <CatalogTextValue>{model.vendor_name}</CatalogTextValue>
-      </CatalogInfoCell>
+      </CatalogSpecRow>
     )
   }
 
   cells.push(
-    <CatalogInfoCell key='type' label={t('Type')}>
+    <CatalogSpecRow key='type' label={t('Type')}>
       <ModelBillingModeBadge model={model} />
-    </CatalogInfoCell>
+    </CatalogSpecRow>
   )
+
+  if (capabilities.length > 0) {
+    cells.push(
+      <CatalogSpecRow key='capabilities' label={t('Capabilities')}>
+        <CatalogPillList
+          items={capabilities.map((capability) =>
+            t(
+              CAPABILITY_LABEL_KEYS[capability as ModelCapability] ?? capability
+            )
+          )}
+        />
+      </CatalogSpecRow>
+    )
+  }
 
   if (groups.length > 0) {
     cells.push(
-      <CatalogInfoCell key='groups' label={t('Groups')}>
+      <CatalogSpecRow key='groups' label={t('Groups')}>
         <CatalogPillList items={groups} />
-      </CatalogInfoCell>
+      </CatalogSpecRow>
     )
   }
 
   if (endpoints.length > 0) {
     cells.push(
-      <CatalogInfoCell key='endpoints' label={t('API Protocol')}>
+      <CatalogSpecRow key='endpoints' label={t('API Protocol')}>
         <CatalogPillList
           items={endpoints.map((endpoint) => getProtocolLabel(t, endpoint))}
         />
-      </CatalogInfoCell>
+      </CatalogSpecRow>
     )
   }
 
   if (tags.length > 0) {
     cells.push(
-      <CatalogInfoCell key='tags' label={t('Tags')}>
+      <CatalogSpecRow key='tags' label={t('Tags')}>
         <CatalogPillList items={tags} />
-      </CatalogInfoCell>
+      </CatalogSpecRow>
     )
   }
 
   if (model.parameter_count) {
     cells.push(
-      <CatalogInfoCell key='parameters' label={t('Parameters')}>
+      <CatalogSpecRow key='parameters' label={t('Parameters')}>
         <CatalogTextValue>{model.parameter_count}</CatalogTextValue>
-      </CatalogInfoCell>
+      </CatalogSpecRow>
     )
   }
 
@@ -547,7 +536,7 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
   return (
     <section>
       <SectionTitle>{t('Model')}</SectionTitle>
-      <div className='border-border/60 bg-border/60 grid grid-cols-1 gap-px overflow-hidden rounded-lg border sm:grid-cols-2'>
+      <div className='divide-border/60 divide-y overflow-hidden rounded-lg border'>
         {cells}
       </div>
     </section>
@@ -558,7 +547,6 @@ function ModelBackendDetailsSection(props: { model: PricingModel }) {
   return (
     <>
       <ModelBackendQuickStats model={props.model} />
-      <ModelBackendSignalsSection model={props.model} />
       <ModelBackendProviderSection model={props.model} />
     </>
   )
@@ -1094,7 +1082,7 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
       <div className='overflow-hidden rounded-lg border'>
         <StaticDataTable
           className='rounded-none border-0'
-          tableClassName='text-sm'
+          tableClassName='text-sm [&_tbody>tr]:h-auto'
           headerRowClassName='hover:bg-transparent'
           data={props.tiers}
           getRowKey={(tier, tierIndex) => `${group}-${tier.label}-${tierIndex}`}
@@ -1174,7 +1162,7 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
             </div>
             <StaticDataTable
               className='rounded-none border-0'
-              tableClassName='text-sm'
+              tableClassName='text-sm [&_tbody>tr]:h-auto'
               headerRowClassName='hover:bg-transparent'
               data={props.usageExampleRows}
               getRowKey={(row) => `${group}-${row.label}`}
@@ -1416,7 +1404,7 @@ function ProviderGroupPricingSection(
       <AutoGroupChain model={props.model} autoGroups={props.autoGroups} />
       <StaticDataTable
         className='-mx-4 rounded-none border-0 sm:mx-0'
-        tableClassName='text-sm'
+        tableClassName='text-sm [&_tbody>tr]:h-auto'
         headerRowClassName='hover:bg-transparent'
         data={availableGroups}
         getRowKey={(group) => group}
@@ -1548,10 +1536,9 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
           })}
         </TabsList>
 
-        <TabsContent value='overview' className='space-y-6 outline-none'>
-          <OverviewSummaryGrid model={props.model} />
-
-          <section className='bg-card/60 space-y-4 rounded-xl border p-3 shadow-sm sm:space-y-5 sm:p-4'>
+        <TabsContent value='overview' className='outline-none'>
+          <div className='grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] xl:items-start'>
+            <section className='bg-card/60 space-y-4 rounded-xl border p-3 shadow-sm sm:space-y-5 sm:p-4'>
             <SectionTitle>{t('Pricing')}</SectionTitle>
             {showBasePrices && (
               <PriceSection
@@ -1583,9 +1570,13 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
               tokenUnit={props.tokenUnit}
               showRechargePrice={showRechargePrice}
             />
-          </section>
+            </section>
 
-          <ModelBackendDetailsSection model={props.model} />
+            <div className='space-y-4'>
+              <OverviewSummaryGrid model={props.model} />
+              <ModelBackendDetailsSection model={props.model} />
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value='performance' className='outline-none'>
@@ -1621,7 +1612,7 @@ export function ModelDetailsDrawer(props: ModelDetailsDrawerProps) {
       <SheetContent
         side='right'
         className={sideDrawerContentClassName(
-          'sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl'
+          'sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-6xl'
         )}
       >
         <SheetHeader className='sr-only'>
@@ -1668,7 +1659,7 @@ export function ModelDetails() {
   if (isLoading) {
     return (
       <PublicLayout>
-        <div className='mx-auto max-w-5xl px-4 sm:px-6'>
+        <div className='mx-auto w-full max-w-7xl px-3 sm:px-6 xl:px-8'>
           <Skeleton className='mb-4 h-5 w-16' />
           <div className='space-y-2'>
             <Skeleton className='h-7 w-64' />
@@ -1710,7 +1701,7 @@ export function ModelDetails() {
 
   return (
     <PublicLayout>
-      <div className='mx-auto max-w-5xl px-4 sm:px-6'>
+      <div className='mx-auto w-full max-w-7xl px-3 sm:px-6 xl:px-8'>
         <Button
           variant='ghost'
           size='sm'

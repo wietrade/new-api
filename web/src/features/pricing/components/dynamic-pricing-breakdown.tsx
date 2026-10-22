@@ -456,9 +456,9 @@ export function DynamicPricingBreakdown({
   const requestRuleKeyOccurrences = new Map<string, number>()
 
   return (
-    <section className={cn('min-w-0', !compact && 'py-3 sm:py-4')}>
+    <section className={cn('min-w-0', !compact && 'py-1')}>
       {!compact && !usageSchema && (
-        <div className='mb-3 flex items-start gap-2 sm:mb-4'>
+        <div className='mb-2 flex items-start gap-2'>
           <span className='mt-0.5 inline-flex size-6 items-center justify-center rounded-lg bg-amber-100 text-amber-700 shadow-sm dark:bg-amber-500/20 dark:text-amber-300'>
             <TagIcon className='size-3.5' />
           </span>
@@ -474,13 +474,13 @@ export function DynamicPricingBreakdown({
       )}
 
       {hasTiers && (
-        <div className={cn(compact ? cn(hasRules && 'mb-2') : 'mb-3 sm:mb-4')}>
+        <div className={cn(compact ? cn(hasRules && 'mb-2') : 'mb-2')}>
           {!usageSchema && (
             <div
               className={
                 compact
                   ? 'text-muted-foreground mb-1.5 text-xs font-medium'
-                  : 'text-foreground mb-2 text-sm font-semibold'
+                  : 'text-foreground mb-1.5 text-sm font-semibold'
               }
             >
               {t('Tiered price table')}
@@ -584,8 +584,8 @@ export function DynamicPricingBreakdown({
             className='hidden rounded-none border-0 sm:block'
             tableClassName={
               compact
-                ? '[&_td]:text-xs [&_td_*]:text-xs [&_th]:text-xs [&_th_*]:text-xs'
-                : 'text-sm'
+                ? '[&_td]:text-xs [&_td_*]:text-xs [&_th]:text-xs [&_th_*]:text-xs [&_tbody>tr]:h-auto'
+                : 'text-sm [&_tbody>tr]:h-auto'
             }
             headerRowClassName='hover:bg-transparent'
             data={tiers}
