@@ -21,7 +21,13 @@ For commercial licensing, please contact support@quantumnous.com
 
 import { javascript } from '@codemirror/lang-javascript'
 import { markdown } from '@codemirror/lang-markdown'
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
+import { python } from '@codemirror/lang-python'
+import {
+  HighlightStyle,
+  StreamLanguage,
+  syntaxHighlighting,
+} from '@codemirror/language'
+import { shell } from '@codemirror/legacy-modes/mode/shell'
 import { EditorState, type Extension } from '@codemirror/state'
 import {
   EditorView,
@@ -240,6 +246,22 @@ function getCodeMirrorLanguageExtension(language: BundledLanguage | string) {
     return javascript({ jsx: requestedLanguage === 'tsx', typescript: true })
   }
 
+  if (requestedLanguage === 'python') {
+    return python()
+  }
+
+  if (
+    requestedLanguage === 'bash' ||
+    requestedLanguage === 'sh' ||
+    requestedLanguage === 'zsh'
+  ) {
+    // legacy-modes ships its own StreamParser type instance; the runtime
+    // shape matches StreamLanguage's expectations.
+    return StreamLanguage.define(
+      shell as unknown as Parameters<typeof StreamLanguage.define>[0]
+    )
+  }
+
   return []
 }
 
@@ -442,7 +464,7 @@ export const CodeBlockFrame = ({
     {showToolbar && (
       <div className='bg-muted/35 border-border/70 flex min-h-10 items-center gap-2 border-b px-2 py-1.5'>
         <div className='min-w-0 flex-1'>
-          <div className='text-muted-foreground truncate font-mono text-[11px] font-medium tracking-wide uppercase'>
+          <div className='text-muted-foreground truncate font-mono text-[11px] font-medium'>
             {title}
           </div>
         </div>
