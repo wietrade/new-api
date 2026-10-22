@@ -36,7 +36,6 @@ import { useTranslation } from 'react-i18next'
 import { CopyButton } from '@/components/copy-button'
 import { StaticDataTable } from '@/components/data-table'
 import { sideDrawerContentClassName } from '@/components/drawer-layout'
-import { GroupBadge } from '@/components/group-badge'
 import { PublicLayout } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import {
@@ -894,6 +893,16 @@ function PriceSection(props: {
 // Auto group chain (used inside group pricing section)
 // ----------------------------------------------------------------------------
 
+function groupLabel(
+  group: string | null | undefined,
+  t: (key: string) => string
+) {
+  const name = group?.trim()
+  if (!name) return t('User Group')
+  if (name === 'auto') return t('Auto')
+  return name
+}
+
 function AutoGroupChain(props: { model: PricingModel; autoGroups: string[] }) {
   const { t } = useTranslation()
   const modelEnableGroups = Array.isArray(props.model.enable_groups)
@@ -911,7 +920,7 @@ function AutoGroupChain(props: { model: PricingModel; autoGroups: string[] }) {
       <span className='text-muted-foreground/70'>→</span>
       {autoChain.map((g, idx) => (
         <span key={g} className='flex items-center gap-1'>
-          <GroupBadge group={g} size='sm' className='text-dynamic-billing' />
+          <span className='text-foreground/85'>{groupLabel(g, t)}</span>
           {idx < autoChain.length - 1 && (
             <span className='text-muted-foreground/70'>→</span>
           )}
@@ -1059,7 +1068,7 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
   return (
     <div className='space-y-3'>
       <div
-        className='flex flex-wrap items-center gap-1.5'
+        className='flex flex-wrap items-center gap-x-4 gap-y-1'
         role='group'
         aria-label={t('Pricing by Group')}
       >
@@ -1073,18 +1082,14 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
               aria-pressed={active}
               onClick={() => setActiveGroup(candidate)}
               className={cn(
-                'inline-flex h-7 items-center gap-1.5 rounded-md border px-2 text-xs transition-colors',
+                'inline-flex items-baseline gap-1.5 border-b-2 pb-1 text-xs transition-colors',
                 active
-                  ? 'border-dynamic-billing/50 bg-dynamic-billing/10 text-dynamic-billing'
-                  : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                  ? 'border-dynamic-billing text-foreground font-medium'
+                  : 'text-muted-foreground hover:text-foreground border-transparent'
               )}
             >
-              <GroupBadge
-                group={candidate}
-                size='sm'
-                className={active ? 'text-dynamic-billing' : undefined}
-              />
-              <span className='font-mono'>{candidateRatio}x</span>
+              <span>{groupLabel(candidate, t)}</span>
+              <span className='font-mono text-[11px]'>{candidateRatio}x</span>
             </button>
           )
         })}
@@ -1439,7 +1444,7 @@ function ProviderGroupPricingSection(
             className: thClass,
             cellClassName: 'py-2.5',
             cell: (group) => (
-              <GroupBadge group={group} size='sm' className='text-dynamic-billing' />
+              <span className='text-foreground'>{groupLabel(group, t)}</span>
             ),
           },
           {
