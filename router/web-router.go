@@ -22,6 +22,18 @@ func SetWebRouter(router *gin.Engine, assets WebAssets, pluginDispatcher gin.Han
 	frontendFS := common.EmbedFolder(assets.BuildFS, "web/dist")
 	compress := gzip.Gzip(gzip.DefaultCompression)
 
+	// 文档站：VitePress 产物落在 web/dist/docs。目录索引必须走显式路由，
+	// 否则 NoRoute + http.FileServer 会在 "/docs" 与 "/docs/" 之间来回重定向。
+	if docsIndex, err := assets.BuildFS.ReadFile("web/dist/docs/index.html"); err == nil {
+		router.GET("/docs", func(c *gin.Context) {
+			c.Redirect(http.StatusMovedPermanently, "/docs/")
+		})
+		router.GET("/docs/", func(c *gin.Context) {
+			c.Header("Cache-Control", "no-cache")
+			c.Data(http.StatusOK, "text/html; charset=utf-8", docsIndex)
+		})
+	}
+
 	router.NoRoute(
 		pluginDispatcher,
 		middleware.RouteTag("web"),

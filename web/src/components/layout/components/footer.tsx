@@ -77,7 +77,7 @@ export function Footer(props: FooterProps) {
   const displayLogo = systemLogo || props.logo || '/logo.png'
   const displayName = systemName || props.name || 'New API'
   const currentYear = new Date().getFullYear()
-  const docsHref = (status?.docs_link as string) || 'https://docs.newapi.pro'
+  const docsHref = (status?.docs_link as string) || '/docs'
 
   const [nameHead, nameTail] = useMemo(() => {
     const name = displayName || ''
