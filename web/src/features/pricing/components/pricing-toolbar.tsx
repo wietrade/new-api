@@ -63,13 +63,13 @@ export interface PricingToolbarProps {
   onRechargePriceChange: (value: boolean) => void
   viewMode: ViewMode
   onViewModeChange: (value: ViewMode) => void
-  quotaTypeFilter: string
-  modelTypeFilter: string
-  inputTypeFilter: string
-  contextFilter: string
-  priceTierFilter: string
-  vendorFilter: string
-  groupFilter: string
+  quotaTypeFilter: string[]
+  modelTypeFilter: string[]
+  inputTypeFilter: string[]
+  contextFilter: string[]
+  priceTierFilter: string[]
+  vendorFilter: string[]
+  groupFilter: string[]
   onQuotaTypeChange: (value: string) => void
   onModelTypeChange: (value: string) => void
   onInputTypeChange: (value: string) => void

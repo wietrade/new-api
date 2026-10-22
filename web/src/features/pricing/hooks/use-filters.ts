@@ -22,13 +22,7 @@ import { useMemo, useCallback, useState } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
 
 import {
-  FILTER_ALL,
   SORT_OPTIONS,
-  QUOTA_TYPES,
-  CONTEXT_RANGES,
-  MODEL_TYPES,
-  INPUT_TYPES,
-  PRICE_TIERS,
   DEFAULT_TOKEN_UNIT,
   VIEW_MODES,
   type ViewMode,
@@ -39,16 +33,37 @@ import type { PricingModel, TokenUnit } from '../types'
 type FilterState = {
   search?: string
   sort?: string
-  vendor?: string
-  group?: string
-  quotaType?: string
-  modelType?: string
-  inputType?: string
-  context?: string
-  priceTier?: string
+  vendor?: string[]
+  group?: string[]
+  quotaType?: string[]
+  modelType?: string[]
+  inputType?: string[]
+  context?: string[]
+  priceTier?: string[]
   tokenUnit?: TokenUnit
   view?: ViewMode
   rechargePrice?: boolean
+}
+
+/** URL filters may be `a` or `a,b`; `all` and empties mean "no restriction". */
+function parseList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map(String).filter(Boolean)
+  }
+  if (typeof value === 'string') {
+    if (!value || value === 'all') return []
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+  return []
+}
+
+function toggleValue(list: string[], value: string): string[] {
+  return list.includes(value)
+    ? list.filter((item) => item !== value)
+    : [...list, value]
 }
 
 function normalizeViewMode(value: unknown): ViewMode {
@@ -63,13 +78,13 @@ export function useFilters(models: PricingModel[]) {
   const [filterState, setFilterState] = useState<FilterState>(() => ({
     search: search.search,
     sort: search.sort,
-    vendor: search.vendor,
-    group: search.group,
-    quotaType: search.quotaType,
-    modelType: search.modelType,
-    inputType: search.inputType,
-    context: search.context,
-    priceTier: search.priceTier,
+    vendor: parseList(search.vendor),
+    group: parseList(search.group),
+    quotaType: parseList(search.quotaType),
+    modelType: parseList(search.modelType),
+    inputType: parseList(search.inputType),
+    context: parseList(search.context),
+    priceTier: parseList(search.priceTier),
     tokenUnit: search.tokenUnit,
     view: search.view,
     rechargePrice: search.rechargePrice,
@@ -78,13 +93,13 @@ export function useFilters(models: PricingModel[]) {
   const searchInput = filterState.search || ''
   const debouncedSearchInput = useDebounce(searchInput, 200)
   const sortBy = filterState.sort || SORT_OPTIONS.INPUT_PRICE_LOW
-  const vendorFilter = filterState.vendor || FILTER_ALL
-  const groupFilter = filterState.group || FILTER_ALL
-  const quotaTypeFilter = filterState.quotaType || QUOTA_TYPES.ALL
-  const modelTypeFilter = filterState.modelType || MODEL_TYPES.ALL
-  const inputTypeFilter = filterState.inputType || INPUT_TYPES.ALL
-  const contextFilter = filterState.context || CONTEXT_RANGES.ALL
-  const priceTierFilter = filterState.priceTier || PRICE_TIERS.ALL
+  const vendorFilter = filterState.vendor ?? []
+  const groupFilter = filterState.group ?? []
+  const quotaTypeFilter = filterState.quotaType ?? []
+  const modelTypeFilter = filterState.modelType ?? []
+  const inputTypeFilter = filterState.inputType ?? []
+  const contextFilter = filterState.context ?? []
+  const priceTierFilter = filterState.priceTier ?? []
   const tokenUnit: TokenUnit =
     filterState.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
   const viewMode = normalizeViewMode(filterState.view)
@@ -94,7 +109,12 @@ export function useFilters(models: PricingModel[]) {
     setFilterState((prev) => {
       const next: Record<string, unknown> = { ...prev, ...updates }
       for (const key of Object.keys(next)) {
-        if (next[key] === undefined || next[key] === null) {
+        const value = next[key]
+        if (
+          value === undefined ||
+          value === null ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
           delete next[key]
         }
       }
@@ -111,39 +131,6 @@ export function useFilters(models: PricingModel[]) {
       updateFilters({ sort: v === SORT_OPTIONS.NAME ? undefined : v }),
     [updateFilters]
   )
-  const setVendorFilter = useCallback(
-    (v: string) => updateFilters({ vendor: v === FILTER_ALL ? undefined : v }),
-    [updateFilters]
-  )
-  const setGroupFilter = useCallback(
-    (v: string) => updateFilters({ group: v === FILTER_ALL ? undefined : v }),
-    [updateFilters]
-  )
-  const setQuotaTypeFilter = useCallback(
-    (v: string) =>
-      updateFilters({ quotaType: v === QUOTA_TYPES.ALL ? undefined : v }),
-    [updateFilters]
-  )
-  const setModelTypeFilter = useCallback(
-    (v: string) =>
-      updateFilters({ modelType: v === MODEL_TYPES.ALL ? undefined : v }),
-    [updateFilters]
-  )
-  const setInputTypeFilter = useCallback(
-    (v: string) =>
-      updateFilters({ inputType: v === INPUT_TYPES.ALL ? undefined : v }),
-    [updateFilters]
-  )
-  const setContextFilter = useCallback(
-    (v: string) =>
-      updateFilters({ context: v === CONTEXT_RANGES.ALL ? undefined : v }),
-    [updateFilters]
-  )
-  const setPriceTierFilter = useCallback(
-    (v: string) =>
-      updateFilters({ priceTier: v === PRICE_TIERS.ALL ? undefined : v }),
-    [updateFilters]
-  )
   const setTokenUnit = useCallback(
     (v: TokenUnit) =>
       updateFilters({ tokenUnit: v === DEFAULT_TOKEN_UNIT ? undefined : v }),
@@ -157,6 +144,52 @@ export function useFilters(models: PricingModel[]) {
   const setShowRechargePrice = useCallback(
     (v: boolean) => updateFilters({ rechargePrice: v || undefined }),
     [updateFilters]
+  )
+
+  const setVendorFilter = useCallback(
+    (v: string) =>
+      updateFilters({ vendor: v === 'all' ? [] : toggleValue(vendorFilter, v) }),
+    [vendorFilter, updateFilters]
+  )
+  const setGroupFilter = useCallback(
+    (v: string) =>
+      updateFilters({ group: v === 'all' ? [] : toggleValue(groupFilter, v) }),
+    [groupFilter, updateFilters]
+  )
+  const setQuotaTypeFilter = useCallback(
+    (v: string) =>
+      updateFilters({
+        quotaType: v === 'all' ? [] : toggleValue(quotaTypeFilter, v),
+      }),
+    [quotaTypeFilter, updateFilters]
+  )
+  const setModelTypeFilter = useCallback(
+    (v: string) =>
+      updateFilters({
+        modelType: v === 'all' ? [] : toggleValue(modelTypeFilter, v),
+      }),
+    [modelTypeFilter, updateFilters]
+  )
+  const setInputTypeFilter = useCallback(
+    (v: string) =>
+      updateFilters({
+        inputType: v === 'all' ? [] : toggleValue(inputTypeFilter, v),
+      }),
+    [inputTypeFilter, updateFilters]
+  )
+  const setContextFilter = useCallback(
+    (v: string) =>
+      updateFilters({
+        context: v === 'all' ? [] : toggleValue(contextFilter, v),
+      }),
+    [contextFilter, updateFilters]
+  )
+  const setPriceTierFilter = useCallback(
+    (v: string) =>
+      updateFilters({
+        priceTier: v === 'all' ? [] : toggleValue(priceTierFilter, v),
+      }),
+    [priceTierFilter, updateFilters]
   )
 
   const filteredModels = useMemo(() => {
@@ -188,13 +221,13 @@ export function useFilters(models: PricingModel[]) {
 
   const activeFilters = useMemo(
     () => [
-      vendorFilter !== FILTER_ALL,
-      groupFilter !== FILTER_ALL,
-      quotaTypeFilter !== QUOTA_TYPES.ALL,
-      modelTypeFilter !== MODEL_TYPES.ALL,
-      inputTypeFilter !== INPUT_TYPES.ALL,
-      contextFilter !== CONTEXT_RANGES.ALL,
-      priceTierFilter !== PRICE_TIERS.ALL,
+      vendorFilter.length > 0,
+      groupFilter.length > 0,
+      quotaTypeFilter.length > 0,
+      modelTypeFilter.length > 0,
+      inputTypeFilter.length > 0,
+      contextFilter.length > 0,
+      priceTierFilter.length > 0,
     ],
     [
       vendorFilter,
@@ -218,13 +251,13 @@ export function useFilters(models: PricingModel[]) {
 
   const clearFilters = useCallback(() => {
     updateFilters({
-      vendor: undefined,
-      group: undefined,
-      quotaType: undefined,
-      modelType: undefined,
-      inputType: undefined,
-      context: undefined,
-      priceTier: undefined,
+      vendor: [],
+      group: [],
+      quotaType: [],
+      modelType: [],
+      inputType: [],
+      context: [],
+      priceTier: [],
     })
   }, [updateFilters])
 

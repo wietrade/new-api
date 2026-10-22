@@ -25,7 +25,6 @@ import {
   CONTEXT_RANGES,
   CONTEXT_RANGE_BOUNDS,
   MODEL_TYPES,
-  INPUT_TYPES,
   PRICE_TIERS,
   type ContextRange,
   type SortOption,
@@ -68,10 +67,12 @@ export function filterBySearch(
  */
 export function filterByVendor(
   models: PricingModel[],
-  vendor: string
+  vendors: string[]
 ): PricingModel[] {
-  if (vendor === FILTER_ALL) return models
-  return models.filter((m) => m.vendor_name === vendor)
+  if (vendors.length === 0) return models
+  return models.filter(
+    (m) => m.vendor_name != null && vendors.includes(m.vendor_name)
+  )
 }
 
 /**
@@ -79,31 +80,30 @@ export function filterByVendor(
  */
 export function filterByGroup(
   models: PricingModel[],
-  group: string
+  groups: string[]
 ): PricingModel[] {
-  if (group === FILTER_ALL) return models
-  return models.filter((m) => m.enable_groups?.includes(group))
+  if (groups.length === 0) return models
+  return models.filter((m) => groups.some((g) => m.enable_groups?.includes(g)))
 }
 
 /**
  * Filter models by quota type
  */
+/** Bucket a model by how it is billed. */
+export function getQuotaTypeOf(model: PricingModel): string {
+  // Task-usage models form their own bucket, disjoint from token/request.
+  if (hasTaskUsageSchema(model)) return QUOTA_TYPES.TASK
+  if (model.quota_type === QUOTA_TYPE_VALUES.TOKEN) return QUOTA_TYPES.TOKEN
+  if (model.quota_type === QUOTA_TYPE_VALUES.REQUEST) return QUOTA_TYPES.REQUEST
+  return QUOTA_TYPES.ALL
+}
+
 export function filterByQuotaType(
   models: PricingModel[],
-  quotaType: string
+  quotaTypes: string[]
 ): PricingModel[] {
-  if (quotaType === QUOTA_TYPES.ALL) return models
-  // Task-usage models form their own bucket, disjoint from token/request.
-  if (quotaType === QUOTA_TYPES.TASK) {
-    return models.filter((m) => hasTaskUsageSchema(m))
-  }
-  const targetType =
-    quotaType === QUOTA_TYPES.TOKEN
-      ? QUOTA_TYPE_VALUES.TOKEN
-      : QUOTA_TYPE_VALUES.REQUEST
-  return models.filter(
-    (m) => m.quota_type === targetType && !hasTaskUsageSchema(m)
-  )
+  if (quotaTypes.length === 0) return models
+  return models.filter((m) => quotaTypes.includes(getQuotaTypeOf(m)))
 }
 
 /**
@@ -150,32 +150,36 @@ export function getModelTypes(model: PricingModel): string[] {
 /** Filter models by task-level type. */
 export function filterByModelType(
   models: PricingModel[],
-  modelType: string
+  modelTypes: string[]
 ): PricingModel[] {
-  if (!modelType || modelType === MODEL_TYPES.ALL) return models
-  return models.filter((m) => getModelTypes(m).includes(modelType))
+  if (modelTypes.length === 0) return models
+  return models.filter((m) => {
+    const types = getModelTypes(m)
+    return modelTypes.some((type) => types.includes(type))
+  })
 }
 
 /** Filter models by accepted input modality. */
 export function filterByInputType(
   models: PricingModel[],
-  inputType: string
+  inputTypes: string[]
 ): PricingModel[] {
-  if (!inputType || inputType === INPUT_TYPES.ALL) return models
-  const key = inputType.toLowerCase()
+  if (inputTypes.length === 0) return models
+  const wanted = inputTypes.map((v) => v.toLowerCase())
   return models.filter((m) =>
-    (m.input_modalities ?? []).some((v) => v.toLowerCase() === key)
+    (m.input_modalities ?? []).some((v) => wanted.includes(v.toLowerCase()))
   )
 }
 
 /** Filter models by free / paid tier. */
 export function filterByPriceTier(
   models: PricingModel[],
-  tier: string
+  tiers: string[]
 ): PricingModel[] {
-  if (!tier || tier === PRICE_TIERS.ALL) return models
-  if (tier === PRICE_TIERS.FREE) return models.filter((m) => m.is_free === true)
-  return models.filter((m) => m.is_free !== true)
+  if (tiers.length === 0) return models
+  return models.filter((m) =>
+    tiers.includes(m.is_free === true ? PRICE_TIERS.FREE : PRICE_TIERS.PAID)
+  )
 }
 
 /** Bucket a model by its declared context window; undefined when unknown. */
@@ -196,10 +200,13 @@ export function getContextRangeOf(
 /** Filter models by context window bucket. */
 export function filterByContextRange(
   models: PricingModel[],
-  range: string
+  ranges: string[]
 ): PricingModel[] {
-  if (!range || range === CONTEXT_RANGES.ALL) return models
-  return models.filter((m) => getContextRangeOf(m) === range)
+  if (ranges.length === 0) return models
+  return models.filter((m) => {
+    const range = getContextRangeOf(m)
+    return range != null && ranges.includes(range)
+  })
 }
 
 type SortPriceKind = 'input' | 'output' | 'request'
@@ -306,13 +313,13 @@ export function filterAndSortModels(
   models: PricingModel[],
   filters: {
     search: string
-    vendor: string
-    group: string
-    quotaType: string
-    modelType: string
-    inputType: string
-    context: string
-    priceTier: string
+    vendor: string[]
+    group: string[]
+    quotaType: string[]
+    modelType: string[]
+    inputType: string[]
+    context: string[]
+    priceTier: string[]
     sortBy: string
   }
 ): PricingModel[] {
@@ -324,7 +331,7 @@ export function filterAndSortModels(
   result = filterByInputType(result, filters.inputType)
   result = filterByContextRange(result, filters.context)
   result = filterByPriceTier(result, filters.priceTier)
-  result = sortModels(result, filters.sortBy, filters.group)
+  result = sortModels(result, filters.sortBy, filters.group[0])
 
   return result
 }

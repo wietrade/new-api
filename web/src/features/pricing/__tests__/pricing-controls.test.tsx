@@ -38,13 +38,13 @@ function toolbarProps(): PricingToolbarProps {
     tokenUnit: 'M',
     showRechargePrice: false,
     viewMode: 'card',
-    quotaTypeFilter: 'all',
-    modelTypeFilter: 'all',
-    inputTypeFilter: 'all',
-    contextFilter: 'all',
-    priceTierFilter: 'all',
-    vendorFilter: 'all',
-    groupFilter: 'all',
+    quotaTypeFilter: [],
+    modelTypeFilter: [],
+    inputTypeFilter: [],
+    contextFilter: [],
+    priceTierFilter: [],
+    vendorFilter: [],
+    groupFilter: [],
     onSortChange: vi.fn(),
     onTokenUnitChange: vi.fn(),
     onRechargePriceChange: vi.fn(),
@@ -177,6 +177,42 @@ describe('pricing controls', () => {
     ).toBeVisible()
   })
 
+  it('keeps several options selected in the same section and highlights them green', async () => {
+    const props = toolbarProps()
+    const user = userEvent.setup()
+    const { rerender } = render(
+      <PricingSidebar {...props} models={[]} modelTypeFilter={[]} />
+    )
+    const embeddings = screen.getByRole('button', { name: /^Embeddings\s*0$/ })
+    const rerank = screen.getByRole('button', { name: /^Rerank\s*0$/ })
+    expect(embeddings).toHaveAttribute('aria-pressed', 'false')
+    expect(rerank).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(embeddings)
+    expect(props.onModelTypeChange).toHaveBeenCalledWith('embedding')
+
+    rerender(
+      <PricingSidebar
+        {...props}
+        models={[]}
+        modelTypeFilter={['embedding', 'rerank']}
+      />
+    )
+    const activeEmbeddings = screen.getByRole('button', {
+      name: /^Embeddings\s*0$/,
+    })
+    const activeRerank = screen.getByRole('button', { name: /^Rerank\s*0$/ })
+    expect(activeEmbeddings).toHaveAttribute('aria-pressed', 'true')
+    expect(activeRerank).toHaveAttribute('aria-pressed', 'true')
+    expect(activeEmbeddings.className).toContain('emerald')
+    // `Text` exists in the model-type and the input-type section.
+    for (const chip of screen.getAllByRole('button', {
+      name: /^Text\s*0$/,
+    })) {
+      expect(chip).toHaveAttribute('aria-pressed', 'false')
+    }
+  })
+
   it('switches to table view with the keyboard and exposes the selected view', async () => {
     const props = toolbarProps()
     const user = userEvent.setup()
@@ -217,7 +253,7 @@ describe('pricing controls', () => {
     rerender(
       <PricingToolbar
         {...props}
-        groupFilter='premium'
+        groupFilter={['premium']}
         hasActiveFilters
         activeFilterCount={1}
       />

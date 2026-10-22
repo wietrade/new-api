@@ -60,19 +60,21 @@ type FilterOption = {
 
 type FilterSectionProps = {
   title: string
-  value: string
+  /** Selected option values; empty means "all". */
+  value: string[]
+  allValue: string
   options: FilterOption[]
   onChange: (value: string) => void
 }
 
 export interface PricingSidebarProps {
-  quotaTypeFilter: string
-  modelTypeFilter: string
-  inputTypeFilter: string
-  contextFilter: string
-  priceTierFilter: string
-  vendorFilter: string
-  groupFilter: string
+  quotaTypeFilter: string[]
+  modelTypeFilter: string[]
+  inputTypeFilter: string[]
+  contextFilter: string[]
+  priceTierFilter: string[]
+  vendorFilter: string[]
+  groupFilter: string[]
   onQuotaTypeChange: (value: string) => void
   onModelTypeChange: (value: string) => void
   onInputTypeChange: (value: string) => void
@@ -100,16 +102,25 @@ function formatGroupRatio(ratio: number | undefined): string | undefined {
 function FilterChip(props: {
   option: FilterOption
   active: boolean
+  /** Real selection (not the "all" chip) gets the green treatment. */
+  highlight?: boolean
   onClick: () => void
 }) {
   return (
     <Button
       type='button'
-      variant={props.active ? 'secondary' : 'outline'}
+      variant='outline'
       size='sm'
       onClick={props.onClick}
       aria-pressed={props.active}
-      className='h-auto max-w-full gap-1.5 px-2 py-1 text-xs'
+      className={cn(
+        'h-auto max-w-full gap-1.5 px-2 py-1 text-xs',
+        props.highlight &&
+          'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:border-emerald-400/40 dark:text-emerald-300',
+        props.active &&
+          !props.highlight &&
+          'bg-muted/60 text-foreground'
+      )}
       title={props.option.label}
     >
       {props.option.icon && (
@@ -120,8 +131,8 @@ function FilterChip(props: {
         <span
           className={cn(
             'rounded-md px-1.5 py-0.5 text-[12px]',
-            props.active
-              ? 'bg-background text-foreground'
+            props.highlight
+              ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-200'
               : 'bg-muted text-muted-foreground'
           )}
         >
@@ -146,14 +157,21 @@ function FilterSection(props: FilterSectionProps) {
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className='flex flex-wrap gap-1.5'>
-          {props.options.map((option) => (
-            <FilterChip
-              key={option.value}
-              option={option}
-              active={props.value === option.value}
-              onClick={() => props.onChange(option.value)}
-            />
-          ))}
+          {props.options.map((option) => {
+            const isAll = option.value === props.allValue
+            const active = isAll
+              ? props.value.length === 0
+              : props.value.includes(option.value)
+            return (
+              <FilterChip
+                key={option.value}
+                option={option}
+                active={active}
+                highlight={active && !isAll}
+                onClick={() => props.onChange(option.value)}
+              />
+            )
+          })}
         </div>
       </CollapsibleContent>
     </Collapsible>
@@ -351,42 +369,49 @@ export const PricingSidebar = memo(function PricingSidebar(
         <FilterSection
           title={t('Model Types')}
           value={props.modelTypeFilter}
+          allValue={MODEL_TYPES.ALL}
           options={modelTypeOptions}
           onChange={props.onModelTypeChange}
         />
         <FilterSection
           title={t('Input Types')}
           value={props.inputTypeFilter}
+          allValue={INPUT_TYPES.ALL}
           options={inputTypeOptions}
           onChange={props.onInputTypeChange}
         />
         <FilterSection
           title={t('Context Length')}
           value={props.contextFilter}
+          allValue={CONTEXT_RANGES.ALL}
           options={contextOptions}
           onChange={props.onContextChange}
         />
         <FilterSection
           title={t('Price')}
           value={props.priceTierFilter}
+          allValue={PRICE_TIERS.ALL}
           options={priceTierOptions}
           onChange={props.onPriceTierChange}
         />
         <FilterSection
           title={t('Pricing Type')}
           value={props.quotaTypeFilter}
+          allValue={QUOTA_TYPES.ALL}
           options={quotaOptions}
           onChange={props.onQuotaTypeChange}
         />
         <FilterSection
           title={t('All Vendors')}
           value={props.vendorFilter}
+          allValue={FILTER_ALL}
           options={vendorOptions}
           onChange={props.onVendorChange}
         />
         <FilterSection
           title={t('Groups')}
           value={props.groupFilter}
+          allValue={FILTER_ALL}
           options={groupOptions}
           onChange={props.onGroupChange}
         />

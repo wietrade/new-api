@@ -132,7 +132,7 @@ export function Pricing() {
           usdExchangeRate={usdExchangeRate}
           tokenUnit={tokenUnit}
           showRechargePrice={showRechargePrice}
-          selectedGroup={groupFilter}
+          selectedGroup={groupFilter[0]}
         />
       )
     }
@@ -144,7 +144,7 @@ export function Pricing() {
         usdExchangeRate={usdExchangeRate}
         tokenUnit={tokenUnit}
         showRechargePrice={showRechargePrice}
-        selectedGroup={groupFilter}
+        selectedGroup={groupFilter[0]}
         onModelClick={handleModelClick}
       />
     )
