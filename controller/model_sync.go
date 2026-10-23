@@ -316,6 +316,7 @@ func fetchMetadataCatalog(c *gin.Context, locale string) (metadataSyncSource, ma
 		values := model.MetadataValues{
 			Description:      item.Description,
 			Icon:             item.Icon,
+			Tags:             strings.TrimSpace(item.Tags),
 			Capabilities:     strings.Join(capabilities, ","),
 			InputModalities:  strings.Join(model.NormalizeCapabilities(item.InputModalities), ","),
 			OutputModalities: strings.Join(model.NormalizeCapabilities(item.OutputModalities), ","),
@@ -440,6 +441,11 @@ func SyncUpstreamPreview(c *gin.Context) {
 		_ = common.Unmarshal(localRaw, &localFields)
 		_ = common.Unmarshal(upRaw, &upFields)
 		for _, field := range model.MetadataSyncFields {
+			// Never offer to blank out local tags: an upstream record without
+			// tags means "unknown", not "remove them".
+			if field == "tags" && strings.TrimSpace(up.Tags) == "" {
+				continue
+			}
 			if local == nil || localFields[field] != upFields[field] {
 				candidate.Fields = append(candidate.Fields, metadataSyncField{Field: field, Local: localFields[field], Upstream: upFields[field]})
 			}

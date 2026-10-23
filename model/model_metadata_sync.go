@@ -37,7 +37,7 @@ func lockMetadataMutation(tx *gorm.DB) error {
 
 var ErrMetadataSyncConflict = errors.New("metadata changed; preview again before applying")
 
-var MetadataSyncFields = []string{"description", "icon", "capabilities", "input_modalities", "output_modalities", "context_length", "max_output_tokens", "is_free", "vendor", "endpoints", "name_rule", "status"}
+var MetadataSyncFields = []string{"description", "icon", "tags", "capabilities", "input_modalities", "output_modalities", "context_length", "max_output_tokens", "is_free", "vendor", "endpoints", "name_rule", "status"}
 
 // MetadataCapabilityVocabulary is the closed set of structured capability keys.
 // Keep it in sync with web/src/features/pricing/constants.ts (MODEL_CAPABILITIES).
