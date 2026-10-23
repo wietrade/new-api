@@ -3,6 +3,70 @@
  * 只覆盖外观，不改动任何数据与交互逻辑。
  */
 
+/* ── 表格上方的筛选栏 ─────────────────────────────────── */
+.pricing-page .pricing-filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 18px;
+  padding: 16px 0 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pricing-page .pf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pricing-page .pf-field.pf-search {
+  flex: 1 1 260px;
+  min-width: 220px;
+  max-width: 420px;
+}
+
+.pricing-page .pf-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.pricing-page .pf-select {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  color: var(--foreground);
+  font-size: 13px;
+  outline: none;
+}
+
+.pricing-page .pf-select:hover {
+  border-color: color-mix(in oklab, var(--ring) 45%, var(--border));
+}
+
+.pricing-page .pf-select:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 20%, transparent);
+}
+
+.pricing-page .pf-count {
+  margin-left: auto;
+  padding-bottom: 8px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .pricing-page .pf-count {
+    margin-left: 0;
+  }
+}
+
 /* ── 页头 ─────────────────────────────────────────────── */
 .pricing-page .pricing-hero {
   max-width: 900px;

@@ -1,18 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
 import { getSortLabels, type SortOption } from '../constants'
 import type { PricingVendor } from '../types'
 import { SearchBar } from './search-bar'
-
-const ANY = '__any__'
 
 const MODEL_TYPE_LABELS: Record<string, string> = {
   text: '文本',
@@ -55,35 +45,27 @@ function Field(props: {
   )
 }
 
-function SingleSelect(props: {
+function NativeSelect(props: {
   value: string[]
   onChange: (value: string) => void
   options: Record<string, string>
   placeholder: string
   width?: string
 }) {
-  const current = props.value[0] ?? ANY
-
   return (
-    <Select
-      value={current}
-      onValueChange={(v: string) => props.onChange(v === ANY ? '' : v)}
+    <select
+      className='pf-select'
+      style={props.width ? { width: props.width } : undefined}
+      value={props.value[0] ?? ''}
+      onChange={(e) => props.onChange(e.target.value)}
     >
-      <SelectTrigger
-        className='h-9 w-full text-[13px]'
-        style={props.width ? { width: props.width } : undefined}
-      >
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value={ANY}>{props.placeholder}</SelectItem>
-        {Object.entries(props.options).map(([value, label]) => (
-          <SelectItem key={value} value={value}>
-            {label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+      <option value=''>{props.placeholder}</option>
+      {Object.entries(props.options).map(([value, label]) => (
+        <option key={value} value={value}>
+          {label}
+        </option>
+      ))}
+    </select>
   )
 }
 
@@ -133,7 +115,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       </Field>
 
       <Field label={t('Vendor')}>
-        <SingleSelect
+        <NativeSelect
           value={props.vendorFilter}
           onChange={props.onVendorChange}
           options={vendorOptions}
@@ -143,7 +125,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       </Field>
 
       <Field label={t('Model Types')}>
-        <SingleSelect
+        <NativeSelect
           value={props.modelTypeFilter}
           onChange={props.onModelTypeChange}
           options={MODEL_TYPE_LABELS}
@@ -153,7 +135,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       </Field>
 
       <Field label={t('Input')}>
-        <SingleSelect
+        <NativeSelect
           value={props.inputTypeFilter}
           onChange={props.onInputTypeChange}
           options={INPUT_TYPE_LABELS}
@@ -163,7 +145,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       </Field>
 
       <Field label='上下文'>
-        <SingleSelect
+        <NativeSelect
           value={props.contextFilter}
           onChange={props.onContextChange}
           options={CONTEXT_LABELS}
@@ -173,7 +155,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       </Field>
 
       <Field label={t('Price')}>
-        <SingleSelect
+        <NativeSelect
           value={props.priceTierFilter}
           onChange={props.onPriceTierChange}
           options={PRICE_TIER_LABELS}
@@ -183,7 +165,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       </Field>
 
       <Field label='分组'>
-        <SingleSelect
+        <NativeSelect
           value={props.groupFilter}
           onChange={props.onGroupChange}
           options={groupOptions}
@@ -193,21 +175,18 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       </Field>
 
       <Field label={t('Sort')}>
-        <Select
+        <select
+          className='pf-select'
+          style={{ width: '180px' }}
           value={props.sortBy}
-          onValueChange={(v: string) => props.onSortChange(v)}
+          onChange={(e) => props.onSortChange(e.target.value)}
         >
-          <SelectTrigger className='h-9 text-[13px]' style={{ width: '180px' }}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(sortLabels).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label as string}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          {Object.entries(sortLabels).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label as string}
+            </option>
+          ))}
+        </select>
       </Field>
 
       <div className='pf-count'>
