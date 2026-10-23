@@ -8,7 +8,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 12px 14px;
+  gap: 10px;
   padding: 16px 0 18px;
   border-bottom: 1px solid var(--border);
 }
@@ -20,9 +20,9 @@
 }
 
 .pricing-page .pf-field.pf-search {
-  flex: 1 1 200px;
-  min-width: 200px;
-  max-width: 320px;
+  flex: 1 1 160px;
+  min-width: 148px;
+  max-width: 240px;
 }
 
 .pricing-page .pf-label {
@@ -55,10 +55,11 @@
 
 .pricing-page .pf-count {
   margin-left: auto;
-  padding-bottom: 8px;
+  padding-bottom: 9px;
   font-size: 12px;
   color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* ── 类型药丸 + 数量 ─────────────────────────────────── */
