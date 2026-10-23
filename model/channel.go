@@ -204,14 +204,24 @@ func (channel *Channel) GetKeys() []string {
 		}
 	}
 	// Otherwise, fall back to splitting by newline
-	keys := strings.Split(strings.Trim(channel.Key, "\n"), "\n")
+	raw := strings.Split(strings.Trim(channel.Key, "\n"), "\n")
+	keys := make([]string, 0, len(raw))
+	for _, key := range raw {
+		// 粘贴渠道密钥时常带行尾空格/回车，未 trim 会变成
+		// `net/http: invalid header field value for "Authorization"`。
+		trimmed := strings.TrimSpace(key)
+		if trimmed == "" {
+			continue
+		}
+		keys = append(keys, trimmed)
+	}
 	return keys
 }
 
 func (channel *Channel) GetNextEnabledKey() (string, int, *types.NewAPIError) {
 	// If not in multi-key mode, return the original key string directly.
 	if !channel.ChannelInfo.IsMultiKey {
-		return channel.Key, 0, nil
+		return strings.TrimSpace(channel.Key), 0, nil
 	}
 
 	// Obtain all keys (split by \n)
