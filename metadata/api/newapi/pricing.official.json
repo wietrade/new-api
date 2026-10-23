@@ -958,8 +958,8 @@
       "effective_to": null,
       "upcoming": null,
       "confidence": "high",
-      "quote": "chatgpt-image-latest | Image | $8.00 | $32.00 | $2.00；chatgpt-image-latest | Text | $5.00 | $10.00 | $1.25",
-      "notes": "按模态分别计价：图像输入 $8、图像输出 $32、图像缓存读 $2；文本输入 $5、文本输出 $10、文本缓存读 $1.25。Batch 为 Standard 的 50%。input/output 记文本侧为基准，图像侧见 input_image/output_image。 Token 价与按张价并存：Responses/图像 token 按 token 计，Images API 按上图质量×尺寸的单张价计费，两者各自官方原文，不互相推导。",
+      "quote": "chatgpt-image-latest | Image | $8.00 | $32.00 | $2.00；chatgpt-image-latest | Text | $5.00 | $10.00 | $1.25；模型页：'This points to the Image snapshot previously used in ChatGPT.'",
+      "notes": "按模态分别计价：图像输入 $8、图像输出 $32、图像缓存读 $2；文本输入 $5、文本输出 $10、文本缓存读 $1.25。Batch 为 Standard 的 50%。input/output 记文本侧为基准，图像侧见 input_image/output_image。 Token 价与按张价并存：Responses/图像 token 按 token 计，Images API 按上图质量×尺寸的单张价计费，两者各自官方原文，不互相推导。 别名关系：官方把 chatgpt-image-latest 定义为「指向 ChatGPT 当时所用 Image 快照」的浮动别名，另注明该快照为 ChatGPT 之前使用的版本；gpt-image-1.5 是固定快照 gpt-image-1.5-2025-12-16。两者 2026-10-23 的价格表逐格相同（文本 5/1.25/10、图像 8/2/32、按张 low 0.009/0.013、medium 0.034/0.05、high 0.133/0.2），端点与限流亦一致，当前可视为同一代模型；但别名会随 ChatGPT 换型而漂移，gpt-image-1.5 不会。",
       "meters": [
         {
           "dim": "output_image",
