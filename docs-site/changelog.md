@@ -14,7 +14,7 @@
 - 桌面页补充手机端可用客户端说明
 - `cli`、`quick-start`、`faq/network` 补充 Windows PowerShell / CMD 环境变量写法
 - cc-switch 页：介绍改为「开源跨平台」，并补上 GitHub Releases 下载地址
-- 顶部导航新增「主站 ↗」，一键回到 `https://www.nowhub.org`（蓝底白字按钮，新窗口打开）
+- 顶部导航新增「主站 ↗」，一键回到 `https://www.nowhub.org`（蓝底白字按钮，当前窗口打开）
 - 主站（首页导航与页脚）指向文档站的链接统一改为新窗口打开
 
 ## 2026-10-22
