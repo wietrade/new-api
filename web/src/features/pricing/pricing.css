@@ -119,8 +119,10 @@
 
 /* ── 页头 ─────────────────────────────────────────────── */
 .pricing-page .pricing-hero {
-  max-width: 900px;
-  padding: 40px 4px 28px;
+  /* 不设 max-width、不留左右 padding：标题区与统计区的上边框要和下方表格
+     左右边缘严格对齐（表格内容宽 = 容器宽）。正文段落自己用 pricing-subtitle
+     的 max-width 控制行长，不影响版面端点。 */
+  padding: 40px 0 28px;
 }
 
 .pricing-page .pricing-breadcrumb {
