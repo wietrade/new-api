@@ -118,14 +118,6 @@ export function ApiKeysMutateDrawer({
   )
   const defaultUseAutoGroup = status?.default_use_auto_group === true
 
-  // Fetch models
-  const { data: modelsData } = useQuery({
-    queryKey: ['user-models'],
-    queryFn: async () => requireServerSuccess(await getUserModels()),
-    enabled: open,
-    staleTime: 0,
-  })
-
   // Fetch groups
   const {
     data: groupsData,
@@ -161,7 +153,6 @@ export function ApiKeysMutateDrawer({
     staleTime: 0,
   })
 
-  const models = modelsData?.data || []
   const groups = useMemo<ApiKeyGroupOption[]>(
     () =>
       Object.entries(groupsData?.data || {}).map(([key, info]) => ({
@@ -265,6 +256,29 @@ export function ApiKeysMutateDrawer({
     isUpdate && currentRow ? `update:${currentRow.id}` : 'create'
   const isFormInitialized = initializedTarget === formTarget
   const selectedGroup = form.watch('group')
+
+  // 模型列表跟着所选分组走：选了某个分组就只能看到该分组的模型。
+  // 未选分组（group 为空）时后端返回全部分组并集，保持原行为。
+  const { data: modelsData } = useQuery({
+    queryKey: ['user-models', selectedGroup ?? ''],
+    queryFn: async () =>
+      requireServerSuccess(await getUserModels(selectedGroup || undefined)),
+    enabled: open,
+    staleTime: 0,
+  })
+
+  // 切换分组后，已勾选但不在新分组里的模型会被令牌拦掉，保存前就剔除。
+  // 等模型列表真正拿到再清理，避免首次加载时把已保存的限制清空。
+  const modelOptions = modelsData?.data ?? []
+  useEffect(() => {
+    if (!open || !modelsData?.data?.length) return
+    const allowed = new Set(modelsData.data)
+    const current = form.getValues('model_limits') ?? []
+    const kept = current.filter((name) => allowed.has(name))
+    if (kept.length !== current.length) {
+      form.setValue('model_limits', kept, { shouldDirty: true })
+    }
+  }, [open, modelsData, form])
 
   // Correct group after groups load: if the form value is not in available groups, fall back
   useEffect(() => {
@@ -706,7 +720,7 @@ export function ApiKeysMutateDrawer({
                           <FormLabel>{t('Model Limits')}</FormLabel>
                           <FormControl>
                             <MultiSelect
-                              options={models.map((m) => ({
+                              options={modelOptions.map((m) => ({
                                 label: m,
                                 value: m,
                               }))}

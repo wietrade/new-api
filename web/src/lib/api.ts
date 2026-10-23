@@ -48,12 +48,15 @@ export async function getSelf() {
   return res.data
 }
 
-export async function getUserModels(): Promise<{
+export async function getUserModels(group?: string): Promise<{
   success: boolean
   message?: string
   data?: string[]
 }> {
-  const res = await api.get('/api/user/models')
+  // 不传 group 时后端返回用户全部可用分组的并集；传了就只返回该分组的模型。
+  const res = await api.get('/api/user/models', {
+    params: group ? { group } : undefined,
+  })
   return res.data
 }
 
