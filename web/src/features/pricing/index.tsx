@@ -101,6 +101,15 @@ export function Pricing() {
     [usableGroup]
   )
 
+  // 只统计真正有可用模型的供应商（后台存在但无渠道的供应商不计入）
+  const vendorCount = useMemo(
+    () =>
+      new Set(
+        (models || []).map((m) => m.vendor_name).filter((v): v is string => !!v)
+      ).size,
+    [models]
+  )
+
   const handleClearAll = useCallback(() => {
     clearFilters()
     clearSearch()
@@ -160,7 +169,7 @@ export function Pricing() {
               </div>
               <div>
                 <dt>02 · 供应商</dt>
-                <dd>{vendors?.length ?? 0}</dd>
+                <dd>{vendorCount}</dd>
               </div>
               <div>
                 <dt>03 · 可用分组</dt>
