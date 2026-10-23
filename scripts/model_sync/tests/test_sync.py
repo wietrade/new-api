@@ -298,6 +298,20 @@ class MergeTest(unittest.TestCase):
         row = merge.price_records(existing, index, official)[0]
         self.assertEqual(row["meters"], meters)
 
+    def test_official_row_without_numbers_is_skipped(self):
+        """Unpriced official entries (unresolved) must not become price rows."""
+        index, _ = merge.index_incoming([])
+        official = {
+            normalize_key("claude-haiku-4-5-20251001"): {
+                "model_name": "claude-haiku-4-5-20251001",
+                "input": None,
+                "output": None,
+                "cache_read": None,
+            }
+        }
+        rows = merge.price_records(self.existing, index, official)
+        self.assertEqual(rows, [])
+
     def test_official_cache_write_12h_pass_through(self):
         index, _ = merge.index_incoming([])
         official = {

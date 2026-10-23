@@ -458,6 +458,20 @@ def official_price_row(record, official):
     return row
 
 
+def has_usable_price(official):
+    """Official row carries at least one number we can bill with.
+
+    ``unresolved`` models (e.g. a variant the vendor never priced) keep their
+    entry with all prices null; such a row must not become a ``pricing.json``
+    row, otherwise downstream ratio derivation divides by None.
+    """
+    if official.get("meters"):
+        return True
+    if official.get("tiers"):
+        return True
+    return any(official.get(key) is not None for key in ("input", "output", "per_image"))
+
+
 def price_records(existing, index, official=None):
     """Build the pricing.json rows for models we actually publish.
 
@@ -479,7 +493,7 @@ def price_records(existing, index, official=None):
         if name in seen:
             continue
         listed = official.get(key)
-        if listed is not None:
+        if listed is not None and has_usable_price(listed):
             seen.add(name)
             rows.append(official_price_row(record, listed))
             continue
