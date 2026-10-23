@@ -19,11 +19,12 @@ export default defineConfig({
   srcExclude: ['README.md'],
   head: [
     ['meta', { name: 'theme-color', content: '#0d1117' }],
-    // 主站用 iframe 嵌套时加 ?embed=1，隐藏文档站自己的导航/页脚
+    // 主站用 iframe 嵌套时进入嵌入模式：?embed=1 或被 iframe 加载都算，
+    // 后者保证 iframe 内的站内跳转（丢掉 query）后仍保持嵌入样式
     [
       'script',
       {},
-      "if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed')",
+      "if(new URLSearchParams(location.search).has('embed')||window.self!==window.top)document.documentElement.classList.add('embed')",
     ],
   ],
   themeConfig: {
