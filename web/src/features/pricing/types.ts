@@ -128,6 +128,8 @@ export type ModelCapability =
   | 'rerank'
   | 'web_search'
   | 'code_interpreter'
+  | 'cache_implicit'
+  | 'cache_explicit'
   | 'function_calling'
   | 'streaming'
   | 'json_mode'
