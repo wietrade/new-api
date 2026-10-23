@@ -57,7 +57,6 @@ export function Pricing() {
     sortBy,
     vendorFilter,
     groupFilter,
-    quotaTypeFilter,
     modelTypeFilter,
     inputTypeFilter,
     contextFilter,
@@ -66,13 +65,11 @@ export function Pricing() {
     showRechargePrice,
     setSearchInput,
     setSortBy,
-    setVendorFilter,
-    setGroupFilter,
-    setQuotaTypeFilter,
-    setModelTypeFilter,
-    setInputTypeFilter,
-    setContextFilter,
-    setPriceTierFilter,
+    selectVendorFilter,
+    selectModelTypeFilter,
+    selectInputTypeFilter,
+    selectContextFilter,
+    selectPriceTierFilter,
     setTokenUnit,
     setShowRechargePrice,
     filteredModels,
@@ -180,15 +177,15 @@ export function Pricing() {
             onSortChange={setSortBy}
             vendors={vendors || []}
             vendorFilter={vendorFilter}
-            onVendorChange={setVendorFilter}
+            onVendorChange={selectVendorFilter}
             modelTypeFilter={modelTypeFilter}
-            onModelTypeChange={setModelTypeFilter}
+            onModelTypeChange={selectModelTypeFilter}
             inputTypeFilter={inputTypeFilter}
-            onInputTypeChange={setInputTypeFilter}
+            onInputTypeChange={selectInputTypeFilter}
             contextFilter={contextFilter}
-            onContextChange={setContextFilter}
+            onContextChange={selectContextFilter}
             priceTierFilter={priceTierFilter}
-            onPriceTierChange={setPriceTierFilter}
+            onPriceTierChange={selectPriceTierFilter}
             filteredCount={filteredModels.length}
             totalCount={models?.length}
             models={models || []}

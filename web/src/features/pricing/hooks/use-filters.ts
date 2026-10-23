@@ -115,8 +115,7 @@ export function useFilters(models: PricingModel[]) {
     [updateFilters]
   )
   const setSortBy = useCallback(
-    (v: string) =>
-      updateFilters({ sort: v === SORT_OPTIONS.NAME ? undefined : v }),
+    (v: string) => updateFilters({ sort: v || undefined }),
     [updateFilters]
   )
   const setTokenUnit = useCallback(
@@ -173,6 +172,31 @@ export function useFilters(models: PricingModel[]) {
         priceTier: v === 'all' ? [] : toggleValue(priceTierFilter, v),
       }),
     [priceTierFilter, updateFilters]
+  )
+
+  /*
+   * 单选下拉（筛选栏）用：直接替换当前值，而不是 toggle。
+   * 侧边栏的多选勾选仍用上面的 toggle 版本。
+   */
+  const selectVendorFilter = useCallback(
+    (v: string) => updateFilters({ vendor: v ? [v] : [] }),
+    [updateFilters]
+  )
+  const selectModelTypeFilter = useCallback(
+    (v: string) => updateFilters({ modelType: v ? [v] : [] }),
+    [updateFilters]
+  )
+  const selectInputTypeFilter = useCallback(
+    (v: string) => updateFilters({ inputType: v ? [v] : [] }),
+    [updateFilters]
+  )
+  const selectContextFilter = useCallback(
+    (v: string) => updateFilters({ context: v ? [v] : [] }),
+    [updateFilters]
+  )
+  const selectPriceTierFilter = useCallback(
+    (v: string) => updateFilters({ priceTier: v ? [v] : [] }),
+    [updateFilters]
   )
 
   const filteredModels = useMemo(() => {
@@ -269,6 +293,11 @@ export function useFilters(models: PricingModel[]) {
     setInputTypeFilter,
     setContextFilter,
     setPriceTierFilter,
+    selectVendorFilter,
+    selectModelTypeFilter,
+    selectInputTypeFilter,
+    selectContextFilter,
+    selectPriceTierFilter,
     setTokenUnit,
     setShowRechargePrice,
     filteredModels,

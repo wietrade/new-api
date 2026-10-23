@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { getSortLabels, type SortOption } from '../constants'
+import { getContextRangeOf, getModelTypes } from '../lib/filters'
 import type { PricingModel, PricingVendor } from '../types'
 import { SearchBar } from './search-bar'
 
@@ -62,6 +63,8 @@ function NativeSelect(props: {
   options: Record<string, string>
   placeholder: string
   width?: string
+  /** 选项命中数；为 0 时置灰禁用，避免选完必然空结果 */
+  counts?: Record<string, number>
 }) {
   return (
     <select
@@ -71,11 +74,14 @@ function NativeSelect(props: {
       onChange={(e) => props.onChange(e.target.value)}
     >
       <option value=''>{props.placeholder}</option>
-      {Object.entries(props.options).map(([value, label]) => (
-        <option key={value} value={value}>
-          {label}
-        </option>
-      ))}
+      {Object.entries(props.options).map(([value, label]) => {
+        const count = props.counts?.[value]
+        return (
+          <option key={value} value={value} disabled={count === 0}>
+            {count === undefined ? label : `${label} (${count})`}
+          </option>
+        )
+      })}
     </select>
   )
 }
@@ -116,6 +122,31 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
     props.vendors.map((v) => [v.name, v.name])
   )
 
+  // 各筛选维度的命中数（基于全量模型，不受当前筛选影响）
+  const allModels = props.models ?? []
+  const vendorCounts: Record<string, number> = {}
+  const modelTypeCounts: Record<string, number> = {}
+  const inputTypeCounts: Record<string, number> = {}
+  const contextCounts: Record<string, number> = {}
+  const priceCounts: Record<string, number> = { free: 0, paid: 0 }
+  for (const model of allModels) {
+    if (model.vendor_name) {
+      vendorCounts[model.vendor_name] =
+        (vendorCounts[model.vendor_name] ?? 0) + 1
+    }
+    for (const type of new Set(getModelTypes(model))) {
+      modelTypeCounts[type] = (modelTypeCounts[type] ?? 0) + 1
+    }
+    for (const modality of new Set(
+      (model.input_modalities ?? []).map((v) => String(v).toLowerCase())
+    )) {
+      inputTypeCounts[modality] = (inputTypeCounts[modality] ?? 0) + 1
+    }
+    const range = getContextRangeOf(model)
+    if (range) contextCounts[range] = (contextCounts[range] ?? 0) + 1
+    priceCounts[model.is_free === true ? 'free' : 'paid'] += 1
+  }
+
   return (
     <div className='pricing-filterbar'>
       <Field label={t('Search')} className='pf-search'>
@@ -133,8 +164,9 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           value={props.vendorFilter}
           onChange={props.onVendorChange}
           options={vendorOptions}
+          counts={vendorCounts}
           placeholder='全部供应商'
-          width='118px'
+          width='132px'
         />
       </Field>
 
@@ -143,8 +175,9 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           value={props.modelTypeFilter}
           onChange={props.onModelTypeChange}
           options={MODEL_TYPE_LABELS}
+          counts={modelTypeCounts}
           placeholder='全部类型'
-          width='100px'
+          width='110px'
         />
       </Field>
 
@@ -153,8 +186,9 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           value={props.inputTypeFilter}
           onChange={props.onInputTypeChange}
           options={INPUT_TYPE_LABELS}
+          counts={inputTypeCounts}
           placeholder='全部输入'
-          width='100px'
+          width='110px'
         />
       </Field>
 
@@ -163,8 +197,9 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           value={props.contextFilter}
           onChange={props.onContextChange}
           options={CONTEXT_LABELS}
+          counts={contextCounts}
           placeholder='不限'
-          width='104px'
+          width='124px'
         />
       </Field>
 
@@ -173,8 +208,9 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           value={props.priceTierFilter}
           onChange={props.onPriceTierChange}
           options={PRICE_TIER_LABELS}
+          counts={priceCounts}
           placeholder='不限'
-          width='84px'
+          width='96px'
         />
       </Field>
 
@@ -208,11 +244,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           全部 <span>{props.models?.length ?? 0}</span>
         </button>
         {Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => {
-          const count = (props.models ?? []).filter(
-            (m) =>
-              String((m as { model_type?: string }).model_type ?? 'text') ===
-              value
-          ).length
+          const count = modelTypeCounts[value] ?? 0
           if (count === 0) return null
           return (
             <button
