@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { getSortLabels, type SortOption } from '../constants'
-import type { PricingVendor } from '../types'
+import type { PricingModel, PricingVendor } from '../types'
 import { SearchBar } from './search-bar'
 
 const MODEL_TYPE_LABELS: Record<string, string> = {
@@ -91,6 +91,7 @@ export interface PricingFilterBarProps {
   groups: string[]
   filteredCount: number
   totalCount?: number
+  models?: PricingModel[]
 }
 
 export function PricingFilterBar(props: PricingFilterBarProps) {
@@ -192,6 +193,36 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
       <div className='pf-count'>
         {props.filteredCount}
         {props.totalCount ? ` / ${props.totalCount}` : ''} 个结果
+      </div>
+
+      <div className='pf-kinds'>
+        <button
+          type='button'
+          className='pf-kind'
+          data-active={props.modelTypeFilter.length === 0}
+          onClick={() => props.onModelTypeChange('')}
+        >
+          全部 <span>{props.models?.length ?? 0}</span>
+        </button>
+        {Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => {
+          const count = (props.models ?? []).filter(
+            (m) =>
+              String((m as { model_type?: string }).model_type ?? 'text') ===
+              value
+          ).length
+          if (count === 0) return null
+          return (
+            <button
+              key={value}
+              type='button'
+              className='pf-kind'
+              data-active={props.modelTypeFilter[0] === value}
+              onClick={() => props.onModelTypeChange(value)}
+            >
+              {label} <span>{count}</span>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

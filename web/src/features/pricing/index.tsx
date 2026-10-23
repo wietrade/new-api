@@ -194,6 +194,7 @@ export function Pricing() {
             groups={availableGroups}
             filteredCount={filteredModels.length}
             totalCount={models?.length}
+            models={models || []}
           />
 
           <main className='mt-4 min-w-0'>{renderPricingContent()}</main>
