@@ -7,12 +7,14 @@ import {
   Code,
   Database,
   Eye,
+  FileText,
   Globe,
   Image as ImageIcon,
   ListOrdered,
   MessageSquare,
   Paperclip,
   Save,
+  Type,
   Video,
   Wrench,
 } from 'lucide-react'
@@ -26,7 +28,12 @@ import { requireServerSuccess } from '@/lib/server-error-message'
 import { DEFAULT_TOKEN_UNIT } from '../constants'
 import { getDisplayGroupRatio } from '../lib/model-helpers'
 import { formatPrice } from '../lib/price'
-import type { ModelCapability, PricingModel, TokenUnit } from '../types'
+import type {
+  Modality,
+  ModelCapability,
+  PricingModel,
+  TokenUnit,
+} from '../types'
 
 export interface ModelTableProps {
   models: PricingModel[]
@@ -59,6 +66,18 @@ const CAPABILITY_META: Record<
   code_interpreter: { icon: Code, label: '代码执行' },
 }
 
+/** 输入模态是另一条轴（吃什么），和 capabilities（功能特性）并列展示。 */
+const MODALITY_META: Record<
+  Modality,
+  { icon: typeof MessageSquare; label: string }
+> = {
+  text: { icon: Type, label: '文本输入' },
+  image: { icon: ImageIcon, label: '图片输入' },
+  file: { icon: FileText, label: '文件输入' },
+  audio: { icon: AudioLines, label: '音频输入' },
+  video: { icon: Video, label: '视频输入' },
+}
+
 function formatContext(tokens?: number): string {
   if (!tokens || tokens <= 0) return '—'
   if (tokens >= 1_000_000) {
@@ -69,27 +88,46 @@ function formatContext(tokens?: number): string {
   return String(tokens)
 }
 
-function CapabilityIcons(props: { capabilities?: ModelCapability[] }) {
+function CapabilityIcons(props: {
+  capabilities?: ModelCapability[]
+  inputModalities?: Modality[]
+}) {
+  const modalities = (props.inputModalities ?? []).filter((m) => MODALITY_META[m])
   const caps = (props.capabilities ?? []).filter((c) => CAPABILITY_META[c])
-  if (caps.length === 0) {
+  const items = [
+    ...modalities.map((m) => ({ key: `modality:${m}`, ...MODALITY_META[m] })),
+    ...caps.map((c) => ({ key: `capability:${c}`, ...CAPABILITY_META[c] })),
+  ]
+  if (items.length === 0) {
     return <span className='text-muted-foreground/60 text-xs'>—</span>
   }
-  const shown = caps.slice(0, 5)
-  const rest = caps.length - shown.length
+  const shown = items.slice(0, 6)
+  const rest = items.length - shown.length
 
   return (
     <div className='flex items-center gap-1.5'>
-      {shown.map((c) => {
-        const meta = CAPABILITY_META[c]
-        const Icon = meta.icon
+      {shown.map((item) => {
+        const Icon = item.icon
         return (
-          <span key={c} title={meta.label} className='text-muted-foreground/80'>
+          <span
+            key={item.key}
+            title={item.label}
+            className='text-muted-foreground/80'
+          >
             <Icon className='size-3.5' strokeWidth={1.8} />
           </span>
         )
       })}
       {rest > 0 && (
-        <span className='text-muted-foreground/70 text-[11px]'>+{rest}</span>
+        <span
+          className='text-muted-foreground/70 text-[11px]'
+          title={items
+            .slice(6)
+            .map((item) => item.label)
+            .join(' · ')}
+        >
+          +{rest}
+        </span>
       )}
     </div>
   )
@@ -260,7 +298,10 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
                   {ttft ? `${(ttft / 1000).toFixed(1)} s` : '—'}
                 </td>
                 <td>
-                  <CapabilityIcons capabilities={model.capabilities} />
+                  <CapabilityIcons
+                    capabilities={model.capabilities}
+                    inputModalities={model.input_modalities}
+                  />
                 </td>
               </tr>
             )
