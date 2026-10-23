@@ -140,3 +140,39 @@ func TestPricingSyncCompleteSourcesAndArrayFormats(t *testing.T) {
 	assert.Equal(t, float64(0), response.Data.Prices["sync-token"].Upstreams["Expressions(1)"]["cache_ratio"])
 	assert.Equal(t, float64(0), response.Data.Prices["sync-free"].Upstreams["Legacy(2)"]["model_ratio"])
 }
+
+func TestModelsDevCanonicalProviderDetection(t *testing.T) {
+	cases := []struct {
+		name      string
+		provider  string
+		canonical string
+		want      bool
+	}{
+		{"exact", "alibaba", "alibaba/qwen3.8-flash", true},
+		{"case insensitive", "Alibaba", "alibaba/qwen3.8-flash", true},
+		{"reseller", "openrouter", "alibaba/qwen3.8-flash", false},
+		{"missing canonical", "alibaba", "", false},
+		{"no provider prefix", "alibaba", "qwen3.8-flash", false},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, isCanonicalModelsDevProvider(tt.provider, tt.canonical))
+		})
+	}
+}
+
+// 同步 models.dev 价格时必须优先采用厂商自家条目，否则「取全网最低价」会
+// 把官方定价换成某个转售商的折扣价。
+func TestModelsDevCanonicalPriceBeatsCheapest(t *testing.T) {
+	official := modelsDevCandidate{Provider: "alibaba", Input: 0.15, Canonical: true}
+	reseller := modelsDevCandidate{Provider: "cheap-market", Input: 0.11}
+
+	assert.False(t, shouldReplaceModelsDevCandidate(official, reseller),
+		"reseller must not override the vendor entry")
+	assert.True(t, shouldReplaceModelsDevCandidate(reseller, official),
+		"vendor entry must replace an already selected reseller entry")
+
+	cheaper := modelsDevCandidate{Provider: "other-market", Input: 0.09}
+	assert.True(t, shouldReplaceModelsDevCandidate(reseller, cheaper),
+		"reseller vs reseller still resolves to the cheapest non-zero input")
+}

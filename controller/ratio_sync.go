@@ -1399,7 +1399,8 @@ type modelsDevProvider struct {
 }
 
 type modelsDevModel struct {
-	Cost modelsDevCost `json:"cost"`
+	Cost             modelsDevCost `json:"cost"`
+	CanonicalModelID string        `json:"canonical_model_id"`
 }
 
 type modelsDevCost struct {
@@ -1413,6 +1414,9 @@ type modelsDevCandidate struct {
 	Input     float64
 	Output    *float64
 	CacheRead *float64
+	// Canonical means this entry comes from the model's own vendor
+	// (canonical_model_id prefix), i.e. the official list price.
+	Canonical bool
 }
 
 func cloneFloatPtr(v *float64) *float64 {
@@ -1430,7 +1434,23 @@ func isValidNonNegativeCost(v float64) bool {
 	return v >= 0
 }
 
-func buildModelsDevCandidate(provider string, cost modelsDevCost) (modelsDevCandidate, bool) {
+// isCanonicalModelsDevProvider reports whether provider owns the model.
+// models.dev tags every entry with canonical_model_id (e.g.
+// "alibaba/qwen3.8-flash"); its prefix is the vendor that publishes the
+// model, so that entry carries the official list price.
+func isCanonicalModelsDevProvider(provider, canonicalModelID string) bool {
+	if strings.TrimSpace(canonicalModelID) == "" {
+		return false
+	}
+	prefix, _, ok := strings.Cut(canonicalModelID, "/")
+	if !ok {
+		return false
+	}
+	return strings.EqualFold(prefix, provider)
+}
+
+func buildModelsDevCandidate(provider string, model modelsDevModel) (modelsDevCandidate, bool) {
+	cost := model.Cost
 	if cost.Input == nil {
 		return modelsDevCandidate{}, false
 	}
@@ -1463,10 +1483,17 @@ func buildModelsDevCandidate(provider string, cost modelsDevCost) (modelsDevCand
 		Input:     input,
 		Output:    output,
 		CacheRead: cacheRead,
+		Canonical: isCanonicalModelsDevProvider(provider, model.CanonicalModelID),
 	}, true
 }
 
 func shouldReplaceModelsDevCandidate(current, next modelsDevCandidate) bool {
+	// Vendor-owned entries are the official list price and must win over any
+	// reseller, otherwise "cheapest non-zero" would silently replace the
+	// published price with a discounted marketplace one.
+	if current.Canonical != next.Canonical {
+		return next.Canonical
+	}
 	currentNonZero := current.Input > 0
 	nextNonZero := next.Input > 0
 	if currentNonZero != nextNonZero {
@@ -1488,8 +1515,10 @@ func shouldReplaceModelsDevCandidate(current, next modelsDevCandidate) bool {
 //	completion_ratio = output_cost / input_cost
 //	cache_ratio = cache_read_cost / input_cost
 //
-// Duplicate model keys across providers are resolved by selecting the
-// cheapest non-zero input cost. If only zero-priced candidates exist,
+// Duplicate model keys across providers are resolved by preferring the entry
+// whose provider owns the model (canonical_model_id prefix), i.e. the vendor's
+// official list price. Only when no vendor entry exists does it fall back to
+// the cheapest non-zero input cost. If only zero-priced candidates exist,
 // a zero ratio is kept.
 func convertModelsDevToRatioData(reader io.Reader) (map[string]any, error) {
 	var upstreamData map[string]modelsDevProvider
@@ -1520,7 +1549,7 @@ func convertModelsDevToRatioData(reader io.Reader) (map[string]any, error) {
 		sort.Strings(modelNames)
 
 		for _, modelName := range modelNames {
-			candidate, ok := buildModelsDevCandidate(provider, providerData.Models[modelName].Cost)
+			candidate, ok := buildModelsDevCandidate(provider, providerData.Models[modelName])
 			if !ok {
 				continue
 			}
