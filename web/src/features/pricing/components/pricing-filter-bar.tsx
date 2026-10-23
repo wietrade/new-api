@@ -147,6 +147,12 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
     priceCounts[model.is_free === true ? 'free' : 'paid'] += 1
   }
 
+  // 只保留真的有模型命中的选项，避免选完必然空结果
+  const keepHit = (options: Record<string, string>, counts: Record<string, number>) =>
+    Object.fromEntries(
+      Object.entries(options).filter(([key]) => (counts[key] ?? 0) > 0)
+    )
+
   return (
     <div className='pricing-filterbar'>
       <Field label={t('Search')} className='pf-search'>
@@ -163,7 +169,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
         <NativeSelect
           value={props.vendorFilter}
           onChange={props.onVendorChange}
-          options={vendorOptions}
+          options={keepHit(vendorOptions, vendorCounts)}
           counts={vendorCounts}
           placeholder='全部供应商'
           width='132px'
@@ -174,7 +180,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
         <NativeSelect
           value={props.modelTypeFilter}
           onChange={props.onModelTypeChange}
-          options={MODEL_TYPE_LABELS}
+          options={keepHit(MODEL_TYPE_LABELS, modelTypeCounts)}
           counts={modelTypeCounts}
           placeholder='全部类型'
           width='110px'
@@ -185,7 +191,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
         <NativeSelect
           value={props.inputTypeFilter}
           onChange={props.onInputTypeChange}
-          options={INPUT_TYPE_LABELS}
+          options={keepHit(INPUT_TYPE_LABELS, inputTypeCounts)}
           counts={inputTypeCounts}
           placeholder='全部输入'
           width='110px'
@@ -196,7 +202,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
         <NativeSelect
           value={props.contextFilter}
           onChange={props.onContextChange}
-          options={CONTEXT_LABELS}
+          options={keepHit(CONTEXT_LABELS, contextCounts)}
           counts={contextCounts}
           placeholder='不限'
           width='124px'
@@ -207,7 +213,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
         <NativeSelect
           value={props.priceTierFilter}
           onChange={props.onPriceTierChange}
-          options={PRICE_TIER_LABELS}
+          options={keepHit(PRICE_TIER_LABELS, priceCounts)}
           counts={priceCounts}
           placeholder='不限'
           width='96px'
