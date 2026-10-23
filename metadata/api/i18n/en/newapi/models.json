@@ -1404,6 +1404,26 @@
       "max_output_tokens": 524288,
       "is_free": false,
       "endpoints": null
+    },
+    {
+      "model_name": "free",
+      "vendor_name": "",
+      "description": "",
+      "icon": "",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "",
+      "capabilities": [],
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": true,
+      "endpoints": null
     }
   ]
 }
