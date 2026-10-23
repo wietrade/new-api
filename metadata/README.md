@@ -170,6 +170,22 @@ LLM 的 token 价继续用上面的标量字段；**按张 / 按秒 / 按次 / �
 
 > `unresolved[]` 记录官方提到但未给出具体数值的项（例：`gpt-5.5` 高档缓存价未明确），
 > 这些字段一律留 `null`，不得按倍率推算填入。
+
+### 从数据源到线上
+
+`pricing.json` 里的 `billing_expr` 只是数据。真正生效要写进 new-api 的 options：
+
+```bash
+python scripts/model_sync/sync_models.py --only pricing
+python -m scripts.model_sync.export_billing -o /tmp/billing.json
+python scripts/ops/apply_billing.py -i /tmp/billing.json --dry-run
+python scripts/ops/apply_billing.py -i /tmp/billing.json
+systemctl restart new-api
+```
+
+模型的增删改名同理，见 `scripts/ops/README.md`。每一步都可重复执行，线上状态
+因此能从 git 复现，而不依赖谁还记得后台点过什么。
+
 ## 原始第三方快照（metadata/raw/）
 
 `raw/` 存放**未合并**的第三方抓取快照，供人工比对后决定是否并入 `api/newapi/models.json`：
