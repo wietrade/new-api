@@ -33,6 +33,7 @@ import {
 import { EXCLUDED_GROUPS } from './constants'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
+import './pricing.css'
 
 export function Pricing() {
   const { t } = useTranslation()
@@ -145,15 +146,31 @@ export function Pricing() {
 
   return (
     <PublicLayout showMainContainer={false}>
-      <div className='relative'>
-        <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-10 xl:px-8'>
-          <header className='mx-auto mb-5 max-w-3xl pt-5 text-center sm:mb-10 sm:pt-10'>
-            <h1 className='text-[clamp(2rem,5.5vw,3.5rem)] leading-[1.15] font-bold tracking-tight'>
-              {t('Model Square')}
-            </h1>
-            <p className='text-muted-foreground/80 mt-3 text-sm sm:mt-4 sm:text-base'>
-              一个 API 接入主流大模型，价格透明、开箱可用！
+      <div className='pricing-page relative'>
+        <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pb-8 sm:px-6 sm:pb-10 xl:px-8'>
+          <header className='pricing-hero'>
+            <p className='pricing-breadcrumb'>
+              NowHub <em>/</em> 模型广场 <em>/</em> Live catalog
             </p>
+            <h1 className='pricing-title'>{t('Model Square')}</h1>
+            <p className='pricing-subtitle'>
+              一个 API 接入主流大模型，价格透明、开箱可用。所有价格均为本站实际结算价，
+              按分组倍率实时换算。
+            </p>
+            <dl className='pricing-stats'>
+              <div>
+                <dt>01 · 模型</dt>
+                <dd>{models?.length ?? 0}</dd>
+              </div>
+              <div>
+                <dt>02 · 供应商</dt>
+                <dd>{vendors?.length ?? 0}</dd>
+              </div>
+              <div>
+                <dt>03 · 可用分组</dt>
+                <dd>{availableGroups?.length ?? 0}</dd>
+              </div>
+            </dl>
           </header>
 
           <div className='grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)]'>

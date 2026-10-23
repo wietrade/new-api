@@ -1,0 +1,137 @@
+/*
+ * 模型广场视觉改造（参考 cheaperinference /markets 的排版语言）
+ * 只覆盖外观，不改动任何数据与交互逻辑。
+ */
+
+/* ── 页头 ─────────────────────────────────────────────── */
+.pricing-page .pricing-hero {
+  max-width: 900px;
+  padding: 40px 4px 28px;
+}
+
+.pricing-page .pricing-breadcrumb {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+}
+
+.pricing-page .pricing-breadcrumb em {
+  font-style: normal;
+  opacity: 0.45;
+  padding: 0 6px;
+}
+
+.pricing-page .pricing-title {
+  margin-top: 14px;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.pricing-page .pricing-subtitle {
+  margin-top: 12px;
+  max-width: 46rem;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+}
+
+.pricing-page .pricing-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  margin: 28px 0 8px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+.pricing-page .pricing-stats dt {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.pricing-page .pricing-stats dd {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ── 表格 ─────────────────────────────────────────────── */
+.pricing-page table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.pricing-page thead th {
+  height: 40px;
+  padding: 0 14px !important;
+  border-bottom: 1px solid var(--border) !important;
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted-foreground) !important;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+}
+
+.pricing-page tbody td {
+  padding: 13px 14px !important;
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--border) 55%, transparent) !important;
+  vertical-align: middle;
+}
+
+.pricing-page tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.pricing-page tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+.pricing-page tbody tr:hover td {
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+
+/* 模型名：常规字体、主信息更突出 */
+.pricing-page tbody td .font-mono {
+  font-family: inherit !important;
+  font-size: 13.5px !important;
+  font-weight: 550 !important;
+  letter-spacing: -0.005em;
+}
+
+/* 数字统一等宽对齐 */
+.pricing-page tbody td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 分组/端点这类次要标签降噪 */
+.pricing-page tbody td .text-muted-foreground {
+  font-size: 12px;
+}
+
+/* 表格外框：更收敛的圆角与描边 */
+.pricing-page .rounded-xl.border,
+.pricing-page [data-slot='table-container'] {
+  border-radius: 14px !important;
+  border-color: color-mix(in oklab, var(--border) 80%, transparent) !important;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .pricing-page .pricing-stats {
+    gap: 28px;
+  }
+  .pricing-page .pricing-hero {
+    padding-top: 24px;
+  }
+}
