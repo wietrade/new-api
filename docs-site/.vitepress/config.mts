@@ -33,6 +33,7 @@ export default defineConfig({
       { text: 'API', link: '/api/chat-completions', activeMatch: '^/docs/api/' },
       { text: '客户端', link: '/tools/', activeMatch: '^/docs/tools/' },
       { text: '排障', link: '/faq/', activeMatch: '^/docs/faq/' },
+      { text: '主站 ↗', link: 'https://www.nowhub.org/' },
     ],
     sidebar: [
       {
