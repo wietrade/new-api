@@ -731,12 +731,12 @@
       "notes": "Gemma 4 在 Gemini API 仅提供 Free Tier，官方标价 Free of charge，Paid Tier 为 Not available；无付费 token 价。:free 为转售商免费档别名。"
     },
     {
-      "model_name": "minimax-m3.1-flash:free",
+      "model_name": "minimax-m3.1-flash",
       "vendor_name": "MiniMax",
       "price_kind": "vendor_official",
       "source_kind": "official_doc",
-      "source_url": "https://platform.minimax.io/docs/guides/pricing",
-      "retrieved_at": "2026-10-23T22:55:00+08:00",
+      "source_url": "https://platform.minimax.io/docs/pricing/overview",
+      "retrieved_at": "2026-10-23T23:10:00+08:00",
       "currency": "USD",
       "unit": "per_1m_tokens",
       "input": 0.15,
@@ -754,7 +754,7 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "MiniMax-M3.1-Flash | $0.15 | $0.60 | $0.015 (Input / Output / Prompt caching Read, $ per M tokens)",
-      "notes": "国际站直接以美元标价，非汇率折算。国内站同款为 ¥1.00 / ¥4.00 / ¥0.10 每百万 tokens。该条目在目录中带 :free 后缀，是聚合站的免费变体命名；厂商 API 本身按上表付费价计费。"
+      "notes": "官方定价页 Pricing Overview → LLM 表：Input $0.15 / Output $0.60 / Prompt caching Read $0.015（USD per 1M tokens）。国内站同款 ¥1.00 / ¥4.00 / ¥0.10。MiniMax-M3 另有 ≤512k 与 >512k 两档，本模型为单一档。"
     },
     {
       "model_name": "kimi-k3",

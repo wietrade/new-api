@@ -1241,13 +1241,13 @@
       "endpoints": null
     },
     {
-      "model_name": "minimax-m3.1-flash:free",
+      "model_name": "minimax-m3.1-flash",
       "vendor_name": "MiniMax",
       "description": "MiniMax-M3.1-Flash is a multimodal model from MiniMax. Compared with M3, it delivers significant improvements across multiple benchmarks, particularly in complex agentic tasks, coding, and cybersecuri",
       "icon": "Minimax",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,多模态,免费",
+      "tags": "推理,工具,多模态",
       "capabilities": [
         "reasoning",
         "tools",
@@ -1265,7 +1265,7 @@
       ],
       "context_length": 1000000,
       "max_output_tokens": 524288,
-      "is_free": true,
+      "is_free": false,
       "endpoints": null
     },
     {
