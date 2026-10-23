@@ -34,10 +34,10 @@ client = OpenAI(base_url="https://api.nowhub.org/v1", api_key="sk-...")
 ```
 
 ```ts
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 
-const client = new Anthropic({
-  baseURL: 'https://api.nowhub.org',
+const client = new OpenAI({
+  baseURL: 'https://api.nowhub.org/v1',
   apiKey: 'sk-...',
 })
 ```
@@ -55,6 +55,16 @@ client = anthropic.Anthropic(
     base_url="https://api.nowhub.org",
     api_key="sk-...",
 )
+```
+
+```ts
+import Anthropic from '@anthropic-ai/sdk'
+
+// 注意：Anthropic SDK 的 baseURL 不带 /v1，SDK 会自己拼 /v1/messages
+const client = new Anthropic({
+  baseURL: 'https://api.nowhub.org',
+  apiKey: 'sk-...',
+})
 ```
 
 ## Gemini 兼容

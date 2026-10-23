@@ -20,6 +20,10 @@ export BASE_URL="https://api.nowhub.org"
 export NEW_API_KEY="sk-..."
 ```
 
+::: tip Windows（PowerShell）
+上面是 bash 写法。PowerShell 临时设置用 `$env:BASE_URL="https://api.nowhub.org"`；持久化用 `setx BASE_URL "https://api.nowhub.org"`（需重开终端生效）。CMD 用 `set BASE_URL=...`。
+:::
+
 ::: tip 关于路径
 基地址**不带** `/v1`。OpenAI 兼容接口是 `/v1/chat/completions`，Anthropic 兼容接口是 `/v1/messages`，Gemini 兼容接口是 `/v1beta/models/<model>:generateContent`。
 :::

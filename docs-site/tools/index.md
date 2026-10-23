@@ -17,13 +17,14 @@
 | 客户端 | 类型 | 平台 | 推荐协议 |
 | --- | --- | --- | --- |
 | [Cherry Studio](/tools/desktop#cherry-studio) | 桌面聊天 | Windows / macOS / Linux | OpenAI |
+| [ChatWise](/tools/desktop#chatwise) | 桌面聊天 | macOS / Windows | OpenAI / Anthropic |
 | [Chatbox](/tools/desktop#chatbox) | 桌面 + 移动 | 全平台 | OpenAI |
 | [LobeChat](/tools/desktop#lobe-chat) | 网页 / 自托管 | 浏览器 | OpenAI |
 | [NextChat](/tools/desktop#nextchat) | 网页 / 自托管 | 浏览器 | OpenAI |
 | [Open WebUI](/tools/desktop#open-webui) | 自托管 | 浏览器 / Docker | OpenAI |
 | [SillyTavern](/tools/desktop#sillytavern) | 角色扮演 | 本地 | OpenAI |
 | [沉浸式翻译](/tools/desktop#沉浸式翻译) | 浏览器扩展 | Chrome / Edge / Safari | OpenAI |
-| [VS Code 内置 BYOK](/tools/vscode#vs-code-内置-byokcopilot-chat) | 编辑器自带 | VS Code | OpenAI 兼容 |
+| [VS Code 内置 BYOK](/tools/vscode#vs-code-内置-byok-copilot-chat) | 编辑器自带 | VS Code | OpenAI 兼容 |
 | [Cline](/tools/vscode#cline) | VS Code 编程助手 | VS Code | OpenAI |
 | [Roo Code](/tools/vscode#roo-code) | VS Code 编程助手 | VS Code | OpenAI |
 | [Continue](/tools/vscode#continue) | 代码补全 + 对话 | VS Code / JetBrains | OpenAI |

@@ -4,7 +4,9 @@
 
 Claude Code 的 provider 配置只有一份（`~/.claude/settings.json`），在几个中转站之间来回切就得手改 JSON、记 key、改模型名，很容易改错。
 
-cc-switch 是一个本地小工具（托盘常驻）：把多套 provider 存起来，点一下就把配置写进 Claude Code（也可以管 Codex CLI），并且可以起一个本地代理让多个客户端共用同一份上游。
+cc-switch 是一个**开源跨平台**的配置切换工具（托盘常驻）：把多套 provider 存起来，点一下就把配置写进 Claude Code（也可以管 Codex CLI），并且可以起一个本地代理让多个客户端共用同一份上游。
+
+下载：<https://github.com/farion1231/cc-switch/releases/latest>
 
 ## 添加本站作为 provider
 

@@ -1,6 +1,6 @@
 # 终端编程助手
 
-Claude Code 与 Codex CLI 有单独页面，这里补其余常见 CLI。
+Claude Code、Codex CLI、OpenCode 有单独页面，这里补其余常见 CLI。
 
 ## Gemini CLI
 
@@ -45,6 +45,10 @@ aider --model openai/<模型ID>
 export NOWHUB_BASE="https://api.nowhub.org/v1"
 export NOWHUB_KEY="sk-你的令牌"
 ```
+
+::: tip Windows（PowerShell / CMD）
+上面是 bash 写法。PowerShell 临时设置：`$env:OPENAI_API_BASE="https://api.nowhub.org/v1"`；持久化用 `setx OPENAI_API_BASE "https://api.nowhub.org/v1"`（需重开终端生效）。CMD 用 `set VAR=value`，只对当前窗口有效。
+:::
 
 ::: warning 不要把 Key 提交到仓库
 `.env` 要进 `.gitignore`；CI 里用 Secrets，不要写进代码。泄露的 Key 请立刻在控制台禁用并重建。

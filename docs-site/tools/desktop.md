@@ -1,5 +1,7 @@
 # 桌面与网页客户端
 
+> 手机端可以用 Chatbox（iOS / Android）等支持自定义接口的客户端；桌面端国内最常用的是 Cherry Studio 与 ChatWise。
+
 ## Cherry Studio
 
 国内最常用的桌面客户端，支持 Windows / macOS / Linux。
@@ -11,6 +13,17 @@
 5. 对话页左上角选中该提供商与模型
 
 支持多助手、知识库、MCP。做知识库时注意向量模型是否在令牌可用范围内。
+
+## ChatWise
+
+桌面客户端（macOS / Windows），支持接入任意 OpenAI / Anthropic 兼容服务。
+
+1. 设置（`⌘ ,`）→ **Providers** → 点 `+` 新增
+2. 协议选 **OpenAI 兼容**（或 Anthropic 兼容），Base URL 填 `https://api.nowhub.org/v1`（Anthropic 协议填 `https://api.nowhub.org`）
+3. 填 API Key
+4. 点「Fetch models」自动拉取模型；拉不到就手动填模型 ID
+
+同一个令牌可以同时挂 OpenAI 与 Anthropic 两个 Provider，按模型选择对应协议即可。
 
 ## Chatbox
 
@@ -38,6 +51,10 @@ Chatbox 有移动端，手机与电脑可以用同一个令牌。
 2. 接口地址 `https://api.nowhub.org`
 3. 填 API Key
 4. 自定义模型填模型 ID，用英文逗号分隔多个
+
+::: tip 报 404 时
+NextChat 各版本对「接口地址」是否自动补 `/v1` 处理不一致。如果对话报 404，把地址改成 `https://api.nowhub.org/v1` 再试一次。
+:::
 
 ## Open WebUI
 

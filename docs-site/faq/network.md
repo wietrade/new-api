@@ -27,6 +27,10 @@ export HTTP_PROXY=http://127.0.0.1:7890
 export NO_PROXY=127.0.0.1,localhost,::1
 ```
 
+::: tip Windows（PowerShell）
+`$env:HTTPS_PROXY="http://127.0.0.1:7890"`、`$env:HTTP_PROXY=...` 同理；要长期生效用 `setx HTTPS_PROXY "http://127.0.0.1:7890"`（需重开终端）。
+:::
+
 Python 的 `httpx` / `requests` 会自动读这些变量；`requests` 还认 `REQUESTS_CA_BUNDLE`。
 
 ## Docker 容器里访问不到

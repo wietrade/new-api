@@ -2,6 +2,19 @@
 
 记录文档站本身的变更。模型上线与价格调整请看[模型广场](https://nowhub.org/pricing)。
 
+## 2026-10-23
+
+- 修正「接口兼容性」页：OpenAI 兼容小节的 TypeScript 示例误用了 `@anthropic-ai/sdk`，改为 `openai`（baseURL 带 `/v1`）
+- 同一页补充「Anthropic 兼容」的 TypeScript 示例（baseURL 不带 `/v1`），与 Python 示例对照
+- 修正「错误码」页表格顺序：按状态码升序排列（`402` 原先排在 `404` 之后）
+- 修正「客户端接入」总览页指向 VS Code 页面的锚点（`#vs-code-内置-byok-copilot-chat`）
+- 「后续计划」小节标题由「待补充」改写，避免被误读为未完成内容
+- 新增 ChatWise 接入说明（支持任一 OpenAI / Anthropic 兼容服务），客户端总览表同步补行
+- NextChat 补充 `/v1` 路径歧义提示（报 404 时改用带 `/v1` 的地址）
+- 桌面页补充手机端可用客户端说明
+- `cli`、`quick-start`、`faq/network` 补充 Windows PowerShell / CMD 环境变量写法
+- cc-switch 页：介绍改为「开源跨平台」，并补上 GitHub Releases 下载地址
+
 ## 2026-10-22
 
 - 文档站上线：`https://nowhub.org/docs/`
@@ -54,7 +67,7 @@
 - 说明高性价比线路的缓存可能冷启动：线路切换后缓存失效，会重新产生缓存写入费用
 - 缓存页新增线路缓存说明与四条降本做法；定价页注明扣费含 cache_creation
 
-## 待补充
+## 后续计划
 
 - 图像 / 视频模型接入
 - 余额查询与日志查询 API
