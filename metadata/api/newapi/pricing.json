@@ -374,6 +374,29 @@
           "cache_write": null,
           "cache_write_1h": null
         }
+      ],
+      "meters": [
+        {
+          "dim": "input_image",
+          "price": 0.0011,
+          "unit": "image"
+        },
+        {
+          "dim": "output_image",
+          "price": 0.134,
+          "unit": "image",
+          "when": {
+            "resolution": "1K-2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.24,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
       ]
     },
     {
@@ -404,6 +427,29 @@
           "cache_write": null,
           "cache_write_1h": null
         }
+      ],
+      "meters": [
+        {
+          "dim": "input_image",
+          "price": 0.0011,
+          "unit": "image"
+        },
+        {
+          "dim": "output_image",
+          "price": 0.134,
+          "unit": "image",
+          "when": {
+            "resolution": "1K-2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.24,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
       ]
     },
     {
@@ -422,7 +468,41 @@
       "output": 60.0,
       "output_text": 3.0,
       "output_image": 60.0,
-      "per_image": 0.067
+      "per_image": 0.067,
+      "meters": [
+        {
+          "dim": "output_image",
+          "price": 0.045,
+          "unit": "image",
+          "when": {
+            "resolution": "0.5K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.067,
+          "unit": "image",
+          "when": {
+            "resolution": "1K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.101,
+          "unit": "image",
+          "when": {
+            "resolution": "2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.151,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
+      ]
     },
     {
       "model_name": "gemini-3.1-flash-image-preview",
@@ -440,7 +520,41 @@
       "output": 60.0,
       "output_text": 3.0,
       "output_image": 60.0,
-      "per_image": 0.067
+      "per_image": 0.067,
+      "meters": [
+        {
+          "dim": "output_image",
+          "price": 0.045,
+          "unit": "image",
+          "when": {
+            "resolution": "0.5K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.067,
+          "unit": "image",
+          "when": {
+            "resolution": "1K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.101,
+          "unit": "image",
+          "when": {
+            "resolution": "2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.151,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
+      ]
     },
     {
       "model_name": "gemini-4-argon",

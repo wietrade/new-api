@@ -130,6 +130,38 @@ openrouter（tie-break）  ┘
 > `tiers` **不是「第 0 档」**：基础价是阈值以下的价，`tiers[i]` 是「达到阈值之后」的价。
 > 例：`claude-haiku-5.5` 基础 `input: 0.1`，`tiers[0] = {prompt_tokens_at_least: 100000, input: 0.5}`。
 
+### 非 token 计费：`meters[]`
+
+LLM 的 token 价继续用上面的标量字段；**按张 / 按秒 / 按次 / 按 credit** 的模型用 `meters[]`
+补充描述，每条对应一个可以直接计费的维度：
+
+```json
+"meters": [
+  { "dim": "output_image", "price": 0.134, "unit": "image",
+    "when": { "resolution": "1K-2K" } },
+  { "dim": "output_image", "price": 0.24, "unit": "image",
+    "when": { "resolution": "4K" } },
+  { "dim": "input_image", "price": 0.0011, "unit": "image" }
+]
+```
+
+| 键 | 含义 |
+|:---|:---|
+| `dim` | 计量维度：`input_tokens` / `output_tokens` / `cache_read_tokens` / `input_image` / `output_image` / `input_second` / `output_second` / `request` / `credit` |
+| `price` | 单价（USD） |
+| `unit` | 单位：`1m_tokens` / `image` / `second` / `request` / `credit` |
+| `when` | 生效条件，全部命中才算（可为空）：`prompt_tokens_at_least` / `prompt_tokens_below` / `resolution` / `mode` |
+| `free` | 免费额度（前 N 张 / 前 N 秒），可选 |
+| `note` | 补充说明，可选 |
+
+规则：
+
+- `dim` + `when` 必须能翻译成一条计费表达式（见 `pkg/billingexpr/expr.md`），翻译不了的不许写；
+- 同一 `dim` 的多条 rate 用不同 `when` 区分，条件不得重叠；
+- token 与按张价可以并存（例如 Gemini 图像模型既有 `$120/1M image tokens`，又有按分辨率的每张价），
+  但两者各自来自官方原文，**不得互相推导覆盖**；
+- `meters` 只描述可直接标价的维度；没有 `meters` 的模型表示只按 token 计费。
+
 > `unresolved[]` 记录官方提到但未给出具体数值的项（例：`gpt-5.5` 高档缓存价未明确），
 > 这些字段一律留 `null`，不得按倍率推算填入。
 ## 原始第三方快照（metadata/raw/）

@@ -551,7 +551,30 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "输入 $2.00（≤20万token）/ $4.00（>20万）；输出文本 $12.00（≤20万）/ $18.00（>20万）；图像输出 $120.00 固定。文本部分沿用 Gemini 3.1 Pro 的 200K 两档。",
-      "notes": "Standard 档：输入 $2.00(text/image)；文本与思考输出 $12.00、图像输出 $120.00/1M tokens；按图折算 1K/2K $0.134、4K $0.24；图像输入 $0.0011/张；Batch 档输入 $1.00、图像输出 $60.00（即 Standard 的 50%）；不支持 Caching；无免费档。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。"
+      "notes": "Standard 档：输入 $2.00(text/image)；文本与思考输出 $12.00、图像输出 $120.00/1M tokens；按图折算 1K/2K $0.134、4K $0.24；图像输入 $0.0011/张；Batch 档输入 $1.00、图像输出 $60.00（即 Standard 的 50%）；不支持 Caching；无免费档。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。",
+      "meters": [
+        {
+          "dim": "input_image",
+          "price": 0.0011,
+          "unit": "image"
+        },
+        {
+          "dim": "output_image",
+          "price": 0.134,
+          "unit": "image",
+          "when": {
+            "resolution": "1K-2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.24,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
+      ]
     },
     {
       "model_name": "gemini-3-pro-image-preview",
@@ -588,7 +611,30 @@
       "upcoming": null,
       "confidence": "medium",
       "quote": "输入 $2.00（≤20万token）/ $4.00（>20万）；输出文本 $12.00（≤20万）/ $18.00（>20万）；图像输出 $120.00 固定。文本部分沿用 Gemini 3.1 Pro 的 200K 两档。",
-      "notes": "官方已不收录该别名（单模型页 404），按同款稳定版 gemini-3-pro-image Standard 档对齐：输入 $2.00；文本/思考 $12.00、图像 $120.00；1K/2K $0.134、4K $0.24/张；Batch 5 折。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。"
+      "notes": "官方已不收录该别名（单模型页 404），按同款稳定版 gemini-3-pro-image Standard 档对齐：输入 $2.00；文本/思考 $12.00、图像 $120.00；1K/2K $0.134、4K $0.24/张；Batch 5 折。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。",
+      "meters": [
+        {
+          "dim": "input_image",
+          "price": 0.0011,
+          "unit": "image"
+        },
+        {
+          "dim": "output_image",
+          "price": 0.134,
+          "unit": "image",
+          "when": {
+            "resolution": "1K-2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.24,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
+      ]
     },
     {
       "model_name": "gemini-3.1-flash-image",
@@ -614,7 +660,41 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "输入 $0.50（文本/图片）；输出 $3.00（文本和思考）/ $60.00（图片）。",
-      "notes": "Standard 档：输入 $0.50(text/image)；文本与思考输出 $3.00、图像输出 $60.00/1M tokens；按图折算 0.5K $0.045、1K $0.067、2K $0.101、4K $0.151；Batch 档输入 $0.25、图像输出 $30.00（5 折）；不支持 Caching；无免费档。"
+      "notes": "Standard 档：输入 $0.50(text/image)；文本与思考输出 $3.00、图像输出 $60.00/1M tokens；按图折算 0.5K $0.045、1K $0.067、2K $0.101、4K $0.151；Batch 档输入 $0.25、图像输出 $30.00（5 折）；不支持 Caching；无免费档。",
+      "meters": [
+        {
+          "dim": "output_image",
+          "price": 0.045,
+          "unit": "image",
+          "when": {
+            "resolution": "0.5K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.067,
+          "unit": "image",
+          "when": {
+            "resolution": "1K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.101,
+          "unit": "image",
+          "when": {
+            "resolution": "2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.151,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
+      ]
     },
     {
       "model_name": "gemini-3.1-flash-image-preview",
@@ -640,7 +720,41 @@
       "upcoming": null,
       "confidence": "medium",
       "quote": "输入 $0.50（文本/图片）；输出 $3.00（文本和思考）/ $60.00（图片）。",
-      "notes": "官方已不收录该别名（单模型页 404），按同款稳定版 gemini-3.1-flash-image Standard 档对齐：输入 $0.50；文本/思考 $3.00、图像 $60.00；1K $0.067/张。"
+      "notes": "官方已不收录该别名（单模型页 404），按同款稳定版 gemini-3.1-flash-image Standard 档对齐：输入 $0.50；文本/思考 $3.00、图像 $60.00；1K $0.067/张。",
+      "meters": [
+        {
+          "dim": "output_image",
+          "price": 0.045,
+          "unit": "image",
+          "when": {
+            "resolution": "0.5K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.067,
+          "unit": "image",
+          "when": {
+            "resolution": "1K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.101,
+          "unit": "image",
+          "when": {
+            "resolution": "2K"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.151,
+          "unit": "image",
+          "when": {
+            "resolution": "4K"
+          }
+        }
+      ]
     },
     {
       "model_name": "gemini-4-argon",

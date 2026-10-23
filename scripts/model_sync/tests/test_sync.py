@@ -277,6 +277,27 @@ class MergeTest(unittest.TestCase):
         self.assertEqual(row["cache_read_image"], 2.0)
         self.assertEqual(row["output_image"], 32.0)
 
+    def test_official_meters_pass_through(self):
+        """Per-image / per-second meters survive into pricing.json untouched."""
+        index, _ = merge.index_incoming([])
+        meters = [
+            {"dim": "output_image", "price": 0.134, "unit": "image",
+             "when": {"resolution": "1K-2K"}},
+            {"dim": "output_image", "price": 0.24, "unit": "image",
+             "when": {"resolution": "4K"}},
+        ]
+        official = {
+            normalize_key("gemini-3-pro-image"): {
+                "model_name": "gemini-3-pro-image",
+                "input": 2.0,
+                "output": 120.0,
+                "meters": meters,
+            }
+        }
+        existing = [{**self.existing[0], "model_name": "gemini-3-pro-image"}]
+        row = merge.price_records(existing, index, official)[0]
+        self.assertEqual(row["meters"], meters)
+
     def test_exact_name_wins_over_source_priority(self):
         """ollama-hosted and official rows share a key; the exact id must win."""
         index, _ = merge.index_incoming(
