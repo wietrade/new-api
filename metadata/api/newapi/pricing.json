@@ -515,6 +515,34 @@
       "cache_read": 0.0
     },
     {
+      "model_name": "MiniMax-M3",
+      "vendor_name": "MiniMax",
+      "price_kind": "vendor_official",
+      "source_kind": "official_doc",
+      "source": "vendor_official",
+      "source_model_id": "MiniMax-M3",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "source_url": "https://platform.minimax.io/docs/pricing/overview",
+      "retrieved_at": "2026-10-23T23:15:00+08:00",
+      "confidence": "high",
+      "input": 0.3,
+      "output": 1.2,
+      "cache_read": 0.06,
+      "tiers": [
+        {
+          "prompt_tokens_at_least": 512000,
+          "input": 0.6,
+          "output": 2.4,
+          "output_text": null,
+          "output_image": null,
+          "cache_read": 0.12,
+          "cache_write": null,
+          "cache_write_1h": null
+        }
+      ]
+    },
+    {
       "model_name": "minimax-m3.1-flash",
       "vendor_name": "MiniMax",
       "price_kind": "vendor_official",

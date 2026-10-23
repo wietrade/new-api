@@ -1422,6 +1422,34 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
+    },
+    {
+      "model_name": "MiniMax-M3",
+      "vendor_name": "MiniMax",
+      "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
+      "icon": "Minimax",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 524288,
+      "is_free": false,
+      "endpoints": null
     }
   ]
 }
