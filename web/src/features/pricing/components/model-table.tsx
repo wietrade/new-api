@@ -26,6 +26,10 @@ import { getLobeIcon } from '@/lib/lobe-icon'
 import { requireServerSuccess } from '@/lib/server-error-message'
 
 import { DEFAULT_TOKEN_UNIT } from '../constants'
+import {
+  getDynamicDisplayGroupRatio,
+  getDynamicPricingSummary,
+} from '../lib/dynamic-price'
 import { getDisplayGroupRatio } from '../lib/model-helpers'
 import { formatPrice } from '../lib/price'
 import type {
@@ -209,42 +213,86 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
             const discount =
               ratio > 0 && ratio < 1 ? Math.round((1 - ratio) * 100) : 0
 
-            const inputOurs = formatPrice(
-              model,
-              'input',
+            // Expression-priced models settle on the expression, so the list must
+            // quote the expression's coefficients. Falling back to model_ratio
+            // showed 75x the real price (ratio 37.5 x 2) for models whose ratio
+            // entry was never configured.
+            const dynamicList = getDynamicPricingSummary(model, {
+              priceRate: props.priceRate,
+              usdExchangeRate: props.usdExchangeRate,
+              showRechargePrice: props.showRechargePrice,
               tokenUnit,
-              props.showRechargePrice,
-              props.priceRate,
-              props.usdExchangeRate,
-              props.selectedGroup
-            )
-            const inputList = formatPrice(
-              model,
-              'input',
+            })
+            const dynamicOurs = getDynamicPricingSummary(model, {
+              priceRate: props.priceRate,
+              usdExchangeRate: props.usdExchangeRate,
+              showRechargePrice: props.showRechargePrice,
               tokenUnit,
-              props.showRechargePrice,
-              props.priceRate,
-              props.usdExchangeRate,
-              undefined
-            )
-            const outputOurs = formatPrice(
-              model,
-              'output',
-              tokenUnit,
-              props.showRechargePrice,
-              props.priceRate,
-              props.usdExchangeRate,
-              props.selectedGroup
-            )
-            const outputList = formatPrice(
-              model,
-              'output',
-              tokenUnit,
-              props.showRechargePrice,
-              props.priceRate,
-              props.usdExchangeRate,
-              undefined
-            )
+              groupRatioMultiplier: getDynamicDisplayGroupRatio(
+                model,
+                props.selectedGroup
+              ),
+            })
+            const expressionPrice = (
+              summary: typeof dynamicList,
+              field: 'inputPrice' | 'outputPrice'
+            ) =>
+              summary?.entries.find(
+                (entry) => entry.field === field && entry.unit === 'token'
+              )?.formatted
+
+            const inputOurs =
+              expressionPrice(dynamicOurs, 'inputPrice') ??
+              (dynamicOurs
+                ? '—'
+                : formatPrice(
+                    model,
+                    'input',
+                    tokenUnit,
+                    props.showRechargePrice,
+                    props.priceRate,
+                    props.usdExchangeRate,
+                    props.selectedGroup
+                  ))
+            const inputList =
+              expressionPrice(dynamicList, 'inputPrice') ??
+              (dynamicList
+                ? '—'
+                : formatPrice(
+                    model,
+                    'input',
+                    tokenUnit,
+                    props.showRechargePrice,
+                    props.priceRate,
+                    props.usdExchangeRate,
+                    undefined
+                  ))
+            const outputOurs =
+              expressionPrice(dynamicOurs, 'outputPrice') ??
+              (dynamicOurs
+                ? '—'
+                : formatPrice(
+                    model,
+                    'output',
+                    tokenUnit,
+                    props.showRechargePrice,
+                    props.priceRate,
+                    props.usdExchangeRate,
+                    props.selectedGroup
+                  ))
+            const outputList =
+              expressionPrice(dynamicList, 'outputPrice') ??
+              (dynamicList
+                ? '—'
+                : formatPrice(
+                    model,
+                    'output',
+                    tokenUnit,
+                    props.showRechargePrice,
+                    props.priceRate,
+                    props.usdExchangeRate,
+                    undefined
+                  ))
             const ttft = perfMap.get(model.model_name)
 
             return (
