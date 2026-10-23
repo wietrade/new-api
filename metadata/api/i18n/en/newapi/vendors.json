@@ -43,6 +43,60 @@
       "description": "",
       "icon": "Moonshot",
       "status": 1
+    },
+    {
+      "name": "Qwen",
+      "description": "",
+      "icon": "Qwen.Color",
+      "status": 1
+    },
+    {
+      "name": "xAI",
+      "description": "",
+      "icon": "Grok",
+      "status": 1
+    },
+    {
+      "name": "NVIDIA",
+      "description": "",
+      "icon": "NVIDIA",
+      "status": 1
+    },
+    {
+      "name": "Poolside",
+      "description": "",
+      "icon": "Poolside",
+      "status": 1
+    },
+    {
+      "name": "Thinking Machines",
+      "description": "",
+      "icon": "ThinkingMachines",
+      "status": 1
+    },
+    {
+      "name": "Dots Studio",
+      "description": "",
+      "icon": "Dots",
+      "status": 1
+    },
+    {
+      "name": "Liquid AI",
+      "description": "",
+      "icon": "Liquid",
+      "status": 1
+    },
+    {
+      "name": "MiniMax",
+      "description": "",
+      "icon": "Minimax",
+      "status": 1
+    },
+    {
+      "name": "Xingchen AGI",
+      "description": "",
+      "icon": "Xingchen",
+      "status": 1
     }
   ]
 }

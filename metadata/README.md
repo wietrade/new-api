@@ -100,3 +100,23 @@ openrouter（tie-break）  ┘
   - `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`（约 12h 缓存）
 - `api/newapi/pricing.json` 只是价格快照，**不参与** new-api 自动写库；后台能直接写库的仍是“上游倍率预设”与“models.dev 价格预设”两个虚拟渠道。
 - 每日 02:17 UTC 的 GitHub Actions 会自动跑一遍并开 PR；合并前请重点看新增模型与价格涨跌。
+
+## 原始第三方快照（metadata/raw/）
+
+`raw/` 存放**未合并**的第三方抓取快照，供人工比对后决定是否并入 `api/newapi/models.json`：
+
+| 文件 | 来源 | 内容 |
+|:---|:---|:---|
+| `cheaperinference.json` | `platform.cheaperinference.com/markets` | 模型事实字段（上下文、最大输出、模态、能力标记），**已剔除全部价格字段** |
+
+抓取：`python scripts/model_sync/fetch_cheaperinference.py`（走 `HTTPS_PROXY`，只取首屏内嵌数据）。
+
+`derived` 块由 `fetch_cheaperinference.derive()` 生成，规则只有它一处实现，合并脚本会重新推导而不是直接读快照里的 `derived`：
+
+- `kind` 为 `text` / `decision` 时，`image` 模态只信 `vision` 布尔；`image` / `video` / `retrieval` 仍信 `image-input` token（图生视频、多模态 embedding 的 `vision` 常为 false）
+- 输出模态不含 `text` 时丢弃 `structured-output`（站点对图片 / 语音 / 转写模型也一律打了这个 token）
+- `context-128k` / `context-1m` 只是尺寸提示，`image-edit` 我方词表暂无对应项，三者都不写入目录
+
+合并：`python scripts/model_sync/merge_cheaperinference.py`（dry-run）→ 确认后 `--write`。
+
+合并前先跑一次对比，确认差异是针对模型事实（context / modalities / capabilities），价格一律不采用。
