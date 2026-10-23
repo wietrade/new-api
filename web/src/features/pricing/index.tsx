@@ -25,8 +25,7 @@ import { PageTransition } from '@/components/page-transition'
 import {
   LoadingSkeleton,
   EmptyState,
-  PricingSidebar,
-  PricingToolbar,
+  PricingFilterBar,
   ModelTable,
   ModelDetailsDrawer,
 } from './components'
@@ -173,70 +172,31 @@ export function Pricing() {
             </dl>
           </header>
 
-          <div className='grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)]'>
-            <PricingSidebar
-              quotaTypeFilter={quotaTypeFilter}
-              modelTypeFilter={modelTypeFilter}
-              inputTypeFilter={inputTypeFilter}
-              contextFilter={contextFilter}
-              priceTierFilter={priceTierFilter}
-              vendorFilter={vendorFilter}
-              groupFilter={groupFilter}
-              onQuotaTypeChange={setQuotaTypeFilter}
-              onModelTypeChange={setModelTypeFilter}
-              onInputTypeChange={setInputTypeFilter}
-              onContextChange={setContextFilter}
-              onPriceTierChange={setPriceTierFilter}
-              onVendorChange={setVendorFilter}
-              onGroupChange={setGroupFilter}
-              vendors={vendors || []}
-              groups={availableGroups}
-              groupRatios={groupRatio}
-              models={models || []}
-              hasActiveFilters={hasActiveFilters}
-              onClearFilters={clearFilters}
-              className='hover-scrollbar sticky top-20 hidden max-h-[calc(100dvh-6rem)] self-start overflow-y-auto xl:block'
-            />
+          <PricingFilterBar
+            searchQuery={searchInput}
+            onSearchChange={setSearchInput}
+            onSearchClear={clearSearch}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            vendors={vendors || []}
+            vendorFilter={vendorFilter}
+            onVendorChange={setVendorFilter}
+            modelTypeFilter={modelTypeFilter}
+            onModelTypeChange={setModelTypeFilter}
+            inputTypeFilter={inputTypeFilter}
+            onInputTypeChange={setInputTypeFilter}
+            contextFilter={contextFilter}
+            onContextChange={setContextFilter}
+            priceTierFilter={priceTierFilter}
+            onPriceTierChange={setPriceTierFilter}
+            groupFilter={groupFilter}
+            onGroupChange={setGroupFilter}
+            groups={availableGroups}
+            filteredCount={filteredModels.length}
+            totalCount={models?.length}
+          />
 
-            <main className='min-w-0 space-y-4'>
-              <PricingToolbar
-                filteredCount={filteredModels.length}
-                totalCount={models?.length}
-                searchQuery={searchInput}
-                onSearchChange={setSearchInput}
-                onSearchClear={clearSearch}
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-                tokenUnit={tokenUnit}
-                onTokenUnitChange={setTokenUnit}
-                showRechargePrice={showRechargePrice}
-                onRechargePriceChange={setShowRechargePrice}
-                quotaTypeFilter={quotaTypeFilter}
-                modelTypeFilter={modelTypeFilter}
-                inputTypeFilter={inputTypeFilter}
-                contextFilter={contextFilter}
-                priceTierFilter={priceTierFilter}
-                vendorFilter={vendorFilter}
-                groupFilter={groupFilter}
-                onQuotaTypeChange={setQuotaTypeFilter}
-                onModelTypeChange={setModelTypeFilter}
-                onInputTypeChange={setInputTypeFilter}
-                onContextChange={setContextFilter}
-                onPriceTierChange={setPriceTierFilter}
-                onVendorChange={setVendorFilter}
-                onGroupChange={setGroupFilter}
-                vendors={vendors || []}
-                groups={availableGroups}
-                groupRatios={groupRatio}
-                models={models || []}
-                hasActiveFilters={hasActiveFilters}
-                activeFilterCount={activeFilterCount}
-                onClearFilters={clearFilters}
-              />
-
-              {renderPricingContent()}
-            </main>
-          </div>
+          <main className='mt-4 min-w-0'>{renderPricingContent()}</main>
 
           {selectedModel && (
             <ModelDetailsDrawer
