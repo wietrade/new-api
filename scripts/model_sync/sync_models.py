@@ -145,6 +145,7 @@ def main(argv=None):
     models_path = os.path.join(api_dir, "newapi", "models.json")
     vendors_path = os.path.join(api_dir, "newapi", "vendors.json")
     pricing_path = os.path.join(api_dir, "newapi", "pricing.json")
+    official_pricing_path = os.path.join(api_dir, "newapi", "pricing.official.json")
 
     if not os.path.exists(models_path):
         print("error: %s not found (wrong --root?)" % models_path, file=sys.stderr)
@@ -284,12 +285,16 @@ def main(argv=None):
                 )
 
     if args.only in ("pricing", "all"):
-        rows = merge.price_records(models, index)
+        official_prices = merge.load_official_prices(official_pricing_path)
+        rows = merge.price_records(models, index, official_prices)
         pricing_envelope = {
             "success": True,
             "message": "ok",
-            "price_kind": "aggregator_reference",
-            "notice": "aggregator list prices (models.dev / openrouter); NOT vendor official list prices",
+            "price_kind": "mixed",
+            "notice": (
+                "vendor official list prices (pricing.official.json) win; "
+                "aggregator reference rows only fill models without an official entry"
+            ),
             "currency": "USD",
             "unit": "per_1m_tokens",
             "sources": source_names,
@@ -297,7 +302,13 @@ def main(argv=None):
         pricing_text = dump_envelope(pricing_envelope, rows)
         pending.append((pricing_path, pricing_text))
         if not args.quiet:
-            print("prices: %d rows" % len(rows))
+            official_count = sum(
+                1 for row in rows if row.get("price_kind") == "vendor_official"
+            )
+            print(
+                "prices: %d rows (%d vendor official, %d aggregator)"
+                % (len(rows), official_count, len(rows) - official_count)
+            )
 
     changed = []
     for path, text in pending:

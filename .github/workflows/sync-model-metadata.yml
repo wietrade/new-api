@@ -109,7 +109,7 @@ jobs:
 
           请 review：
           - metadata/api/newapi/models.json：上下文、最大输出、模态、能力的刷新；新增模型需确认后再合并。
-          - metadata/api/newapi/pricing.json：价格为参考价快照（聚合源，非厂商官方牌价），合并本 PR 不会自动改价。
+          - metadata/api/newapi/pricing.json：价格为参考价快照：有官方条目的模型用厂商牌价（`price_kind: vendor_official`），其余才是聚合源（`aggregator_reference`）；合并本 PR 不会自动改价。
 
           合并后到后台「同步资料」预览并应用，才会写入模型库。
           BODY

@@ -100,7 +100,35 @@ openrouter（tie-break）  ┘
   - `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`（约 12h 缓存）
 - `api/newapi/pricing.json` 只是价格快照，**不参与** new-api 自动写库；后台能直接写库的仍是“上游倍率预设”与“models.dev 价格预设”两个虚拟渠道。
 - 每日 02:17 UTC 的 GitHub Actions 会自动跑一遍并开 PR；合并前请重点看新增模型与价格涨跌。
+## 价格文件
 
+| 文件 | 内容 | 维护方式 |
+|:---|:---|:---|
+| `api/newapi/pricing.official.json` | 厂商官方定价页抄录，`price_kind: vendor_official`，逐条带 `source_url` 与 `quote` | 人工（官方页核对后导入） |
+| `api/newapi/pricing.json` | 每个已发布模型当前采用的列表价，逐条 `price_kind` 标明来源 | `scripts/model_sync` 生成 |
+
+优先级：**官方 > 聚合源**。官方有条目的模型一律用官方价；聚合源（models.dev / OpenRouter）
+只补官方未覆盖的模型。这样「某个转售商的最低报价」不会在无人察觉时替掉厂商牌价。
+
+字段语义（schema v2，USD / 每 1M tokens）：
+
+| 字段 | 含义 |
+|:---|:---|
+| `input` / `output` | 基础价（未达第一个档位阈值时的价） |
+| `output_text` / `output_image` | 文本 / 图像输出价；仅当与 `output` 不同才填（图像模型必填） |
+| `cache_read` / `cache_write` | 缓存读 / 5 分钟缓存写入 |
+| `cache_write_1h` | 1 小时缓存写入（Anthropic 等有 TTL 分档的厂商） |
+| `tiers[]` | 阈值触发的覆盖价：输入达到 `prompt_tokens_at_least` 时，整条请求按该档计价 |
+| `effective_from` / `effective_to` | 该价格的有效期（`YYYY-MM-DD`），长期价写 `null` |
+| `upcoming[]` | 已公布但尚未生效的价格（如 `gemini-4-argon` 2026-12-01 涨价） |
+| `per_image` | 按张计价，与 token 价并存，仅供展示参考 |
+| `confidence` / `quote` | 抄录置信度与官方原文片段，用于复核 |
+
+> `tiers` **不是「第 0 档」**：基础价是阈值以下的价，`tiers[i]` 是「达到阈值之后」的价。
+> 例：`claude-haiku-5.5` 基础 `input: 0.1`，`tiers[0] = {prompt_tokens_at_least: 100000, input: 0.5}`。
+
+> `unresolved[]` 记录官方提到但未给出具体数值的项（例：`gpt-5.5` 高档缓存价未明确），
+> 这些字段一律留 `null`，不得按倍率推算填入。
 ## 原始第三方快照（metadata/raw/）
 
 `raw/` 存放**未合并**的第三方抓取快照，供人工比对后决定是否并入 `api/newapi/models.json`：

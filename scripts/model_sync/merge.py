@@ -15,6 +15,8 @@ Merge policy (deliberate, keeps hand-maintained content alive):
 
 from __future__ import annotations
 
+import json
+
 from .normalize import CAPABILITY_ORDER, normalize_key
 
 MODALITY_ORDER = ("text", "image", "file", "audio", "video")
@@ -373,20 +375,95 @@ def merge_metadata(existing, index, allow_new=False, min_release_date="",
     return existing, changes, added, ambiguous, missing, tie_broken
 
 
-def price_records(existing, index):
-    """Build the pricing.json rows for models we actually publish."""
+def load_official_prices(path):
+    """Read ``pricing.official.json`` into ``{normalized_key: row}``.
+
+    The file is optional: without it the merge behaves exactly as before and
+    ``pricing.json`` stays an aggregator-only snapshot.
+    """
+    try:
+        with open(path, encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except FileNotFoundError:
+        return {}
+    prices = {}
+    for row in payload.get("data") or []:
+        name = str(row.get("model_name") or "").strip()
+        if name:
+            prices[normalize_key(name)] = row
+    return prices
+
+
+OFFICIAL_PRICE_FIELDS = (
+    "input",
+    "output",
+    "output_text",
+    "output_image",
+    "cache_read",
+    "cache_write",
+    "cache_write_1h",
+    "per_image",
+    "tiers",
+    "effective_from",
+    "effective_to",
+    "upcoming",
+)
+
+
+def official_price_row(record, official):
+    """Turn one ``pricing.official.json`` row into a ``pricing.json`` row."""
+    name = str(record.get("model_name", ""))
+    row = {
+        "model_name": name,
+        "vendor_name": record.get("vendor_name") or official.get("vendor_name") or "",
+        "price_kind": "vendor_official",
+        "source_kind": official.get("source_kind") or "official_doc",
+        "source": "vendor_official",
+        "source_model_id": official.get("model_name") or name,
+        "currency": "USD",
+        "unit": "per_1m_tokens",
+    }
+    for key in ("source_url", "retrieved_at", "confidence"):
+        value = official.get(key)
+        if value:
+            row[key] = value
+    for field in OFFICIAL_PRICE_FIELDS:
+        value = official.get(field)
+        if value is not None:
+            row[field] = value
+    return row
+
+
+def price_records(existing, index, official=None):
+    """Build the pricing.json rows for models we actually publish.
+
+    Vendor official list prices win over aggregator rows: a reseller price must
+    never silently replace the published list price. Models without an official
+    entry keep the aggregator reference price, so coverage stays complete and
+    every row still says where its number came from (``price_kind``).
+
+    One row per **published model name**: aliases (``claude-haiku-5.5`` vs
+    ``claude-haiku-5-5``) each get their own row, because price lookup is by
+    exact model id.
+    """
+    official = official or {}
     rows = []
     seen = set()
     for record in existing:
         name = str(record.get("model_name", ""))
         key = normalize_key(name)
-        if key in seen:
+        if name in seen:
+            continue
+        listed = official.get(key)
+        if listed is not None:
+            seen.add(name)
+            rows.append(official_price_row(record, listed))
             continue
         candidates = index.get(key) or []
         model = pick_incoming(candidates, name)
         if model is None or not model.price:
             continue
-        seen.add(key)
+        seen.add(name)
         row = {
             "model_name": name,
             "vendor_name": record.get("vendor_name") or model.vendor_name,

@@ -162,6 +162,68 @@ class MergeTest(unittest.TestCase):
         self.assertEqual(rows[0]["input"], 1.0)
         self.assertNotIn("cache_write", rows[0])
 
+    def test_official_price_beats_aggregator(self):
+        """A reseller price must never replace the vendor list price."""
+        index, _ = merge.index_incoming(
+            [source("claude-haiku-4-5", price={"input": 0.6, "output": 3.0})]
+        )
+        official = {
+            normalize_key("claude-haiku-4-5-20251001"): {
+                "model_name": "claude-haiku-4-5-20251001",
+                "vendor_name": "Anthropic",
+                "source_kind": "official_doc",
+                "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
+                "input": 1.0,
+                "output": 5.0,
+                "cache_read": 0.1,
+                "cache_write": 1.25,
+                "cache_write_1h": 2.0,
+                "tiers": None,
+            }
+        }
+        rows = merge.price_records(self.existing, index, official)
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row["price_kind"], "vendor_official")
+        self.assertEqual(row["source_kind"], "official_doc")
+        self.assertEqual(row["input"], 1.0)
+        self.assertEqual(row["output"], 5.0)
+        self.assertEqual(row["cache_write_1h"], 2.0)
+        self.assertNotIn("tiers", row)  # null values are dropped
+
+    def test_official_price_fills_model_without_aggregator(self):
+        """Models the aggregators miss still get a row from the official file."""
+        index, _ = merge.index_incoming([])
+        official = {
+            normalize_key("claude-haiku-4-5-20251001"): {
+                "model_name": "claude-haiku-4-5-20251001",
+                "input": 1.0,
+                "output": 5.0,
+            }
+        }
+        rows = merge.price_records(self.existing, index, official)
+        self.assertEqual([row["model_name"] for row in rows], ["claude-haiku-4-5-20251001"])
+
+    def test_aliases_each_get_a_price_row(self):
+        """Price lookup is by exact model id, so every published alias needs a row."""
+        existing = list(self.existing) + [
+            {**self.existing[0], "model_name": "claude-haiku-4.5"}
+        ]
+        index, _ = merge.index_incoming([])
+        official = {
+            normalize_key("claude-haiku-4-5-20251001"): {
+                "model_name": "claude-haiku-4-5-20251001",
+                "input": 1.0,
+                "output": 5.0,
+            }
+        }
+        rows = merge.price_records(existing, index, official)
+        self.assertEqual(len(rows), 2)
+        self.assertTrue(all(row["price_kind"] == "vendor_official" for row in rows))
+
+    def test_load_official_prices_missing_file_is_empty(self):
+        self.assertEqual(merge.load_official_prices("/nonexistent/pricing.official.json"), {})
+
     def test_exact_name_wins_over_source_priority(self):
         """ollama-hosted and official rows share a key; the exact id must win."""
         index, _ = merge.index_incoming(
