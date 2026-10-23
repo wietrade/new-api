@@ -45,6 +45,7 @@ CAPABILITY_ORDER = (
     "chat",
     "reasoning",
     "tools",
+    "structured_output",
     "vision",
     "files",
     "audio",
@@ -54,11 +55,21 @@ CAPABILITY_ORDER = (
     "rerank",
     "web_search",
     "code_interpreter",
+    "cache_implicit",
+    "cache_explicit",
 )
 
 # capabilities that must live in `capabilities[]`; the rest are derived from
 # modalities and therefore deliberately not duplicated (see metadata/README.md).
-CAPABILITIES_FROM_FLAGS = ("reasoning", "tools", "web_search", "code_interpreter")
+CAPABILITIES_FROM_FLAGS = (
+    "reasoning",
+    "tools",
+    "structured_output",
+    "web_search",
+    "code_interpreter",
+    "cache_implicit",
+    "cache_explicit",
+)
 
 MODALITY_ALIASES = {
     "text": "text",
@@ -136,8 +147,18 @@ def capabilities_from_flags(model, family=""):
         caps.add("reasoning")
     if model.get("tool_call") or model.get("tools") or model.get("function_calling"):
         caps.add("tools")
+    if (
+        model.get("structured_output")
+        or model.get("structured_outputs")
+        or model.get("response_format")
+    ):
+        caps.add("structured_output")
     if model.get("web_search"):
         caps.add("web_search")
+    if model.get("cache_read") or model.get("cache_implicit"):
+        caps.add("cache_implicit")
+    if model.get("cache_write") or model.get("cache_explicit"):
+        caps.add("cache_explicit")
     if model.get("code_interpreter"):
         caps.add("code_interpreter")
 

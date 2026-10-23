@@ -122,6 +122,7 @@ export const MODEL_CAPABILITIES = {
   CHAT: 'chat',
   REASONING: 'reasoning',
   TOOLS: 'tools',
+  STRUCTURED_OUTPUT: 'structured_output',
   VISION: 'vision',
   FILES: 'files',
   AUDIO: 'audio',
@@ -131,6 +132,8 @@ export const MODEL_CAPABILITIES = {
   RERANK: 'rerank',
   WEB_SEARCH: 'web_search',
   CODE_INTERPRETER: 'code_interpreter',
+  CACHE_IMPLICIT: 'cache_implicit',
+  CACHE_EXPLICIT: 'cache_explicit',
 } as const
 
 export type ModelCapabilityKey =
@@ -141,6 +144,7 @@ export const MODEL_CAPABILITY_ORDER: ModelCapabilityKey[] = [
   MODEL_CAPABILITIES.CHAT,
   MODEL_CAPABILITIES.REASONING,
   MODEL_CAPABILITIES.TOOLS,
+  MODEL_CAPABILITIES.STRUCTURED_OUTPUT,
   MODEL_CAPABILITIES.VISION,
   MODEL_CAPABILITIES.FILES,
   MODEL_CAPABILITIES.IMAGE_GENERATION,
@@ -150,6 +154,8 @@ export const MODEL_CAPABILITY_ORDER: ModelCapabilityKey[] = [
   MODEL_CAPABILITIES.AUDIO,
   MODEL_CAPABILITIES.WEB_SEARCH,
   MODEL_CAPABILITIES.CODE_INTERPRETER,
+  MODEL_CAPABILITIES.CACHE_IMPLICIT,
+  MODEL_CAPABILITIES.CACHE_EXPLICIT,
 ]
 
 const CAPABILITY_LABEL_KEYS: Record<ModelCapabilityKey, string> = {
@@ -165,6 +171,9 @@ const CAPABILITY_LABEL_KEYS: Record<ModelCapabilityKey, string> = {
   [MODEL_CAPABILITIES.RERANK]: 'Rerank',
   [MODEL_CAPABILITIES.WEB_SEARCH]: 'Web Search',
   [MODEL_CAPABILITIES.CODE_INTERPRETER]: 'Code Interpreter',
+  [MODEL_CAPABILITIES.STRUCTURED_OUTPUT]: 'Structured Output',
+  [MODEL_CAPABILITIES.CACHE_IMPLICIT]: 'Implicit Caching',
+  [MODEL_CAPABILITIES.CACHE_EXPLICIT]: 'Explicit Caching',
 }
 
 /** Localized label for a capability key; unknown keys pass through unchanged. */

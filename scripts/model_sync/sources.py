@@ -231,7 +231,15 @@ def fetch_openrouter(vendors, timeout=30):
                         "reasoning": "reasoning" in params
                         or bool(item.get("reasoning")),
                         "tools": "tools" in params or "tool_choice" in params,
-                        "web_search": "web_search" in params,
+                        "structured_output": bool(
+                            {"structured_outputs", "response_format"} & params
+                        ),
+                        # A published per-token price means the vendor bills
+                        # cache reads/writes, i.e. the feature is supported.
+                        "web_search": "web_search" in params
+                        or bool(pricing.get("web_search")),
+                        "cache_read": bool(pricing.get("input_cache_read")),
+                        "cache_write": bool(pricing.get("input_cache_write")),
                     },
                     item.get("id") or "",
                 ),

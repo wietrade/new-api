@@ -42,18 +42,21 @@ var MetadataSyncFields = []string{"description", "icon", "capabilities", "input_
 // MetadataCapabilityVocabulary is the closed set of structured capability keys.
 // Keep it in sync with web/src/features/pricing/constants.ts (MODEL_CAPABILITIES).
 var MetadataCapabilityVocabulary = map[string]bool{
-	"chat":             true,
-	"reasoning":        true,
-	"tools":            true,
-	"vision":           true,
-	"files":            true,
-	"audio":            true,
-	"image_generation": true,
-	"video_generation": true,
-	"embedding":        true,
-	"rerank":           true,
-	"web_search":       true,
-	"code_interpreter": true,
+	"chat":              true,
+	"reasoning":         true,
+	"tools":             true,
+	"structured_output": true,
+	"vision":            true,
+	"files":             true,
+	"audio":             true,
+	"image_generation":  true,
+	"video_generation":  true,
+	"embedding":         true,
+	"rerank":            true,
+	"web_search":        true,
+	"code_interpreter":  true,
+	"cache_implicit":    true,
+	"cache_explicit":    true,
 }
 
 // upstreamTagCapabilities maps upstream metadata tags onto the closed
