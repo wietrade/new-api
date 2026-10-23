@@ -29,6 +29,22 @@ import { requireServerSuccess } from '@/lib/server-error-message'
 
 import { getAboutContent } from './api'
 
+/**
+ * 后台「关于」内容若配置成本站文档站地址（/docs/...），转成内嵌壳路径。
+ * 直接放 sandbox iframe 会因缺少 allow-same-origin 触发 CORS，脚本与字体全部加载失败。
+ */
+function toEmbeddedDocsPath(raw: string): string | null {
+  try {
+    const url = new URL(raw, window.location.origin)
+    if (url.origin !== window.location.origin) return null
+    const matched = url.pathname.match(/^\/docs(?:\/(.*))?$/)
+    if (!matched) return null
+    return (matched[1] ?? '') + url.hash
+  } catch {
+    return null
+  }
+}
+
 function EmptyAboutState() {
   const { t } = useTranslation()
   const currentYear = new Date().getFullYear()
@@ -143,14 +159,31 @@ export function About() {
     return <DocsEmbed path='about.html' />
   }
 
+  const embeddedDocsPath = isUrl ? toEmbeddedDocsPath(rawContent) : null
+  if (embeddedDocsPath !== null) {
+    return <DocsEmbed path={embeddedDocsPath} />
+  }
+
   if (isUrl) {
+    const sameOrigin = (() => {
+      try {
+        return new URL(rawContent, window.location.origin).origin === window.location.origin
+      } catch {
+        return false
+      }
+    })()
+
     return (
       <PublicLayout showMainContainer={false}>
         <iframe
           src={rawContent}
           className='h-[calc(100vh-3.5rem)] w-full border-0'
           title={t('About')}
-          sandbox='allow-forms allow-popups allow-popups-to-escape-sandbox allow-scripts'
+          sandbox={
+            sameOrigin
+              ? 'allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts'
+              : 'allow-forms allow-popups allow-popups-to-escape-sandbox allow-scripts'
+          }
         />
       </PublicLayout>
     )
