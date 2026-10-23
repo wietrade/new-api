@@ -123,26 +123,41 @@
   background-color: #fff !important;
 }
 
-/* ── 嵌入模式（?embed=1）：主站 iframe 内使用，隐藏本站导航与页脚 ── */
+/* ── 嵌入模式（?embed=1）：主站 iframe 内使用 ──
+   保留左侧导航与右侧目录，只隐藏会与主站重复的顶部导航 / 页脚 */
 html.embed .VPNav,
-html.embed .VPSidebar,
 html.embed .VPLocalNav,
 html.embed .VPFooter,
-html.embed .VPDocFooter,
-html.embed .VPDocAside {
+html.embed .VPDocFooter {
   display: none !important;
+}
+
+/* 顶部导航隐藏后，固定定位的侧边栏要贴顶 */
+html.embed .VPSidebar {
+  top: 0 !important;
+  height: 100vh !important;
+  padding-top: 24px !important;
 }
 
 html.embed .VPContent {
   padding-top: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
 }
 
 html.embed .VPDoc {
-  padding: 24px 0 48px !important;
+  padding: 32px 24px 48px 32px !important;
 }
 
 html.embed .VPDoc .container {
-  max-width: 880px;
+  max-width: 100% !important;
 }
+
+/* 窄屏（主站 iframe 高度有限）仍收起侧边栏，避免挤压正文 */
+@media (max-width: 960px) {
+  html.embed .VPSidebar {
+    display: none !important;
+  }
+  html.embed .VPContent.has-sidebar {
+    padding-left: 0 !important;
+  }
+}
+
