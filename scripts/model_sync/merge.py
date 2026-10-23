@@ -404,6 +404,7 @@ OFFICIAL_PRICE_FIELDS = (
     "cache_read_image",
     "cache_write",
     "cache_write_1h",
+    "cache_write_12h",
     "per_image",
     "tiers",
     "meters",

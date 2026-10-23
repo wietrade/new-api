@@ -959,7 +959,90 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "chatgpt-image-latest | Image | $8.00 | $32.00 | $2.00；chatgpt-image-latest | Text | $5.00 | $10.00 | $1.25",
-      "notes": "按模态分别计价：图像输入 $8、图像输出 $32、图像缓存读 $2；文本输入 $5、文本输出 $10、文本缓存读 $1.25。Batch 为 Standard 的 50%。input/output 记文本侧为基准，图像侧见 input_image/output_image。"
+      "notes": "按模态分别计价：图像输入 $8、图像输出 $32、图像缓存读 $2；文本输入 $5、文本输出 $10、文本缓存读 $1.25。Batch 为 Standard 的 50%。input/output 记文本侧为基准，图像侧见 input_image/output_image。 Token 价与按张价并存：Responses/图像 token 按 token 计，Images API 按上图质量×尺寸的单张价计费，两者各自官方原文，不互相推导。",
+      "meters": [
+        {
+          "dim": "output_image",
+          "price": 0.009,
+          "unit": "image",
+          "when": {
+            "quality": "low",
+            "size": "1024x1024"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.013,
+          "unit": "image",
+          "when": {
+            "quality": "low",
+            "size": "1024x1536"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.013,
+          "unit": "image",
+          "when": {
+            "quality": "low",
+            "size": "1536x1024"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.034,
+          "unit": "image",
+          "when": {
+            "quality": "medium",
+            "size": "1024x1024"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.05,
+          "unit": "image",
+          "when": {
+            "quality": "medium",
+            "size": "1024x1536"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.05,
+          "unit": "image",
+          "when": {
+            "quality": "medium",
+            "size": "1536x1024"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.133,
+          "unit": "image",
+          "when": {
+            "quality": "high",
+            "size": "1024x1024"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.2,
+          "unit": "image",
+          "when": {
+            "quality": "high",
+            "size": "1024x1536"
+          }
+        },
+        {
+          "dim": "output_image",
+          "price": 0.2,
+          "unit": "image",
+          "when": {
+            "quality": "high",
+            "size": "1536x1024"
+          }
+        }
+      ]
     },
     {
       "model_name": "gpt-5.4",
@@ -1062,7 +1145,8 @@
           "output_image": null,
           "cache_read": 0.04,
           "cache_write": 0.5,
-          "cache_write_1h": null
+          "cache_write_1h": null,
+          "cache_write_12h": 1.0
         }
       ],
       "effective_from": null,
@@ -1070,7 +1154,8 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "Prompts with >272K input tokens are priced at 2x input and 1.5x output for the full request.",
-      "notes": "Input $0.2 / Output $1.2 / Cached $0.02；cache_write=1.25x input=$0.25。 高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。"
+      "notes": "Input $0.2 / Output $1.2 / Cached $0.02；cache_write=1.25x input=$0.25。 高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。 12h 缓存写入价来自官方 pricing 合并表；本地计费引擎目前只有 30m(CC) 与 1h(CC1h) 两个缓存桶。",
+      "cache_write_12h": 0.5
     },
     {
       "model_name": "gpt-5.6-sol",
@@ -1099,7 +1184,8 @@
           "output_image": null,
           "cache_read": 0.8,
           "cache_write": 10.0,
-          "cache_write_1h": null
+          "cache_write_1h": null,
+          "cache_write_12h": 20.0
         }
       ],
       "effective_from": null,
@@ -1107,7 +1193,8 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "Prompts with >272K input tokens are priced at 2x input and 1.5x output for the full request.",
-      "notes": "Input $4 / Output $20 / Cached $0.4；cache_write=1.25x input=$5.0（页内注明 Cache writes billed at 1.25x）。promo 价至少持续到 2026-11-21。 promo 价至少持续到 2026-11-21，到期后按官方页重新确认。高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。"
+      "notes": "Input $4 / Output $20 / Cached $0.4；cache_write=1.25x input=$5.0（页内注明 Cache writes billed at 1.25x）。promo 价至少持续到 2026-11-21。 promo 价至少持续到 2026-11-21，到期后按官方页重新确认。高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。 12h 缓存写入价来自官方 pricing 合并表；本地计费引擎目前只有 30m(CC) 与 1h(CC1h) 两个缓存桶。",
+      "cache_write_12h": 10.0
     },
     {
       "model_name": "gpt-5.6-terra",
@@ -1127,13 +1214,26 @@
       "cache_write_1h": null,
       "per_image": null,
       "batch_discount": null,
-      "tiers": null,
+      "tiers": [
+        {
+          "prompt_tokens_at_least": 272000,
+          "input": 4.0,
+          "output": 18.0,
+          "output_text": null,
+          "output_image": null,
+          "cache_read": 0.4,
+          "cache_write": 5.0,
+          "cache_write_1h": null,
+          "cache_write_12h": 10.0
+        }
+      ],
       "effective_from": null,
       "effective_to": null,
       "upcoming": null,
       "confidence": "high",
       "quote": null,
-      "notes": "Input $2 / Output $12 / Cached $0.2；cache_write=1.25x input=$2.5。"
+      "notes": "Input $2 / Output $12 / Cached $0.2；cache_write=1.25x input=$2.5。 12h 缓存写入价来自官方 pricing 合并表；本地计费引擎目前只有 30m(CC) 与 1h(CC1h) 两个缓存桶。",
+      "cache_write_12h": 5.0
     },
     {
       "model_name": "gpt-6-astra",
@@ -1162,7 +1262,8 @@
           "output_image": null,
           "cache_read": 2.0,
           "cache_write": 25.0,
-          "cache_write_1h": null
+          "cache_write_1h": null,
+          "cache_write_12h": 50.0
         }
       ],
       "effective_from": null,
@@ -1170,7 +1271,8 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "Prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the full request.",
-      "notes": "Input $10 / Output $50 / Cached $1 / Cache writes $12.5；Batch/Flex 50%。>272K 输入 2x/1.5x。"
+      "notes": "Input $10 / Output $50 / Cached $1 / Cache writes $12.5；Batch/Flex 50%。>272K 输入 2x/1.5x。 12h 缓存写入价来自官方 pricing 合并表；本地计费引擎目前只有 30m(CC) 与 1h(CC1h) 两个缓存桶。",
+      "cache_write_12h": 25.0
     },
     {
       "model_name": "gpt-6-luna",
@@ -1190,13 +1292,26 @@
       "cache_write_1h": null,
       "per_image": null,
       "batch_discount": 0.5,
-      "tiers": null,
+      "tiers": [
+        {
+          "prompt_tokens_at_least": 272000,
+          "input": 0.2,
+          "output": 0.75,
+          "output_text": null,
+          "output_image": null,
+          "cache_read": 0.02,
+          "cache_write": 0.25,
+          "cache_write_1h": null,
+          "cache_write_12h": 0.5
+        }
+      ],
       "effective_from": null,
       "effective_to": null,
       "upcoming": null,
       "confidence": "high",
       "quote": null,
-      "notes": "Input $0.1 / Output $0.5 / Cached $0.01 / Cache writes $0.125；Cached=10% input；Batch/Flex 50%。"
+      "notes": "Input $0.1 / Output $0.5 / Cached $0.01 / Cache writes $0.125；Cached=10% input；Batch/Flex 50%。 12h 缓存写入价来自官方 pricing 合并表；本地计费引擎目前只有 30m(CC) 与 1h(CC1h) 两个缓存桶。",
+      "cache_write_12h": 0.25
     },
     {
       "model_name": "gpt-6-sol",
@@ -1225,7 +1340,8 @@
           "output_image": null,
           "cache_read": 0.4,
           "cache_write": 5.0,
-          "cache_write_1h": null
+          "cache_write_1h": null,
+          "cache_write_12h": 10.0
         }
       ],
       "effective_from": null,
@@ -1233,7 +1349,8 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "Prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the full request.",
-      "notes": "Input $2 / Output $10 / Cached $0.2 / Cache writes $2.5；Cached=10% input；Batch/Flex 50%。"
+      "notes": "Input $2 / Output $10 / Cached $0.2 / Cache writes $2.5；Cached=10% input；Batch/Flex 50%。 12h 缓存写入价来自官方 pricing 合并表；本地计费引擎目前只有 30m(CC) 与 1h(CC1h) 两个缓存桶。",
+      "cache_write_12h": 5.0
     },
     {
       "model_name": "gpt-6.1-sol",
@@ -1253,13 +1370,26 @@
       "cache_write_1h": null,
       "per_image": null,
       "batch_discount": 0.5,
-      "tiers": null,
+      "tiers": [
+        {
+          "prompt_tokens_at_least": 272000,
+          "input": 4.0,
+          "output": 15.0,
+          "output_text": null,
+          "output_image": null,
+          "cache_read": 0.2,
+          "cache_write": 5.0,
+          "cache_write_1h": null,
+          "cache_write_12h": 10.0
+        }
+      ],
       "effective_from": null,
       "effective_to": null,
       "upcoming": null,
       "confidence": "high",
       "quote": null,
-      "notes": "Input $2 / Output $10 / Cached $0.1(5%) / Cache writes $2.5；Batch/Flex 50% lower；Ultrafast 6x。"
+      "notes": "Input $2 / Output $10 / Cached $0.1(5%) / Cache writes $2.5；Batch/Flex 50% lower；Ultrafast 6x。 12h 缓存写入价来自官方 pricing 合并表；本地计费引擎目前只有 30m(CC) 与 1h(CC1h) 两个缓存桶。",
+      "cache_write_12h": 5.0
     },
     {
       "model_name": "qwen3.8-flash",

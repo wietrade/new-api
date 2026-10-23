@@ -121,6 +121,7 @@ openrouter（tie-break）  ┘
 | `output_text` / `output_image` | 文本 / 图像输出价；仅当与 `output` 不同才填（图像模型必填） |
 | `cache_read` / `cache_write` | 缓存读 / 5 分钟缓存写入 |
 | `cache_write_1h` | 1 小时缓存写入（Anthropic 等有 TTL 分档的厂商） |
+| `cache_write_12h` | 12 小时缓存写入（OpenAI `prompt_cache_retention`）；计费引擎目前只有 30m/1h 两个缓存桶，此字段仅作参考 |
 | `tiers[]` | 阈值触发的覆盖价：输入达到 `prompt_tokens_at_least` 时，整条请求按该档计价 |
 | `effective_from` / `effective_to` | 该价格的有效期（`YYYY-MM-DD`），长期价写 `null` |
 | `upcoming[]` | 已公布但尚未生效的价格（如 `gemini-4-argon` 2026-12-01 涨价） |

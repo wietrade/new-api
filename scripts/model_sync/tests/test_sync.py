@@ -298,6 +298,28 @@ class MergeTest(unittest.TestCase):
         row = merge.price_records(existing, index, official)[0]
         self.assertEqual(row["meters"], meters)
 
+    def test_official_cache_write_12h_pass_through(self):
+        index, _ = merge.index_incoming([])
+        official = {
+            normalize_key("gpt-6-sol"): {
+                "model_name": "gpt-6-sol",
+                "input": 2.0,
+                "output": 10.0,
+                "cache_write": 2.5,
+                "cache_write_12h": 5.0,
+                "tiers": [{
+                    "prompt_tokens_at_least": 272000,
+                    "input": 4.0, "output": 15.0,
+                    "cache_read": 0.4, "cache_write": 5.0,
+                    "cache_write_12h": 10.0,
+                }],
+            }
+        }
+        existing = [{**self.existing[0], "model_name": "gpt-6-sol"}]
+        row = merge.price_records(existing, index, official)[0]
+        self.assertEqual(row["cache_write_12h"], 5.0)
+        self.assertEqual(row["tiers"][0]["cache_write_12h"], 10.0)
+
     def test_exact_name_wins_over_source_priority(self):
         """ollama-hosted and official rows share a key; the exact id must win."""
         index, _ = merge.index_incoming(
