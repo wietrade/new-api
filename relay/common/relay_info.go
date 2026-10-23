@@ -1140,6 +1140,9 @@ func FailTaskInfo(reason string) *TaskInfo {
 
 // RemoveDisabledFields 从请求 JSON 数据中移除渠道设置中禁用的字段
 // service_tier: 服务层级字段，可能导致额外计费（OpenAI、Claude、Responses API 支持）
+// prompt_cache_retention: OpenAI 扩展缓存保留期（如 24h）；扩展保留期的缓存写入按官方
+// 30m/12h write 档单独计价，而上游 usage 不回报写入 token，本地计费引擎也没有对应缓存桶，
+// 因此默认剥离，避免上游多收而本地仍按普通输入价计费
 // inference_geo: Claude 数据驻留推理区域字段（仅 Claude 支持，默认过滤）
 // speed: Claude 推理速度模式字段（仅 Claude 支持，默认过滤）
 // store: 数据存储授权字段，涉及用户隐私（仅 OpenAI、Responses API 支持，默认允许透传，禁用后可能导致 Codex 无法使用）
@@ -1178,6 +1181,11 @@ func RemoveDisabledFields(jsonData []byte, channelOtherSettings dto.ChannelOther
 		if _, exists := data["speed"]; exists {
 			delete(data, "speed")
 		}
+	}
+
+	// 默认移除 prompt_cache_retention：扩展保留期的缓存写入无法计入本地计费
+	if _, exists := data["prompt_cache_retention"]; exists {
+		delete(data, "prompt_cache_retention")
 	}
 
 	// 默认允许 store 透传，除非明确禁用（禁用可能影响 Codex 使用）
@@ -1227,6 +1235,7 @@ func hasRemovableDisabledField(jsonData []byte, channelOtherSettings dto.Channel
 		"store",
 		"safety_identifier",
 		"stream_options.include_obfuscation",
+		"prompt_cache_retention",
 	)
 
 	return (!channelOtherSettings.AllowServiceTier && values[0].Exists()) ||
@@ -1234,7 +1243,8 @@ func hasRemovableDisabledField(jsonData []byte, channelOtherSettings dto.Channel
 		(!channelOtherSettings.AllowSpeed && values[2].Exists()) ||
 		(channelOtherSettings.DisableStore && values[3].Exists()) ||
 		(!channelOtherSettings.AllowSafetyIdentifier && values[4].Exists()) ||
-		(!channelOtherSettings.AllowIncludeObfuscation && values[5].Exists())
+		(!channelOtherSettings.AllowIncludeObfuscation && values[5].Exists()) ||
+		values[6].Exists()
 }
 
 // RemoveGeminiDisabledFields removes disabled fields from Gemini request JSON data

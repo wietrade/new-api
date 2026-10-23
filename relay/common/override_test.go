@@ -2297,6 +2297,7 @@ func TestRemoveDisabledFieldsDefaultFiltering(t *testing.T) {
 		"cache_control":{"type":"ephemeral"},
 		"safety_identifier":"user-123",
 		"store":true,
+		"prompt_cache_retention":"24h",
 		"stream_options":{"include_obfuscation":false}
 	}`
 	settings := dto.ChannelOtherSettings{}
