@@ -552,7 +552,7 @@
         "text"
       ],
       "context_length": 1048576,
-      "max_output_tokens": 384000,
+      "max_output_tokens": 393216,
       "is_free": false,
       "endpoints": null
     },
@@ -566,11 +566,8 @@
       "tags": "",
       "capabilities": [
         "reasoning",
-        "tools",
-        "structured_output",
-        "web_search",
-        "cache_implicit",
-        "cache_explicit"
+        "image_generation",
+        "web_search"
       ],
       "input_modalities": [
         "text",
@@ -580,7 +577,7 @@
         "text",
         "image"
       ],
-      "context_length": 131072,
+      "context_length": 65536,
       "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null
@@ -595,10 +592,8 @@
       "tags": "",
       "capabilities": [
         "reasoning",
-        "structured_output",
-        "web_search",
-        "cache_implicit",
-        "cache_explicit"
+        "image_generation",
+        "web_search"
       ],
       "input_modalities": [
         "text",
@@ -623,12 +618,14 @@
       "tags": "",
       "capabilities": [
         "reasoning",
-        "structured_output",
+        "image_generation",
         "web_search"
       ],
       "input_modalities": [
         "text",
-        "image"
+        "image",
+        "video",
+        "file"
       ],
       "output_modalities": [
         "text",
@@ -649,19 +646,20 @@
       "tags": "",
       "capabilities": [
         "reasoning",
-        "structured_output",
+        "image_generation",
         "web_search"
       ],
       "input_modalities": [
         "text",
-        "image"
+        "image",
+        "file"
       ],
       "output_modalities": [
         "text",
         "image"
       ],
       "context_length": 65536,
-      "max_output_tokens": 58982,
+      "max_output_tokens": 65536,
       "is_free": false,
       "endpoints": null
     },
@@ -683,14 +681,13 @@
       "input_modalities": [
         "text",
         "image",
-        "video",
-        "file"
+        "video"
       ],
       "output_modalities": [
         "text"
       ],
       "context_length": 1048576,
-      "max_output_tokens": 943718,
+      "max_output_tokens": 1048576,
       "is_free": false,
       "endpoints": null
     },
@@ -713,8 +710,8 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 128000,
-      "max_output_tokens": 16384,
+      "context_length": 262144,
+      "max_output_tokens": 81920,
       "is_free": false,
       "endpoints": null
     },
@@ -862,7 +859,9 @@
       "tags": "推理,工具",
       "capabilities": [
         "reasoning",
-        "tools"
+        "tools",
+        "structured_output",
+        "cache_implicit"
       ],
       "input_modalities": [
         "text",
@@ -872,7 +871,7 @@
         "text"
       ],
       "context_length": 1048576,
-      "max_output_tokens": 943718,
+      "max_output_tokens": 393216,
       "is_free": false,
       "endpoints": null
     },
@@ -928,7 +927,7 @@
         "text"
       ],
       "context_length": 1048576,
-      "max_output_tokens": 943718,
+      "max_output_tokens": 65536,
       "is_free": false,
       "endpoints": null
     },
@@ -948,14 +947,13 @@
       ],
       "input_modalities": [
         "text",
-        "image",
-        "file"
+        "image"
       ],
       "output_modalities": [
         "text"
       ],
       "context_length": 262144,
-      "max_output_tokens": 235929,
+      "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null
     },
@@ -974,14 +972,13 @@
       ],
       "input_modalities": [
         "text",
-        "image",
-        "file"
+        "image"
       ],
       "output_modalities": [
         "text"
       ],
       "context_length": 262144,
-      "max_output_tokens": 16384,
+      "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null
     },
@@ -1059,7 +1056,7 @@
         "text"
       ],
       "context_length": 500000,
-      "max_output_tokens": 450000,
+      "max_output_tokens": 500000,
       "is_free": false,
       "endpoints": null
     },
@@ -1081,8 +1078,7 @@
       "input_modalities": [
         "text",
         "image",
-        "video",
-        "file"
+        "video"
       ],
       "output_modalities": [
         "text"
@@ -1190,7 +1186,7 @@
         "text"
       ],
       "context_length": 1048576,
-      "max_output_tokens": 131072,
+      "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null
     },
@@ -1264,7 +1260,7 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1048576,
+      "context_length": 1000000,
       "max_output_tokens": 524288,
       "is_free": false,
       "endpoints": null
@@ -1287,8 +1283,8 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 131072,
-      "max_output_tokens": 117964,
+      "context_length": 128000,
+      "max_output_tokens": 8192,
       "is_free": false,
       "endpoints": null
     },
