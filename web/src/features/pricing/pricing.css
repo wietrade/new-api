@@ -8,7 +8,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 14px 18px;
+  gap: 12px 14px;
   padding: 16px 0 18px;
   border-bottom: 1px solid var(--border);
 }
@@ -20,9 +20,9 @@
 }
 
 .pricing-page .pf-field.pf-search {
-  flex: 1 1 260px;
-  min-width: 220px;
-  max-width: 420px;
+  flex: 1 1 200px;
+  min-width: 200px;
+  max-width: 320px;
 }
 
 .pricing-page .pf-label {

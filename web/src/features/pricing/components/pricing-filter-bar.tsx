@@ -120,7 +120,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           onChange={props.onVendorChange}
           options={vendorOptions}
           placeholder='全部供应商'
-          width='150px'
+          width='138px'
         />
       </Field>
 
@@ -130,7 +130,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           onChange={props.onModelTypeChange}
           options={MODEL_TYPE_LABELS}
           placeholder='全部类型'
-          width='130px'
+          width='118px'
         />
       </Field>
 
@@ -140,7 +140,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           onChange={props.onInputTypeChange}
           options={INPUT_TYPE_LABELS}
           placeholder='全部输入'
-          width='130px'
+          width='118px'
         />
       </Field>
 
@@ -150,7 +150,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           onChange={props.onContextChange}
           options={CONTEXT_LABELS}
           placeholder='不限'
-          width='140px'
+          width='128px'
         />
       </Field>
 
@@ -160,7 +160,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           onChange={props.onPriceTierChange}
           options={PRICE_TIER_LABELS}
           placeholder='不限'
-          width='110px'
+          width='98px'
         />
       </Field>
 
@@ -170,14 +170,14 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           onChange={props.onGroupChange}
           options={groupOptions}
           placeholder='全部分组'
-          width='130px'
+          width='118px'
         />
       </Field>
 
       <Field label={t('Sort')}>
         <select
           className='pf-select'
-          style={{ width: '180px' }}
+          style={{ width: '156px' }}
           value={props.sortBy}
           onChange={(e) => props.onSortChange(e.target.value)}
         >
