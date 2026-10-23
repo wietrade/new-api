@@ -41,6 +41,11 @@ func RecordRelayResult(ctx context.Context, info *relaycommon.RelayInfo, apiErr 
 	}
 	outcome := ClassifyRelayOutcome(ctx, info, apiErr)
 	if outcome == OutcomeIgnored {
+		stream := info.StreamStatus.OutcomeSnapshot()
+		common.SysLog(fmt.Sprintf(
+			"[perf-debug] ignored model=%q group=%q stream=%v apiErr=%v end=%q resp=%q hasErr=%v rejection=%v ctx=%v",
+			info.OriginModelName, info.UsingGroup, info.IsStream, apiErr, stream.EndReason, stream.Response, stream.HasErrors, info.PerformanceBusinessRejection, ctx.Err(),
+		))
 		return
 	}
 	now := time.Now()
