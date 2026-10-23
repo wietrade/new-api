@@ -6764,7 +6764,6 @@
     "Vendor name is required": "供应商名称不能为空",
     "Vendor updated successfully": "供应商已更新",
     "Vendor:": "供应商：",
-    "Vendors": "供应商",
     "Vendors ranked by aggregated token volume": "厂商按聚合 Token 用量排序",
     "Vendors source": "供应商来源",
     "Vendors still have {{count}} linked model records. Transfer or clear their assignments first.": "供应商仍有关联的 {{count}} 条模型记录，请先转移或清除归属。",
@@ -7396,6 +7395,13 @@
     "© 2025 Your Company. All rights reserved.": "© 2025 您的公司。保留所有权利。",
     "、": "、",
     "，": "，",
-    "，and ": "，并"
+    "，and ": "，并",
+    "Base capabilities": "基础能力",
+    "Output capabilities": "输出能力",
+    "{{modality}} input": "{{modality}}输入",
+    "{{modality}} output": "{{modality}}输出",
+    "Structured Output": "结构化输出",
+    "Implicit Caching": "隐式缓存",
+    "Explicit Caching": "显式缓存"
   }
 }

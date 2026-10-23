@@ -213,6 +213,8 @@ const CAPABILITY_LABEL_KEYS: Record<ModelCapability, string> = {
   image_generation: 'Image generation',
   video_generation: 'Video generation',
   rerank: 'Rerank',
+  cache_implicit: 'Implicit caching',
+  cache_explicit: 'Explicit caching',
 }
 
 const MODALITY_LABEL_KEYS: Record<string, string> = {
@@ -222,6 +224,9 @@ const MODALITY_LABEL_KEYS: Record<string, string> = {
   video: 'Video',
   file: 'File',
 }
+
+/** 生成类能力归到「输出能力」，其余 capabilities 归到「基础能力」 */
+const OUTPUT_CAPABILITIES = new Set(['image_generation', 'video_generation'])
 
 const TOKEN_FORMAT = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 1,
@@ -476,9 +481,31 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
   const endpoints = normalizeCatalogItems(model.supported_endpoint_types)
   // 能力来自官方元数据（同步时写入 capabilities）；标签是站点自定义，不参与同步。
   const capabilities = normalizeCatalogItems(model.capabilities)
-  const capabilityLabels = capabilities.map((capability) =>
-    t(CAPABILITY_LABEL_KEYS[capability as ModelCapability] ?? capability)
-  )
+  const inputModalities = normalizeCatalogItems(model.input_modalities)
+  const outputModalities = normalizeCatalogItems(model.output_modalities)
+  const modalityLabel = (key: string) => t(MODALITY_LABEL_KEYS[key] ?? key)
+  // 基础能力 = 能接受的输入 + 功能特性（推理/工具/结构化输出/缓存…）
+  const baseCapabilityLabels = [
+    ...inputModalities.map((item) =>
+      t('{{modality}} input', { modality: modalityLabel(item) })
+    ),
+    ...capabilities
+      .filter((capability) => !OUTPUT_CAPABILITIES.has(capability))
+      .map((capability) =>
+        t(CAPABILITY_LABEL_KEYS[capability as ModelCapability] ?? capability)
+      ),
+  ]
+  // 输出能力 = 能产出的模态 + 生成类特性
+  const outputCapabilityLabels = [
+    ...outputModalities.map((item) =>
+      t('{{modality}} output', { modality: modalityLabel(item) })
+    ),
+    ...capabilities
+      .filter((capability) => OUTPUT_CAPABILITIES.has(capability))
+      .map((capability) =>
+        t(CAPABILITY_LABEL_KEYS[capability as ModelCapability] ?? capability)
+      ),
+  ]
   const tags = parseTags(model.tags)
   const cells: React.ReactNode[] = []
 
@@ -490,10 +517,18 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
     )
   }
 
-  if (capabilityLabels.length > 0) {
+  if (baseCapabilityLabels.length > 0) {
     cells.push(
-      <CatalogSpecRow key='capabilities' label={t('Capabilities')}>
-        <CatalogPillList items={capabilityLabels} />
+      <CatalogSpecRow key='capabilities' label={t('Base capabilities')}>
+        <CatalogPillList items={baseCapabilityLabels} />
+      </CatalogSpecRow>
+    )
+  }
+
+  if (outputCapabilityLabels.length > 0) {
+    cells.push(
+      <CatalogSpecRow key='output-capabilities' label={t('Output capabilities')}>
+        <CatalogPillList items={outputCapabilityLabels} />
       </CatalogSpecRow>
     )
   }

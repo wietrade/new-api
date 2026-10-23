@@ -6764,7 +6764,6 @@
     "Vendor name is required": "Vendor name is required",
     "Vendor updated successfully": "Vendor updated successfully",
     "Vendor:": "Vendor:",
-    "Vendors": "Vendors",
     "Vendors ranked by aggregated token volume": "Vendors ranked by aggregated token volume",
     "Vendors source": "Vendors source",
     "Vendors still have {{count}} linked model records. Transfer or clear their assignments first.": "Vendors still have {{count}} linked model records. Transfer or clear their assignments first.",
@@ -7396,6 +7395,13 @@
     "© 2025 Your Company. All rights reserved.": "© 2025 Your Company. All rights reserved.",
     "、": ", ",
     "，": ", ",
-    "，and ": ", and "
+    "，and ": ", and ",
+    "Base capabilities": "Base capabilities",
+    "Output capabilities": "Output capabilities",
+    "{{modality}} input": "{{modality}} input",
+    "{{modality}} output": "{{modality}} output",
+    "Structured Output": "Structured Output",
+    "Implicit Caching": "Implicit Caching",
+    "Explicit Caching": "Explicit Caching"
   }
 }
