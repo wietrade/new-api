@@ -5990,6 +5990,8 @@
     "Stripe product price ID": "ID цены продукта Stripe",
     "Stripe/Creem requires creating products on the third-party platform and entering the ID": "Stripe/Creem требует создания продуктов на сторонней платформе и ввода ID",
     "Structured output": "Структурированный вывод",
+    "Explicit caching": "Явное кеширование",
+    "Implicit caching": "Неявное кеширование",
     "Submit": "Отправить",
     "Submit directly": "Отправить напрямую",
     "Submit request": "Отправить запрос",

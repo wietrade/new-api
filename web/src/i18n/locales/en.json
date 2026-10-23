@@ -5734,6 +5734,8 @@
     "Stripe/Creem requires creating products on the third-party platform and entering the ID": "Stripe/Creem requires creating products on the third-party platform and entering the ID",
     "StripePriceId is not configured for this plan": "StripePriceId is not configured for this plan",
     "Structured output": "Structured output",
+    "Explicit caching": "Explicit caching",
+    "Implicit caching": "Implicit caching",
     "Submit": "Submit",
     "Submit Result": "Submit Result",
     "Submit Time": "Submit Time",
