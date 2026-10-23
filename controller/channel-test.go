@@ -40,6 +40,20 @@ type testResult struct {
 	context     *gin.Context
 	localErr    error
 	newAPIError *types.NewAPIError
+	latencyMs   int64
+}
+
+// testChannelOptions 调整 testChannel 的副作用，供后台探针（延迟采样）复用。
+type testChannelOptions struct {
+	// silent 为 true 时不打印响应日志、不写消费日志，也跳过配额结算。
+	silent bool
+}
+
+func resolveTestChannelOptions(opts []testChannelOptions) testChannelOptions {
+	if len(opts) == 0 {
+		return testChannelOptions{}
+	}
+	return opts[0]
 }
 
 func normalizeChannelTestEndpoint(channel *model.Channel, endpointType string) string {
@@ -70,10 +84,11 @@ func resolveChannelTestUserID(c *gin.Context) (int, error) {
 	return rootUser.Id, nil
 }
 
-func testChannel(ctx context.Context, channel *model.Channel, testUserID int, testModel string, endpointType string, isStream bool) testResult {
+func testChannel(ctx context.Context, channel *model.Channel, testUserID int, testModel string, endpointType string, isStream bool, opts ...testChannelOptions) testResult {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	options := resolveTestChannelOptions(opts)
 	tik := time.Now()
 	var unsupportedTestChannelTypes = []int{
 		constant.ChannelTypeMidjourney,
@@ -293,7 +308,9 @@ func testChannel(ctx context.Context, channel *model.Channel, testUserID int, te
 	//// 创建一个用于日志的 info 副本，移除 ApiKey
 	//logInfo := info
 	//logInfo.ApiKey = ""
-	common.SysLog(common.LogText("testing channel %d with model %s , info %+v ", channel.Id, testModel, info.ToString()))
+	if !options.silent {
+		common.SysLog(common.LogText("testing channel %d with model %s , info %+v ", channel.Id, testModel, info.ToString()))
+	}
 
 	priceData, err := helper.ModelPriceHelper(c, info, 0, request.GetTokenCountMeta())
 	if err != nil {
@@ -502,6 +519,9 @@ func testChannel(ctx context.Context, channel *model.Channel, testUserID int, te
 	tok := time.Now()
 	milliseconds := tok.Sub(tik).Milliseconds()
 	consumedTime := float64(milliseconds) / 1000.0
+	if options.silent {
+		return testResult{context: c, latencyMs: milliseconds}
+	}
 	other := buildTestLogOther(c, info, priceData, usage, tieredResult)
 	model.RecordConsumeLog(c, testUserID, model.RecordConsumeLogParams{
 		ChannelId:        channel.Id,
@@ -521,6 +541,7 @@ func testChannel(ctx context.Context, channel *model.Channel, testUserID int, te
 		context:     c,
 		localErr:    nil,
 		newAPIError: nil,
+		latencyMs:   milliseconds,
 	}
 }
 

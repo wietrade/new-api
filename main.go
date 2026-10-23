@@ -352,6 +352,9 @@ func InitResources() error {
 
 	perfmetrics.Init()
 
+	// 后台延迟探针：给没有真实流量的模型补实测延迟（受 perf_metrics_setting.probe_enabled 控制）
+	controller.StartPerfProbeLoop()
+
 	// 启动系统监控
 	common.StartSystemMonitor()
 
