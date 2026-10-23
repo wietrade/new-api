@@ -562,8 +562,22 @@ def apply_overrides(records, overrides, changes=None):
     ``overrides.json`` exists so a conflict between aggregators can be settled
     once, with a link to the vendor doc and the date it was checked, instead of
     leaving the field unknown forever.
+
+    ``excluded`` names models that must not be published at all (no vendor
+    price, removed from the catalog). Filtering here, rather than deleting the
+    row by hand, means the next sync cannot bring it back.
     """
     changes = changes if changes is not None else []
+    excluded = {str(name) for name in (overrides or {}).get("excluded") or []}
+    if excluded and records:
+        kept = [r for r in records if str(r.get("model_name", "")) not in excluded]
+        if len(kept) != len(records):
+            changes.extend(
+                {"model": name, "field": None, "from": "present", "to": None, "via": "excluded"}
+                for name in sorted(excluded)
+                if any(str(r.get("model_name", "")) == name for r in records)
+            )
+            records[:] = kept
     by_name = {str(record.get("model_name", "")): record for record in records}
     applied = 0
     missing = []

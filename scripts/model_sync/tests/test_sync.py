@@ -88,6 +88,11 @@ class MergeTest(unittest.TestCase):
             }
         ]
 
+    def test_excluded_model_is_removed(self):
+        records = [{"model_name": "keep"}, {"model_name": "drop"}]
+        merge.apply_overrides(records, {"excluded": ["drop"]}, [])
+        self.assertEqual([record["model_name"] for record in records], ["keep"])
+
     def test_refreshes_factual_fields_only(self):
         index, _ = merge.index_incoming(
             [
