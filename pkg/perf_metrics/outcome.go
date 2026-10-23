@@ -31,6 +31,17 @@ func ClassifyRelayOutcome(ctx context.Context, info *relaycommon.RelayInfo, apiE
 		stream.Response == relaycommon.ResponseOutcomeCompleted &&
 		(stream.EndReason == relaycommon.StreamEndReasonEOF || stream.EndReason == relaycommon.StreamEndReasonDone) &&
 		!stream.HasErrors && info.StreamStatus.EndError == nil
+	// A non-stream relay never records a stream terminal state, but a successful
+	// upstream call is still a finished sample. The client closing the
+	// connection right after reading the body cancels the request context, and
+	// that must not be read as a user abort. Only a relay with no stream end
+	// reason and no recorded error qualifies; a real abort surfaces through
+	// apiErr or a stream end reason and stays ignored below.
+	if !completedNormally && !info.IsStream && apiErr == nil &&
+		stream.EndReason == "" && !stream.HasErrors &&
+		stream.Response != relaycommon.ResponseOutcomeCancelled {
+		completedNormally = true
+	}
 	if ctx != nil && ctx.Err() == context.Canceled && !completedNormally {
 		return OutcomeIgnored
 	}

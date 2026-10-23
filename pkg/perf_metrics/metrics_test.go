@@ -50,6 +50,21 @@ func TestClassifyRelayOutcome(t *testing.T) {
 	assert.Equal(t, OutcomeIgnored, ClassifyRelayOutcome(context.Background(), &relaycommon.RelayInfo{PerformanceBusinessRejection: true}, nil))
 }
 
+// 非流式请求收完响应后连接关闭会让 ctx 变成 Canceled，这条样本仍是成功的模型调用，
+// 不能因为连接关闭就丢弃；真正的中断会通过 apiErr 传进来。
+func TestClassifyRelayOutcomeNonStreamAfterClientDisconnect(t *testing.T) {
+	canceled, cancel := context.WithCancel(context.Background())
+	cancel()
+	assert.Equal(t, OutcomeSuccess, ClassifyRelayOutcome(canceled, &relaycommon.RelayInfo{}, nil))
+}
+
+// 流式请求没有正常结束就取消，仍然按用户中断处理，不参与成功率。
+func TestClassifyRelayOutcomeStreamCanceledBeforeTerminal(t *testing.T) {
+	canceled, cancel := context.WithCancel(context.Background())
+	cancel()
+	stream := &relaycommon.StreamStatus{}
+	assert.Equal(t, OutcomeIgnored, ClassifyRelayOutcome(canceled, &relaycommon.RelayInfo{IsStream: true, StreamStatus: stream}, nil))
+}
 func TestStreamOutcomeClassification(t *testing.T) {
 	for _, tc := range []struct {
 		name string
