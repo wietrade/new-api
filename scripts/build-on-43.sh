@@ -13,9 +13,9 @@ set -euo pipefail
 SRC_DIR="${SRC_DIR:-/www/wwwroot/new-api-src}"
 DEPLOY_DIR="${DEPLOY_DIR:-/www/wwwroot/new-api}"
 SERVICE="${SERVICE:-new-api}"
-NPM_REG="${NPM_REG:-https://registry.npmmirror.com}"
+BUN_REGISTRY="${BUN_REGISTRY:-https://registry.npmmirror.com}"
 
-export PATH="/usr/local/go/bin:/usr/local/node22/bin:$PATH"
+export PATH="/usr/local/go/bin:/usr/local/bun:/usr/local/node22/bin:$PATH"
 export GOPROXY="${GOPROXY:-https://goproxy.cn,direct}"
 export GOMAXPROCS="${GOMAXPROCS:-2}"
 export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1400}"
@@ -32,17 +32,17 @@ if [ "${1:-}" != "--no-pull" ]; then
 fi
 
 log "前端依赖"
-[ -d web/node_modules ] || ( cd web && npm install --registry="$NPM_REG" --no-audit --no-fund --legacy-peer-deps )
+[ -d web/node_modules ] || ( cd web && bun install --registry="$BUN_REGISTRY" )
 ok "web 依赖就绪"
 
 log "前端构建"
-( cd web && npm run build )
+( cd web && bun run build )
 
 log "文档站依赖"
-[ -d docs-site/node_modules ] || ( cd docs-site && npm install --registry="$NPM_REG" --no-audit --no-fund --legacy-peer-deps )
+[ -d docs-site/node_modules ] || ( cd docs-site && bun install --registry="$BUN_REGISTRY" )
 
 log "文档站构建"
-( cd docs-site && npm run build )
+( cd docs-site && bun run build )
 
 [ -f web/dist/index.html ] || { echo "web/dist/index.html 缺失"; exit 1; }
 [ -f web/dist/docs/index.html ] || { echo "web/dist/docs/index.html 缺失"; exit 1; }
