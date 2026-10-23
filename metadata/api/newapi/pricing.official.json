@@ -37,12 +37,6 @@
       "field": "tiers[0].cache_read",
       "reason": "官方仅说明 >272K 按 2x/1.5x 计价，未明确高档缓存读价。",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna.md"
-    },
-    {
-      "model_name": "Qwen3-Coder-480B-A35B-Instruct-FP8",
-      "field": "pricing",
-      "reason": "阿里云百炼官网定价页（国内站与国际站均已核对）不再列出该型号；开源权重模型的价格由自建推理成本决定，无厂商 token 牌价。",
-      "source_url": "https://www.alibabacloud.com/help/en/model-studio/billing-for-model-studio"
     }
   ],
   "data": [

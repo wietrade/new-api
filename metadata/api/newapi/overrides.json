@@ -3,6 +3,7 @@
   "_comment": "人工核对的权威值，优先级高于所有自动源。用于解决源冲突或补充源缺 口；请在 note 里写清依据与核对日期。excluded 里的模型不会被发布，即使聚合源仍然列出。",
   "models": [],
   "excluded": [
-    "Qwen3-235B-A22B-Thinking-2507"
+    "Qwen3-235B-A22B-Thinking-2507",
+    "Qwen3-Coder-480B-A35B-Instruct-FP8"
   ]
 }

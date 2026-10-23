@@ -692,28 +692,6 @@
       "endpoints": null
     },
     {
-      "model_name": "Qwen3-Coder-480B-A35B-Instruct-FP8",
-      "vendor_name": "Qwen",
-      "description": "Open Qwen coding heavyweight for repository reasoning and agentic engineering",
-      "icon": "Qwen.Color",
-      "name_rule": 0,
-      "status": 1,
-      "tags": "工具",
-      "capabilities": [
-        "tools"
-      ],
-      "input_modalities": [
-        "text"
-      ],
-      "output_modalities": [
-        "text"
-      ],
-      "context_length": 262144,
-      "max_output_tokens": 65536,
-      "is_free": false,
-      "endpoints": null
-    },
-    {
       "model_name": "claude-haiku-5.5",
       "vendor_name": "Anthropic",
       "description": "Claude Haiku 5.5 is Anthropic's small, fast model for high-volume, cost-sensitive work such as summarization, subagents, and browser use. It succeeds Claude Haiku 4.5 with stronger coding, computer us",
