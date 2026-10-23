@@ -70,11 +70,8 @@ export function Pricing() {
     selectInputTypeFilter,
     selectContextFilter,
     selectPriceTierFilter,
-    setTokenUnit,
-    setShowRechargePrice,
     filteredModels,
     hasActiveFilters,
-    activeFilterCount,
     clearFilters,
     clearSearch,
   } = useFilters(models || [])
