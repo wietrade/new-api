@@ -88,13 +88,13 @@ export function useTopNavLinks(): TopNavLink[] {
 
   // Docs (supports external links)
   if (modules?.docs !== false) {
-    if (docsLink) {
-      // 只有绝对 URL 才当外链；站内 /docs 也走 SPA 之外的静态站，统一新开标签页
-      const external = /^https?:\/\//i.test(docsLink)
-      links.push({ title: t('Docs'), href: docsLink, external })
-    } else {
-      links.push({ title: t('Docs'), href: '/help' })
-    }
+    // 绝对 URL 当外链；站内文档统一走 /help（主站外壳 + iframe 嵌文档站）
+    const external = !!docsLink && /^https?:\/\//i.test(docsLink)
+    links.push({
+      title: t('Docs'),
+      href: external ? (docsLink as string) : '/help',
+      external,
+    })
   }
 
   // About
