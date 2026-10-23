@@ -147,7 +147,7 @@ export function Pricing() {
   return (
     <PublicLayout showMainContainer={false}>
       <div className='pricing-page relative'>
-        <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pb-8 sm:px-6 sm:pb-10 xl:px-8'>
+        <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-10 xl:px-8'>
           <header className='pricing-hero'>
             <p className='pricing-breadcrumb'>
               NowHub <em>/</em> 模型广场 <em>/</em> Live catalog
