@@ -122,3 +122,27 @@
 .VPNavScreenMenuLink[href='https://www.nowhub.org/']:hover::after {
   background-color: #fff !important;
 }
+
+/* ── 嵌入模式（?embed=1）：主站 iframe 内使用，隐藏本站导航与页脚 ── */
+html.embed .VPNav,
+html.embed .VPSidebar,
+html.embed .VPLocalNav,
+html.embed .VPFooter,
+html.embed .VPDocFooter,
+html.embed .VPDocAside {
+  display: none !important;
+}
+
+html.embed .VPContent {
+  padding-top: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html.embed .VPDoc {
+  padding: 24px 0 48px !important;
+}
+
+html.embed .VPDoc .container {
+  max-width: 880px;
+}

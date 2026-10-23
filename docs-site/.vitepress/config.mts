@@ -17,7 +17,15 @@ export default defineConfig({
   cleanUrls: false,
   lastUpdated: true,
   srcExclude: ['README.md'],
-  head: [['meta', { name: 'theme-color', content: '#0d1117' }]],
+  head: [
+    ['meta', { name: 'theme-color', content: '#0d1117' }],
+    // 主站用 iframe 嵌套时加 ?embed=1，隐藏文档站自己的导航/页脚
+    [
+      'script',
+      {},
+      "if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed')",
+    ],
+  ],
   themeConfig: {
     siteTitle: 'NowHub API',
     outline: { level: [2, 3], label: '本页目录' },
