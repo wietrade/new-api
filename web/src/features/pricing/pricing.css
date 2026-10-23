@@ -20,9 +20,9 @@
 }
 
 .pricing-page .pf-field.pf-search {
-  flex: 1 1 160px;
-  min-width: 148px;
-  max-width: 240px;
+  flex: 1 1 200px;
+  min-width: 156px;
+  max-width: 320px;
 }
 
 .pricing-page .pf-label {

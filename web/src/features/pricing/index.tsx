@@ -189,9 +189,6 @@ export function Pricing() {
             onContextChange={setContextFilter}
             priceTierFilter={priceTierFilter}
             onPriceTierChange={setPriceTierFilter}
-            groupFilter={groupFilter}
-            onGroupChange={setGroupFilter}
-            groups={availableGroups}
             filteredCount={filteredModels.length}
             totalCount={models?.length}
             models={models || []}

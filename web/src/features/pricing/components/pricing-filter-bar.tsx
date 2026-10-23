@@ -97,9 +97,6 @@ export interface PricingFilterBarProps {
   onContextChange: (value: string) => void
   priceTierFilter: string[]
   onPriceTierChange: (value: string) => void
-  groupFilter: string[]
-  onGroupChange: (value: string) => void
-  groups: string[]
   filteredCount: number
   totalCount?: number
   models?: PricingModel[]
@@ -118,7 +115,6 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
   const vendorOptions = Object.fromEntries(
     props.vendors.map((v) => [v.name, v.name])
   )
-  const groupOptions = Object.fromEntries(props.groups.map((g) => [g, g]))
 
   return (
     <div className='pricing-filterbar'>
@@ -179,16 +175,6 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={PRICE_TIER_LABELS}
           placeholder='不限'
           width='84px'
-        />
-      </Field>
-
-      <Field label='分组'>
-        <NativeSelect
-          value={props.groupFilter}
-          onChange={props.onGroupChange}
-          options={groupOptions}
-          placeholder='全部分组'
-          width='108px'
         />
       </Field>
 
