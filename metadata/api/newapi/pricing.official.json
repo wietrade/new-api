@@ -442,6 +442,15 @@
       "cache_write_1h": null,
       "per_image": null,
       "tiers": null,
+      "time_tiers": {
+        "rule": "deepseek_peak",
+        "peak": {
+          "input": 0.3,
+          "output": 1.2,
+          "cache_read": 0.006
+        },
+        "off_peak_multiplier": 0.5
+      },
       "effective_from": null,
       "effective_to": null,
       "upcoming": null,
@@ -467,6 +476,15 @@
       "cache_write_1h": null,
       "per_image": null,
       "tiers": null,
+      "time_tiers": {
+        "rule": "deepseek_peak",
+        "peak": {
+          "input": 1.32,
+          "output": 3.96,
+          "cache_read": 0.044
+        },
+        "off_peak_multiplier": 0.5
+      },
       "effective_from": null,
       "effective_to": null,
       "upcoming": null,
@@ -492,6 +510,15 @@
       "cache_write_1h": null,
       "per_image": null,
       "tiers": null,
+      "time_tiers": {
+        "rule": "deepseek_peak",
+        "peak": {
+          "input": 0.3,
+          "output": 1.2,
+          "cache_read": 0.006
+        },
+        "off_peak_multiplier": 0.5
+      },
       "effective_from": null,
       "effective_to": null,
       "upcoming": null,

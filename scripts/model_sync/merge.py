@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 
+from . import expr
 from .normalize import CAPABILITY_ORDER, normalize_key
 
 MODALITY_ORDER = ("text", "image", "file", "audio", "video")
@@ -408,6 +409,7 @@ OFFICIAL_PRICE_FIELDS = (
     "per_image",
     "tiers",
     "meters",
+    "time_tiers",
     "effective_from",
     "effective_to",
     "upcoming",
@@ -420,7 +422,7 @@ def free_price_row(record):
     ``is_free`` is our own guarantee that the model is not billed, so a zero row
     is more accurate than leaving the model out of the price list.
     """
-    return {
+    row = {
         "model_name": str(record.get("model_name", "")),
         "vendor_name": record.get("vendor_name") or "",
         "price_kind": "free",
@@ -432,6 +434,25 @@ def free_price_row(record):
         "output": 0.0,
         "cache_read": 0.0,
     }
+    return attach_expression(row)
+
+
+def attach_expression(row):
+    """Add the billing expression new-api actually settles with.
+
+    The engine has no ratio step: the expression is the whole price contract.
+    Emitting it next to the audited numbers keeps the vendor comparison and the
+    billing behaviour in one row, so they cannot drift apart. Whatever the
+    engine cannot express stays visible in ``billing_unexpressible`` rather
+    than being dropped.
+    """
+    expression, unexpressible = expr.build(row)
+    if expression:
+        row["billing_mode"] = "tiered_expr"
+        row["billing_expr"] = expression
+    if unexpressible:
+        row["billing_unexpressible"] = unexpressible
+    return row
 
 
 def official_price_row(record, official):
@@ -455,7 +476,7 @@ def official_price_row(record, official):
         value = official.get(field)
         if value is not None:
             row[field] = value
-    return row
+    return attach_expression(row)
 
 
 def has_usable_price(official):
@@ -519,7 +540,7 @@ def price_records(existing, index, official=None):
             value = model.price.get(component)
             if value is not None:
                 row[component] = value
-        rows.append(row)
+        rows.append(attach_expression(row))
 
     rows.sort(key=lambda item: (item["vendor_name"], item["model_name"]))
     return rows

@@ -125,7 +125,9 @@ openrouter（tie-break）  ┘
 | `tiers[]` | 阈值触发的覆盖价：输入达到 `prompt_tokens_at_least` 时，整条请求按该档计价 |
 | `effective_from` / `effective_to` | 该价格的有效期（`YYYY-MM-DD`），长期价写 `null` |
 | `upcoming[]` | 已公布但尚未生效的价格（如 `gemini-4-argon` 2026-12-01 涨价） |
-| `per_image` | 按张计价，与 token 价并存，仅供展示参考 |
+| `per_image` | 按张计价；仅当没有 token 价时作为 `fixed()` 兜底，否则只供展示 |
+| `billing_mode` / `billing_expr` | 该模型实际结算用的计费表达式，由 `scripts/model_sync/expr.py` 从上面的价格字段确定性生成 |
+| `billing_unexpressible` | 官方价里无法用引擎变量表达的收费项，逐条列出，绝不猜测 |
 | `confidence` / `quote` | 抄录置信度与官方原文片段，用于复核 |
 
 > `tiers` **不是「第 0 档」**：基础价是阈值以下的价，`tiers[i]` 是「达到阈值之后」的价。
@@ -134,7 +136,9 @@ openrouter（tie-break）  ┘
 ### 非 token 计费：`meters[]`
 
 LLM 的 token 价继续用上面的标量字段；**按张 / 按秒 / 按次 / 按 credit** 的模型用 `meters[]`
-补充描述，每条对应一个可以直接计费的维度：
+记录官方原文里的单价。`meters[]` 是**审计与展示用的事实记录，不参与表达式生成**：
+计费引擎能表达的只有 token 变量（含 `img` / `img_o` / `img_cr` / `ai` / `ao`）与
+`image_count`，所以图片模型的计费表达式一律走 token 变量。
 
 ```json
 "meters": [
@@ -157,7 +161,8 @@ LLM 的 token 价继续用上面的标量字段；**按张 / 按秒 / 按次 / �
 
 规则：
 
-- `dim` + `when` 必须能翻译成一条计费表达式（见 `pkg/billingexpr/expr.md`），翻译不了的不许写；
+- `meters[]` **不生成计费表达式**：引擎的图片费用走 `output_image` → `img_o` token 变量，
+  `input_image` 按张与 `resolution` 条件都没有可观测变量，宁可留在 `billing_unexpressible`；
 - 同一 `dim` 的多条 rate 用不同 `when` 区分，条件不得重叠；
 - token 与按张价可以并存（例如 Gemini 图像模型既有 `$120/1M image tokens`，又有按分辨率的每张价），
   但两者各自来自官方原文，**不得互相推导覆盖**；
