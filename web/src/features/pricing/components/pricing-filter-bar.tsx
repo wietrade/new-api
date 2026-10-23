@@ -107,7 +107,6 @@ export interface PricingFilterBarProps {
   totalCount?: number
   models?: PricingModel[]
 }
-
 export function PricingFilterBar(props: PricingFilterBarProps) {
   const { t } = useTranslation()
   const fullSortLabels = getSortLabels(t)
@@ -234,11 +233,6 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           ))}
         </select>
       </Field>
-
-      <div className='pf-count'>
-        {props.filteredCount}
-        {props.totalCount ? ` / ${props.totalCount}` : ''} 个结果
-      </div>
 
       <div className='pf-kinds'>
         <button
