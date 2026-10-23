@@ -115,7 +115,10 @@
   background-color: #2563eb;
 }
 
-/* 外链小箭头跟着文字变白 */
-.VPNavBarMenuLink[href='https://www.nowhub.org/'] .vp-external-link-icon {
-  color: #fff;
+/* 外链箭头（VitePress 用 <a class="vp-external-link-icon"> 的 ::after 绘制，默认灰色）也改白 */
+.VPNavBarMenuLink[href='https://www.nowhub.org/']::after,
+.VPNavBarMenuLink[href='https://www.nowhub.org/']:hover::after,
+.VPNavScreenMenuLink[href='https://www.nowhub.org/']::after,
+.VPNavScreenMenuLink[href='https://www.nowhub.org/']:hover::after {
+  background-color: #fff !important;
 }
