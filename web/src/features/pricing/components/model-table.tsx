@@ -22,8 +22,12 @@ import { memo, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { getPerfMetricsSummary } from '@/features/performance-metrics/api'
+import type { ModelPerfBadgeData } from '@/features/pricing/components/model-perf-badge'
+import { getSuccessRateDotClass } from '@/features/performance-metrics/lib/format'
+import type { SuccessRatePoint } from '@/features/performance-metrics/types'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { requireServerSuccess } from '@/lib/server-error-message'
+import { cn } from '@/lib/utils'
 
 import { DEFAULT_TOKEN_UNIT } from '../constants'
 import {
@@ -47,8 +51,7 @@ export interface ModelTableProps {
   usdExchangeRate?: number
   tokenUnit?: TokenUnit
   showRechargePrice?: boolean
-  selectedGroup?: string
-}
+  selectedGroup?: string}
 
 const CAPABILITY_META: Record<
   string,
@@ -162,6 +165,68 @@ function PriceStack(props: {
   )
 }
 
+const STATUS_SAMPLE_LIMIT = 24
+
+// 与模型详情卡片一致的状态检测：成功率百分比 + 最近每小时的成功/失败色条。
+function ModelStatusCell(props: { perf?: ModelPerfBadgeData }) {
+  const { t } = useTranslation()
+  const perf = props.perf
+  const successRate = perf?.success_rate
+  const hasSuccessRate =
+    typeof successRate === 'number' &&
+    Number.isFinite(successRate) &&
+    successRate >= 0 &&
+    successRate <= 100
+  const samples: SuccessRatePoint[] = useMemo(
+    () =>
+      (perf?.recent_success_series ?? [])
+        .filter(
+          (point) =>
+            Number.isFinite(point.ts) &&
+            Number.isFinite(point.success_rate) &&
+            point.success_rate >= 0 &&
+            point.success_rate <= 100
+        )
+        .sort((a, b) => a.ts - b.ts)
+        .slice(-STATUS_SAMPLE_LIMIT),
+    [perf?.recent_success_series]
+  )
+  const latencyMs = perf?.avg_latency_ms
+  const hasLatency =
+    typeof latencyMs === 'number' && Number.isFinite(latencyMs) && latencyMs > 0
+  const tooltip = hasLatency
+    ? `${t('Status')} ${hasSuccessRate ? successRate.toFixed(2) + '%' : '—'} · ${t('Latency short')} ${(latencyMs / 1000).toFixed(1)}s`
+    : t('No performance data available')
+
+  if (!hasSuccessRate && samples.length === 0) {
+    return <span className='text-muted-foreground/50 text-xs'>—</span>
+  }
+
+  return (
+    <div className='flex flex-col gap-1' title={tooltip}>
+      <span className='text-[12.5px] font-medium tabular-nums'>
+        {hasSuccessRate ? `${successRate.toFixed(2)}%` : '—'}
+      </span>
+      <span role='img' aria-label={tooltip} className='flex h-2.5 items-center gap-px'>
+        {samples.length > 0 ? (
+          samples.map((sample) => (
+            <span
+              key={sample.ts}
+              aria-hidden
+              className={cn(
+                'h-full w-[3px] shrink-0 rounded-xs',
+                getSuccessRateDotClass(sample.success_rate)
+              )}
+            />
+          ))
+        ) : (
+          <span className='text-muted-foreground/50 text-[11px]'>—</span>
+        )}
+      </span>
+    </div>
+  )
+}
+
 export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
   const { t } = useTranslation()
   const tokenUnit = props.tokenUnit ?? DEFAULT_TOKEN_UNIT
@@ -182,12 +247,24 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
   })
 
   const perfMap = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const m of perfQuery.data?.data?.models ?? []) {
-      const ms = (m as { avg_latency_ms?: number }).avg_latency_ms
-      if (typeof ms === 'number' && ms > 0) {
-        map.set(String(m.model_name ?? ''), ms)
-      }
+    const map = new Map<string, ModelPerfBadgeData>()
+    for (const model of perfQuery.data?.data?.models ?? []) {
+      map.set(String(model.model_name ?? ''), {
+        ...model,
+        window_start: perfQuery.data?.data.window_start,
+        window_end: perfQuery.data?.data.window_end,
+      })
+    }
+    for (const [name, series] of Object.entries(
+      perfQuery.data?.data?.recent_success_series ?? {}
+    )) {
+      map.set(name, {
+        avg_latency_ms: Number.NaN,
+        avg_tps: Number.NaN,
+        success_rate: Number.NaN,
+        ...map.get(name),
+        recent_success_series: series,
+      })
     }
     return map
   }, [perfQuery.data])
@@ -197,12 +274,12 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
       <table className='w-full table-fixed'>
         <thead>
           <tr>
-            <th className='w-[26%] text-left'>{t('Model')}</th>
+            <th className='w-[25%] text-left'>{t('Model')}</th>
             <th className='w-[13%] text-left'>{t('Input')}</th>
             <th className='w-[13%] text-left'>{t('Output')}</th>
-            <th className='w-[11%] text-left'>折扣</th>
+            <th className='w-[10%] text-left'>折扣</th>
             <th className='w-[10%] text-left'>上下文</th>
-            <th className='w-[10%] text-left'>延迟</th>
+            <th className='w-[12%] text-left'>状态</th>
             <th className='w-[17%] text-left'>能力</th>
           </tr>
         </thead>
@@ -297,7 +374,6 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
                 props.usdExchangeRate,
                 undefined
               )
-            const ttft = perfMap.get(model.model_name)
 
             return (
               <tr
@@ -346,8 +422,8 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
                 <td className='text-muted-foreground text-[12.5px] tabular-nums'>
                   {formatContext(model.context_length)}
                 </td>
-                <td className='text-muted-foreground text-[12.5px] tabular-nums'>
-                  {ttft ? `${(ttft / 1000).toFixed(1)} s` : '—'}
+                <td>
+                  <ModelStatusCell perf={perfMap.get(model.model_name)} />
                 </td>
                 <td>
                   <CapabilityIcons
