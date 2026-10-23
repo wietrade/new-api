@@ -914,6 +914,7 @@
         "tools",
         "structured_output",
         "web_search",
+        "code_interpreter",
         "cache_implicit"
       ],
       "input_modalities": [
@@ -954,7 +955,7 @@
       ],
       "context_length": 262144,
       "max_output_tokens": 32768,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -979,7 +980,7 @@
       ],
       "context_length": 262144,
       "max_output_tokens": 32768,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1102,13 +1103,15 @@
       ],
       "input_modalities": [
         "text",
-        "image"
+        "image",
+        "audio",
+        "video"
       ],
       "output_modalities": [
         "text"
       ],
-      "context_length": 512000,
-      "max_output_tokens": 460800,
+      "context_length": 524288,
+      "max_output_tokens": null,
       "is_free": true,
       "endpoints": null
     },
@@ -1129,14 +1132,14 @@
       "input_modalities": [
         "text",
         "image",
-        "file"
+        "audio"
       ],
       "output_modalities": [
         "text"
       ],
-      "context_length": 524288,
-      "max_output_tokens": 471859,
-      "is_free": false,
+      "context_length": 1048576,
+      "max_output_tokens": null,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1156,14 +1159,14 @@
       "input_modalities": [
         "text",
         "image",
-        "file"
+        "audio"
       ],
       "output_modalities": [
         "text"
       ],
-      "context_length": 524288,
+      "context_length": 1048576,
       "max_output_tokens": 262144,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1187,7 +1190,7 @@
       ],
       "context_length": 1048576,
       "max_output_tokens": 32768,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1211,7 +1214,7 @@
       ],
       "context_length": 262144,
       "max_output_tokens": 32768,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1262,7 +1265,7 @@
       ],
       "context_length": 1000000,
       "max_output_tokens": 524288,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1285,7 +1288,7 @@
       ],
       "context_length": 128000,
       "max_output_tokens": 8192,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1310,7 +1313,7 @@
       ],
       "context_length": 262144,
       "max_output_tokens": 235929,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1337,7 +1340,7 @@
       ],
       "context_length": 1048576,
       "max_output_tokens": 235929,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
