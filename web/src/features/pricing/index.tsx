@@ -27,7 +27,7 @@ import {
   EmptyState,
   PricingSidebar,
   PricingToolbar,
-  ModelCardGrid,
+  ModelTable,
   ModelDetailsDrawer,
 } from './components'
 import { EXCLUDED_GROUPS } from './constants'
@@ -122,7 +122,7 @@ export function Pricing() {
     }
 
     return (
-      <ModelCardGrid
+      <ModelTable
         models={filteredModels}
         onModelClick={handleModelClick}
         priceRate={priceRate}
