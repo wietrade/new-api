@@ -22,6 +22,7 @@ import { PrefillGroupManagement } from './dialogs/prefill-group-management'
 import { PriceSyncDialog } from './dialogs/price-sync-dialog'
 import { SyncWizardDialog } from './dialogs/sync-wizard-dialog'
 import { VendorMutateDialog } from './dialogs/vendor-mutate-dialog'
+import { ModelMetadataDrawer } from './drawers/model-metadata-drawer'
 import { ModelMutateDrawer } from './drawers/model-mutate-drawer'
 import { useModels } from './models-provider'
 
@@ -51,6 +52,13 @@ export function ModelsDialogs() {
         initialSection={open === 'price-model' ? 'pricing' : 'metadata'}
         onOpenChange={(v) => !v && setOpen(null)}
         currentRow={currentRow}
+      />
+
+      {/* Model Metadata Drawer (read-only) */}
+      <ModelMetadataDrawer
+        open={open === 'view-model'}
+        onOpenChange={(v) => !v && setOpen(null)}
+        model={currentRow}
       />
 
       {/* Vendor Create/Update Dialog */}

@@ -44,6 +44,12 @@ export interface Model {
   description?: string
   icon?: string
   tags?: string
+  capabilities?: string
+  input_modalities?: string
+  output_modalities?: string
+  context_length?: number
+  max_output_tokens?: number
+  is_free?: number
   vendor_id?: number
   endpoints?: string
   supported_endpoints?: string[]

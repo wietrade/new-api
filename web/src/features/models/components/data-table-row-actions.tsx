@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useQueryClient } from '@tanstack/react-query'
 import type { Row } from '@tanstack/react-table'
-import { Eye, EyeOff, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Info, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -90,6 +90,17 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
       {model.id > 0 && (
         <DataTableRowActionMenu ariaLabel={t('Open menu')}>
+          <DropdownMenuItem
+            onSelect={() => {
+              setCurrentRow(model)
+              setOpen('view-model')
+            }}
+          >
+            {t('View metadata')}
+            <DropdownMenuShortcut>
+              <Info size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleToggleStatus}>
             {toggleLabel}
             <DropdownMenuShortcut>
