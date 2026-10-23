@@ -7402,6 +7402,7 @@
     "{{modality}} output": "{{modality}} output",
     "Structured Output": "Structured Output",
     "Implicit Caching": "Implicit Caching",
-    "Explicit Caching": "Explicit Caching"
+    "Explicit Caching": "Explicit Caching",
+    "Input capabilities": "Input capabilities"
   }
 }

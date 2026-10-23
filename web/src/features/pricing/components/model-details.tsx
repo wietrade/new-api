@@ -484,7 +484,7 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
   const inputModalities = normalizeCatalogItems(model.input_modalities)
   const outputModalities = normalizeCatalogItems(model.output_modalities)
   const modalityLabel = (key: string) => t(MODALITY_LABEL_KEYS[key] ?? key)
-  // 基础能力 = 能接受的输入 + 功能特性（推理/工具/结构化输出/缓存…）
+  // 输入能力 = 能接受的输入 + 功能特性（推理/工具/结构化输出/缓存…）
   const baseCapabilityLabels = [
     ...inputModalities.map((item) =>
       t('{{modality}} input', { modality: modalityLabel(item) })
@@ -519,7 +519,7 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
 
   if (baseCapabilityLabels.length > 0) {
     cells.push(
-      <CatalogSpecRow key='capabilities' label={t('Base capabilities')}>
+      <CatalogSpecRow key='capabilities' label={t('Input capabilities')}>
         <CatalogPillList items={baseCapabilityLabels} />
       </CatalogSpecRow>
     )
