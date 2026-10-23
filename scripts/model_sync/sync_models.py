@@ -302,13 +302,12 @@ def main(argv=None):
         pricing_text = dump_envelope(pricing_envelope, rows)
         pending.append((pricing_path, pricing_text))
         if not args.quiet:
-            official_count = sum(
-                1 for row in rows if row.get("price_kind") == "vendor_official"
-            )
-            print(
-                "prices: %d rows (%d vendor official, %d aggregator)"
-                % (len(rows), official_count, len(rows) - official_count)
-            )
+            kinds = {}
+            for row in rows:
+                kind = row.get("price_kind") or "unknown"
+                kinds[kind] = kinds.get(kind, 0) + 1
+            detail = ", ".join("%d %s" % (n, k) for k, n in sorted(kinds.items()))
+            print("prices: %d rows (%s)" % (len(rows), detail))
 
     changed = []
     for path, text in pending:

@@ -399,7 +399,9 @@ OFFICIAL_PRICE_FIELDS = (
     "output",
     "output_text",
     "output_image",
+    "input_image",
     "cache_read",
+    "cache_read_image",
     "cache_write",
     "cache_write_1h",
     "per_image",
@@ -408,6 +410,26 @@ OFFICIAL_PRICE_FIELDS = (
     "effective_to",
     "upcoming",
 )
+
+
+def free_price_row(record):
+    """Row for a model the catalog marks free but no source prices.
+
+    ``is_free`` is our own guarantee that the model is not billed, so a zero row
+    is more accurate than leaving the model out of the price list.
+    """
+    return {
+        "model_name": str(record.get("model_name", "")),
+        "vendor_name": record.get("vendor_name") or "",
+        "price_kind": "free",
+        "source_kind": "catalog",
+        "source": "metadata:is_free",
+        "currency": "USD",
+        "unit": "per_1m_tokens",
+        "input": 0.0,
+        "output": 0.0,
+        "cache_read": 0.0,
+    }
 
 
 def official_price_row(record, official):
@@ -462,6 +484,9 @@ def price_records(existing, index, official=None):
         candidates = index.get(key) or []
         model = pick_incoming(candidates, name)
         if model is None or not model.price:
+            if record.get("is_free"):
+                seen.add(name)
+                rows.append(free_price_row(record))
             continue
         seen.add(name)
         row = {

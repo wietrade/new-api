@@ -107,14 +107,17 @@ openrouter（tie-break）  ┘
 | `api/newapi/pricing.official.json` | 厂商官方定价页抄录，`price_kind: vendor_official`，逐条带 `source_url` 与 `quote` | 人工（官方页核对后导入） |
 | `api/newapi/pricing.json` | 每个已发布模型当前采用的列表价，逐条 `price_kind` 标明来源 | `scripts/model_sync` 生成 |
 
-优先级：**官方 > 聚合源**。官方有条目的模型一律用官方价；聚合源（models.dev / OpenRouter）
-只补官方未覆盖的模型。这样「某个转售商的最低报价」不会在无人察觉时替掉厂商牌价。
+优先级：**官方 > 聚合源 > 目录免费标记**。官方有条目的模型一律用官方价；聚合源（models.dev / OpenRouter）
+补官方未覆盖的模型；目录里 `is_free: true` 但两边都没有报价的模型，直接写 `0`（`price_kind: free`）。
+每条 `pricing.json` 记录都用 `price_kind` 标明来源。
+这样「某个转售商的最低报价」不会在无人察觉时替掉厂商牌价。
 
 字段语义（schema v2，USD / 每 1M tokens）：
 
 | 字段 | 含义 |
 |:---|:---|
 | `input` / `output` | 基础价（未达第一个档位阈值时的价） |
+| `input_image` / `cache_read_image` | 图像模态的输入 / 缓存读价；仅当与文本价不同才填（如 `chatgpt-image-latest`） |
 | `output_text` / `output_image` | 文本 / 图像输出价；仅当与 `output` 不同才填（图像模型必填） |
 | `cache_read` / `cache_write` | 缓存读 / 5 分钟缓存写入 |
 | `cache_write_1h` | 1 小时缓存写入（Anthropic 等有 TTL 分档的厂商） |

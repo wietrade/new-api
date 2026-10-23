@@ -6,7 +6,7 @@
   "notice": "厂商官方定价页抄录（非聚合站参考价）；tiers 为阈值触发的覆盖价，见 metadata/README.md",
   "currency": "USD",
   "unit": "per_1m_tokens",
-  "generated_at": "2026-10-23T20:34:08+08:00",
+  "generated_at": "2026-10-23T22:40:00+08:00",
   "unresolved": [
     {
       "model_name": "glm-5.3-prime",
@@ -37,6 +37,18 @@
       "field": "tiers[0].cache_read",
       "reason": "官方仅说明 >272K 按 2x/1.5x 计价，未明确高档缓存读价。",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna.md"
+    },
+    {
+      "model_name": "Qwen3-235B-A22B-Thinking-2507",
+      "field": "pricing",
+      "reason": "阿里云百炼官网定价页（国内站与国际站均已核对）不再列出该型号；开源权重模型的价格由自建推理成本决定，无厂商 token 牌价。",
+      "source_url": "https://www.alibabacloud.com/help/en/model-studio/billing-for-model-studio"
+    },
+    {
+      "model_name": "Qwen3-Coder-480B-A35B-Instruct-FP8",
+      "field": "pricing",
+      "reason": "阿里云百炼官网定价页（国内站与国际站均已核对）不再列出该型号；开源权重模型的价格由自建推理成本决定，无厂商 token 牌价。",
+      "source_url": "https://www.alibabacloud.com/help/en/model-studio/billing-for-model-studio"
     }
   ],
   "data": [
@@ -771,12 +783,40 @@
       "notes": "国内站 CNY 原价：输入(未命中)¥20 / 输出¥100 / 缓存命中¥2 / 缓存写5min¥20 / 1h¥40；按汇率 6.6743 折算为 USD（in $3.0 / out $15.0 / cr $0.3 / cw $3.0 / cw1h $6.0）。"
     },
     {
+      "model_name": "chatgpt-image-latest",
+      "vendor_name": "OpenAI",
+      "price_kind": "vendor_official",
+      "source_kind": "official_doc",
+      "source_url": "https://developers.openai.com/api/docs/pricing",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 5.0,
+      "output": 32.0,
+      "output_text": 10.0,
+      "output_image": 32.0,
+      "input_image": 8.0,
+      "cache_read": 1.25,
+      "cache_read_image": 2.0,
+      "cache_write": null,
+      "cache_write_1h": null,
+      "per_image": null,
+      "batch_discount": 0.5,
+      "tiers": null,
+      "effective_from": null,
+      "effective_to": null,
+      "upcoming": null,
+      "confidence": "high",
+      "quote": "chatgpt-image-latest | Image | $8.00 | $32.00 | $2.00；chatgpt-image-latest | Text | $5.00 | $10.00 | $1.25",
+      "notes": "按模态分别计价：图像输入 $8、图像输出 $32、图像缓存读 $2；文本输入 $5、文本输出 $10、文本缓存读 $1.25。Batch 为 Standard 的 50%。input/output 记文本侧为基准，图像侧见 input_image/output_image。"
+    },
+    {
       "model_name": "gpt-5.4",
       "vendor_name": "OpenAI",
       "price_kind": "vendor_official",
       "source_kind": "official_doc",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.4",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "currency": "USD",
       "unit": "per_1m_tokens",
       "input": 2.5,
@@ -795,7 +835,7 @@
           "output": 22.5,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
+          "cache_read": 0.5,
           "cache_write": null,
           "cache_write_1h": null
         }
@@ -805,7 +845,7 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "For models with a 1.05M context window (GPT-5.4 and GPT-5.4 Pro), prompts with >272K input tokens are priced at 2x input and 1.5x output for the full session.",
-      "notes": "Input $2.5 / Output $15 / Cached $0.25；页内未单列 cache_write，故 null。>272K 2x/1.5x。 高档缓存价官方未明确（推断为 2x，需确认）"
+      "notes": "Input $2.5 / Output $15 / Cached $0.25；页内未单列 cache_write，故 null。>272K 2x/1.5x。 高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。"
     },
     {
       "model_name": "gpt-5.5",
@@ -813,7 +853,7 @@
       "price_kind": "vendor_official",
       "source_kind": "official_doc",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.5.md",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "currency": "USD",
       "unit": "per_1m_tokens",
       "input": 5.0,
@@ -832,7 +872,7 @@
           "output": 45.0,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
+          "cache_read": 1.0,
           "cache_write": null,
           "cache_write_1h": null
         }
@@ -842,7 +882,7 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "For GPT-5.5, prompts with >272K input tokens are priced at 2x input and 1.5x output for the full session for standard, batch, and flex.",
-      "notes": "官方 gpt-5.5.md：Input $5 / Cached input $0.5 / Output $30 per 1M tokens。输入 >272K token 的整段会话按 2x 输入($10) 与 1.5x 输出($45) 计价；区域数据驻留端点另加 10%。官方未公布独立 cache_write 价（OpenAI 提示词缓存仅缓存读折扣）。 高档缓存价官方未明确（推断为 2x，需确认）"
+      "notes": "官方 gpt-5.5.md：Input $5 / Cached input $0.5 / Output $30 per 1M tokens。输入 >272K token 的整段会话按 2x 输入($10) 与 1.5x 输出($45) 计价；区域数据驻留端点另加 10%。官方未公布独立 cache_write 价（OpenAI 提示词缓存仅缓存读折扣）。 高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。"
     },
     {
       "model_name": "gpt-5.6-luna",
@@ -850,7 +890,7 @@
       "price_kind": "vendor_official",
       "source_kind": "official_doc",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "currency": "USD",
       "unit": "per_1m_tokens",
       "input": 0.2,
@@ -869,8 +909,8 @@
           "output": 1.8,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
-          "cache_write": null,
+          "cache_read": 0.04,
+          "cache_write": 0.5,
           "cache_write_1h": null
         }
       ],
@@ -879,7 +919,7 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "Prompts with >272K input tokens are priced at 2x input and 1.5x output for the full request.",
-      "notes": "Input $0.2 / Output $1.2 / Cached $0.02；cache_write=1.25x input=$0.25。 高档缓存价官方未明确（推断为 2x，需确认）"
+      "notes": "Input $0.2 / Output $1.2 / Cached $0.02；cache_write=1.25x input=$0.25。 高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。"
     },
     {
       "model_name": "gpt-5.6-sol",
@@ -887,7 +927,7 @@
       "price_kind": "vendor_official",
       "source_kind": "official_doc",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "currency": "USD",
       "unit": "per_1m_tokens",
       "input": 4.0,
@@ -906,8 +946,8 @@
           "output": 30.0,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
-          "cache_write": null,
+          "cache_read": 0.8,
+          "cache_write": 10.0,
           "cache_write_1h": null
         }
       ],
@@ -916,7 +956,7 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "Prompts with >272K input tokens are priced at 2x input and 1.5x output for the full request.",
-      "notes": "Input $4 / Output $20 / Cached $0.4；cache_write=1.25x input=$5.0（页内注明 Cache writes billed at 1.25x）。promo 价至少持续到 2026-11-21。 promo 价至少持续到 2026-11-21，到期后按官方页重新确认。高档缓存价官方未明确（推断为 2x，需确认）"
+      "notes": "Input $4 / Output $20 / Cached $0.4；cache_write=1.25x input=$5.0（页内注明 Cache writes billed at 1.25x）。promo 价至少持续到 2026-11-21。 promo 价至少持续到 2026-11-21，到期后按官方页重新确认。高档缓存价官方未明确（推断为 2x，需确认） 长上下文缓存价来自官方 pricing 合并表（Long context cached input）。"
     },
     {
       "model_name": "gpt-5.6-terra",
@@ -1069,6 +1109,32 @@
       "confidence": "high",
       "quote": null,
       "notes": "Input $2 / Output $10 / Cached $0.1(5%) / Cache writes $2.5；Batch/Flex 50% lower；Ultrafast 6x。"
+    },
+    {
+      "model_name": "qwen3.8-flash",
+      "vendor_name": "Qwen",
+      "price_kind": "vendor_official",
+      "source_kind": "official_doc",
+      "source_url": "https://www.alibabacloud.com/help/en/model-studio/billing-for-model-studio",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.15,
+      "output": 0.47,
+      "output_text": null,
+      "output_image": null,
+      "cache_read": null,
+      "cache_write": null,
+      "cache_write_1h": null,
+      "per_image": null,
+      "batch_discount": null,
+      "tiers": null,
+      "effective_from": null,
+      "effective_to": null,
+      "upcoming": null,
+      "confidence": "high",
+      "quote": "qwen3.8-flash | International | 0<Token≤1M | $0.15 | $0.47 | 1 million tokens",
+      "notes": "阿里云百炼国际站 Qwen-Flash 分类，0<Token≤1M 单一档，无阶梯。国内站同款为 0.8元/2.7元 每百万 Token。"
     },
     {
       "model_name": "grok-4.7",

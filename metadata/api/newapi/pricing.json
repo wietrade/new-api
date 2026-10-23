@@ -335,6 +335,18 @@
       "cache_read": 0.006
     },
     {
+      "model_name": "dots-3-note-preview:free",
+      "vendor_name": "Dots Studio",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
       "model_name": "gemini-3-pro-image",
       "vendor_name": "Google",
       "price_kind": "vendor_official",
@@ -491,6 +503,18 @@
       "cache_read": 0.0
     },
     {
+      "model_name": "lfm-2.5-2.6b:free",
+      "vendor_name": "Liquid AI",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
       "model_name": "minimax-m3.1-flash:free",
       "vendor_name": "MiniMax",
       "price_kind": "vendor_official",
@@ -525,6 +549,62 @@
       "cache_write_1h": 6.0
     },
     {
+      "model_name": "nemotron-3.5-content-safety:free",
+      "vendor_name": "NVIDIA",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
+      "model_name": "nemotron-3.5-lightning:free",
+      "vendor_name": "NVIDIA",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
+      "model_name": "nemotron-3.5-super-vl:free",
+      "vendor_name": "NVIDIA",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
+      "model_name": "chatgpt-image-latest",
+      "vendor_name": "OpenAI",
+      "price_kind": "vendor_official",
+      "source_kind": "official_doc",
+      "source": "vendor_official",
+      "source_model_id": "chatgpt-image-latest",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "source_url": "https://developers.openai.com/api/docs/pricing",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
+      "confidence": "high",
+      "input": 5.0,
+      "output": 32.0,
+      "output_text": 10.0,
+      "output_image": 32.0,
+      "input_image": 8.0,
+      "cache_read": 1.25,
+      "cache_read_image": 2.0
+    },
+    {
       "model_name": "gpt-5.4",
       "vendor_name": "OpenAI",
       "price_kind": "vendor_official",
@@ -534,7 +614,7 @@
       "currency": "USD",
       "unit": "per_1m_tokens",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.4",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "confidence": "high",
       "input": 2.5,
       "output": 15.0,
@@ -546,7 +626,7 @@
           "output": 22.5,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
+          "cache_read": 0.5,
           "cache_write": null,
           "cache_write_1h": null
         }
@@ -562,7 +642,7 @@
       "currency": "USD",
       "unit": "per_1m_tokens",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.5.md",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "confidence": "high",
       "input": 5.0,
       "output": 30.0,
@@ -574,7 +654,7 @@
           "output": 45.0,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
+          "cache_read": 1.0,
           "cache_write": null,
           "cache_write_1h": null
         }
@@ -590,7 +670,7 @@
       "currency": "USD",
       "unit": "per_1m_tokens",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "confidence": "high",
       "input": 0.2,
       "output": 1.2,
@@ -603,8 +683,8 @@
           "output": 1.8,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
-          "cache_write": null,
+          "cache_read": 0.04,
+          "cache_write": 0.5,
           "cache_write_1h": null
         }
       ]
@@ -619,7 +699,7 @@
       "currency": "USD",
       "unit": "per_1m_tokens",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
-      "retrieved_at": "2026-10-23T18:57:00+08:00",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
       "confidence": "high",
       "input": 4.0,
       "output": 20.0,
@@ -632,8 +712,8 @@
           "output": 30.0,
           "output_text": null,
           "output_image": null,
-          "cache_read": null,
-          "cache_write": null,
+          "cache_read": 0.8,
+          "cache_write": 10.0,
           "cache_write_1h": null
         }
       ]
@@ -759,6 +839,81 @@
       "input": 0.15,
       "output": 0.6,
       "cache_read": 0.075
+    },
+    {
+      "model_name": "laguna-s-2.1:free",
+      "vendor_name": "Poolside",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
+      "model_name": "laguna-xs-2.1:free",
+      "vendor_name": "Poolside",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
+      "model_name": "qwen3.8-flash",
+      "vendor_name": "Qwen",
+      "price_kind": "vendor_official",
+      "source_kind": "official_doc",
+      "source": "vendor_official",
+      "source_model_id": "qwen3.8-flash",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "source_url": "https://www.alibabacloud.com/help/en/model-studio/billing-for-model-studio",
+      "retrieved_at": "2026-10-23T22:40:00+08:00",
+      "confidence": "high",
+      "input": 0.15,
+      "output": 0.47
+    },
+    {
+      "model_name": "inkling-small:free",
+      "vendor_name": "Thinking Machines",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
+      "model_name": "inkling:free",
+      "vendor_name": "Thinking Machines",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
+    },
+    {
+      "model_name": "xing4.0-29b-a4b:free",
+      "vendor_name": "Xingchen AGI",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0
     },
     {
       "model_name": "glm-5",

@@ -8,9 +8,9 @@
 | `metadata/api/newapi/pricing.json` | 当前采用的列表价（USD / 每 1M tokens），逐条 `price_kind` 标明来源 | **否**，仅生成 diff 供人工确认后再改 `model_ratio` 等 |
 | `metadata/api/newapi/pricing.official.json` | 厂商官方定价页抄录（输入源，人工维护） | **否**，由 `pricing.json` 消费 |
 
-价格优先级：`pricing.official.json` > 聚合源（models.dev / OpenRouter）。
-官方有条目的模型一律用官方价，聚合价只用来补官方未覆盖的模型；
-每条 `pricing.json` 记录都用 `price_kind` 标明是 `vendor_official` 还是 `aggregator_reference`。
+价格优先级：`pricing.official.json` > 聚合源（models.dev / OpenRouter）> 目录 `is_free`。
+官方有条目的模型一律用官方价，聚合价只用来补官方未覆盖的模型；目录标为免费但两边都没报价的，
+直接写 `0`（`price_kind: free`）。每条 `pricing.json` 记录都用 `price_kind` 标明来源。
 这样「聚合站最低价」不会在无人察觉的情况下替掉厂商牌价。
 
 分开的原因：元数据变更风险低、可自动应用；价格变更直接影响实收，必须人工过目，

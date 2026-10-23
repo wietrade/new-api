@@ -224,6 +224,59 @@ class MergeTest(unittest.TestCase):
     def test_load_official_prices_missing_file_is_empty(self):
         self.assertEqual(merge.load_official_prices("/nonexistent/pricing.official.json"), {})
 
+    def test_free_model_without_price_gets_zero_row(self):
+        """`:free` models are not billed, so they get an explicit zero row."""
+        existing = list(self.existing) + [
+            {
+                **self.existing[0],
+                "model_name": "dots-3-note-preview:free",
+                "is_free": True,
+            }
+        ]
+        index, _ = merge.index_incoming([])
+        rows = merge.price_records(existing, index, {})
+        names = [row["model_name"] for row in rows]
+        self.assertIn("dots-3-note-preview:free", names)
+        row = next(r for r in rows if r["model_name"] == "dots-3-note-preview:free")
+        self.assertEqual(row["price_kind"], "free")
+        self.assertEqual(row["source_kind"], "catalog")
+        self.assertEqual((row["input"], row["output"], row["cache_read"]), (0.0, 0.0, 0.0))
+
+    def test_official_price_wins_over_free_flag(self):
+        """A paid model is never zeroed just because a source lists it as free."""
+        index, _ = merge.index_incoming([])
+        official = {
+            normalize_key("minimax-m3.1-flash:free"): {
+                "model_name": "minimax-m3.1-flash:free",
+                "input": 0.15,
+                "output": 0.6,
+            }
+        }
+        existing = [{**self.existing[0], "model_name": "minimax-m3.1-flash:free", "is_free": True}]
+        rows = merge.price_records(existing, index, official)
+        self.assertEqual(rows[0]["price_kind"], "vendor_official")
+        self.assertEqual(rows[0]["input"], 0.15)
+
+    def test_official_modality_fields_pass_through(self):
+        index, _ = merge.index_incoming([])
+        official = {
+            normalize_key("chatgpt-image-latest"): {
+                "model_name": "chatgpt-image-latest",
+                "input": 5.0,
+                "output": 32.0,
+                "output_text": 10.0,
+                "output_image": 32.0,
+                "input_image": 8.0,
+                "cache_read": 1.25,
+                "cache_read_image": 2.0,
+            }
+        }
+        existing = [{**self.existing[0], "model_name": "chatgpt-image-latest", "is_free": False}]
+        row = merge.price_records(existing, index, official)[0]
+        self.assertEqual(row["input_image"], 8.0)
+        self.assertEqual(row["cache_read_image"], 2.0)
+        self.assertEqual(row["output_image"], 32.0)
+
     def test_exact_name_wins_over_source_priority(self):
         """ollama-hosted and official rows share a key; the exact id must win."""
         index, _ = merge.index_incoming(
