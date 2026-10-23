@@ -57,8 +57,8 @@ function FooterLinkItem(props: { link: FooterLink }) {
     return (
       <a
         href={href}
-        target={isExternal ? '_blank' : undefined}
-        rel={isExternal ? 'noopener noreferrer' : undefined}
+        target={isExternal || isStatic ? '_blank' : undefined}
+        rel={isExternal || isStatic ? 'noopener noreferrer' : undefined}
         className={className}
       >
         {label}

@@ -89,7 +89,7 @@ export function useTopNavLinks(): TopNavLink[] {
   // Docs (supports external links)
   if (modules?.docs !== false) {
     if (docsLink) {
-      // 只有绝对 URL 才当外链；站内 /docs 走 SPA 之外的静态站，不新开标签页
+      // 只有绝对 URL 才当外链；站内 /docs 也走 SPA 之外的静态站，统一新开标签页
       const external = /^https?:\/\//i.test(docsLink)
       links.push({ title: t('Docs'), href: docsLink, external })
     } else {

@@ -238,8 +238,8 @@ export function PublicHeader(props: PublicHeaderProps) {
                       key={`${link.title}:${link.href}`}
                       href={link.href}
                       title={t(link.title)}
-                      target={link.external ? '_blank' : undefined}
-                      rel={link.external ? 'noopener noreferrer' : undefined}
+                      target={link.external || isStaticPath(link.href) ? '_blank' : undefined}
+                      rel={link.external || isStaticPath(link.href) ? 'noopener noreferrer' : undefined}
                       aria-disabled={link.disabled}
                       tabIndex={link.disabled ? -1 : undefined}
                       onClick={(event) => handleNavLinkClick(event, link)}
@@ -342,8 +342,8 @@ export function PublicHeader(props: PublicHeaderProps) {
                   <a
                     key={`${link.title}:${link.href}`}
                     href={link.href}
-                    target={link.external ? '_blank' : undefined}
-                    rel={link.external ? 'noopener noreferrer' : undefined}
+                    target={link.external || isStaticPath(link.href) ? '_blank' : undefined}
+                    rel={link.external || isStaticPath(link.href) ? 'noopener noreferrer' : undefined}
                     aria-disabled={link.disabled}
                     tabIndex={link.disabled ? -1 : undefined}
                     onClick={(event) => handleNavLinkClick(event, link, true)}

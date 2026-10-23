@@ -67,3 +67,55 @@
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* ── 顶部导航「主站 ↗」：蓝底白字方框 ───────────────── */
+.VPNavBarMenuLink[href='https://www.nowhub.org/'] {
+  align-self: center;
+  margin-left: 10px;
+  padding: 0 14px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: #fff !important;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.VPNavBarMenuLink[href='https://www.nowhub.org/']:hover {
+  background-color: #1d4ed8;
+  color: #fff !important;
+}
+
+/* 移动端折叠菜单里的同一项 */
+.VPNavScreenMenuLink[href='https://www.nowhub.org/'] {
+  margin: 8px 16px;
+  padding: 0 14px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.VPNavScreenMenuLink[href='https://www.nowhub.org/']:hover {
+  background-color: #1d4ed8;
+  color: #fff !important;
+}
+
+/* 深色模式下用更亮的蓝，保证对比度 */
+.dark .VPNavBarMenuLink[href='https://www.nowhub.org/'],
+.dark .VPNavScreenMenuLink[href='https://www.nowhub.org/'] {
+  background-color: #3b82f6;
+}
+
+.dark .VPNavBarMenuLink[href='https://www.nowhub.org/']:hover,
+.dark .VPNavScreenMenuLink[href='https://www.nowhub.org/']:hover {
+  background-color: #2563eb;
+}
+
+/* 外链小箭头跟着文字变白 */
+.VPNavBarMenuLink[href='https://www.nowhub.org/'] .vp-external-link-icon {
+  color: #fff;
+}
