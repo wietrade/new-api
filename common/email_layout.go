@@ -7,6 +7,19 @@ import (
 	"time"
 )
 
+// SiteAddress 与 system_setting.ServerAddress 保持同步，供邮件模板拼接绝对链接。
+// setting/system_setting 依赖 common，反向引用会循环，因此这里做一份镜像。
+var SiteAddress = ""
+
+// emailSiteURL 返回站点主页的绝对地址，未配置时回退到主站域名。
+func emailSiteURL() string {
+	addr := strings.TrimSpace(SiteAddress)
+	if !strings.HasPrefix(addr, "http://") && !strings.HasPrefix(addr, "https://") {
+		return "https://www.nowhub.org/"
+	}
+	return strings.TrimRight(addr, "/") + "/"
+}
+
 // 邮件不使用任何外部图片（很多客户端默认不加载远程图片），
 // 头部品牌标记用纯 CSS 方块 + 首字母渲染。
 func emailBrandInitial() string {
@@ -48,7 +61,9 @@ func BuildEmailHTML(subject string, content string) string {
 		`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#ffffff;border-radius:6px;color:#2e9c45;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700">%s</td></tr></table>`,
 		html.EscapeString(emailBrandInitial()))
 
-	copyright := fmt.Sprintf("&copy; %d %s", year, safeBrand)
+	copyright := fmt.Sprintf(
+		`&copy; %d <a href="%s" style="color:#5b6472;text-decoration:none">%s</a>`,
+		year, html.EscapeString(emailSiteURL()), safeBrand)
 
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="zh">
@@ -85,7 +100,7 @@ func BuildEmailHTML(subject string, content string) string {
     <td class="email-shell" align="center" style="padding:28px 16px">
       <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%%;max-width:600px">
         <tr>
-          <td style="background:#2e9c45;border-radius:14px 14px 0 0;padding:14px 24px">
+          <td style="background:#2e9c45;padding:14px 24px">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
               <tr>
                 <td style="padding-right:8px" valign="middle">%s</td>
