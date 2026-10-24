@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import { Github, LifeBuoy, Mail, Send } from 'lucide-react'
+import { CodeXml, LifeBuoy, Mail, Send } from 'lucide-react'
 import { useMemo, type ComponentType, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -49,11 +49,11 @@ function FooterLinkItem(props: { link: FooterLink }) {
   const label = t(props.link.text)
   const Icon = props.link.icon
   const className =
-    'inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground'
+    'inline-flex min-w-0 items-start gap-2 text-[13px] leading-5 text-muted-foreground transition-colors hover:text-foreground sm:text-sm'
   const content = (
     <>
-      {Icon ? <Icon className='size-4 shrink-0 opacity-70' /> : null}
-      {label}
+      {Icon ? <Icon className='mt-0.5 size-4 shrink-0 opacity-70' /> : null}
+      <span className='min-w-0 break-words'>{label}</span>
     </>
   )
 
@@ -153,7 +153,7 @@ export function Footer(props: FooterProps) {
           {
             text: 'GitHub',
             href: 'https://github.com/wietrade/new-api',
-            icon: Github,
+            icon: CodeXml,
           },
         ],
       },
@@ -169,7 +169,7 @@ export function Footer(props: FooterProps) {
       dangerouslySetInnerHTML={{ __html: footerHtml }}
     />
   ) : (
-    <div className='grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)] lg:gap-14'>
+    <div className='grid gap-9 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)] lg:gap-14'>
       <div className='max-w-sm'>
         <Link to='/' className='inline-flex items-center gap-2.5'>
           <img
@@ -182,10 +182,10 @@ export function Footer(props: FooterProps) {
             <span className='text-muted-foreground'>{nameTail}</span>
           </span>
         </Link>
-        <p className='text-muted-foreground mt-4 text-sm leading-6'>
+        <p className='text-muted-foreground mt-3 text-[13px] leading-6 sm:mt-4 sm:text-sm'>
           {t('footer.brandDescription')}
         </p>
-        <span className='text-muted-foreground mt-5 inline-flex items-center gap-2 text-xs'>
+        <span className='text-muted-foreground mt-4 inline-flex items-center gap-2 text-xs sm:mt-5'>
           <span className='relative flex size-2'>
             <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
             <span className='relative inline-flex size-2 rounded-full bg-emerald-500' />
@@ -194,19 +194,20 @@ export function Footer(props: FooterProps) {
         </span>
       </div>
 
-      <div className='grid grid-cols-2 gap-x-8 gap-y-9 sm:grid-cols-4'>
+      <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8 sm:gap-y-9'>
         {displayColumns.map((column, index) => (
           <div
             key={index}
             className={cn(
+              'min-w-0',
               index === displayColumns.length - 1 &&
                 'sm:border-border/70 sm:border-l sm:pl-6'
             )}
           >
-            <h3 className='mb-3 text-[13px] font-semibold'>
+            <h3 className='mb-2.5 text-[13px] font-semibold sm:mb-3'>
               {t(column.title)}
             </h3>
-            <ul className='space-y-2.5'>
+            <ul className='space-y-2 sm:space-y-2.5'>
               {column.links.map((link, linkIndex) => (
                 <li key={linkIndex}>
                   <FooterLinkItem link={link} />
@@ -226,10 +227,10 @@ export function Footer(props: FooterProps) {
         props.className
       )}
     >
-      <div className='mx-auto w-full max-w-6xl px-5 py-12 sm:px-6 sm:py-14'>
+      <div className='mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14'>
         {body}
 
-        <div className='border-border/70 mt-12 space-y-3 border-t pt-6'>
+        <div className='border-border/70 mt-10 space-y-3 border-t pt-6 sm:mt-12'>
           <p className='text-muted-foreground text-xs'>
             &copy; {currentYear} {displayName}.{' '}
             {props.copyright ?? t('footer.defaultCopyright')}
