@@ -1,7 +1,24 @@
 {
   "version": 1,
   "_comment": "人工核对的权威值，优先级高于所有自动源。用于解决源冲突或补充源缺 口；请在 note 里写清依据与核对日期。excluded 里的模型不会被发布，即使聚合源仍然列出。",
-  "models": [],
+  "models": [
+    {
+      "model_name": "gemini-3-pro-image",
+      "note": "官方模型页 ai.google.dev/gemini-api/docs/models/gemini-3-pro-image（2026-09-08 更新）：输入 token 上限 65,536，输出 32,768；官方价格表 >200K 档对本模型不可达。",
+      "fields": {
+        "context_length": 65536,
+        "max_output_tokens": 32768
+      }
+    },
+    {
+      "model_name": "gemini-3-pro-image-preview",
+      "note": "官方模型页 ai.google.dev/gemini-api/docs/models/gemini-3-pro-image（2026-09-08 更新）：输入 token 上限 65,536，输出 32,768；官方价格表 >200K 档对本模型不可达。",
+      "fields": {
+        "context_length": 65536,
+        "max_output_tokens": 32768
+      }
+    }
+  ],
   "excluded": [
     "Qwen3-235B-A22B-Thinking-2507",
     "Qwen3-Coder-480B-A35B-Instruct-FP8"
