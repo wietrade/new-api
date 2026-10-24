@@ -33,17 +33,17 @@ type BoundChannel struct {
 }
 
 type Model struct {
-	Id                 int            `json:"id"`
-	ModelName          string         `json:"model_name" gorm:"size:128;not null;uniqueIndex:uk_model_name_delete_at,priority:1"`
-	Description        string         `json:"description,omitempty" gorm:"type:text"`
-	Icon               string         `json:"icon,omitempty" gorm:"type:varchar(128)"`
-	Tags               string         `json:"tags,omitempty" gorm:"type:varchar(255)"`
-	Capabilities       string         `json:"capabilities,omitempty" gorm:"type:varchar(255)"`
-	InputModalities    string         `json:"input_modalities,omitempty" gorm:"type:varchar(128)"`
-	OutputModalities   string         `json:"output_modalities,omitempty" gorm:"type:varchar(128)"`
-	ContextLength      int            `json:"context_length,omitempty" gorm:"default:0"`
-	MaxOutputTokens    int            `json:"max_output_tokens,omitempty" gorm:"default:0"`
-	IsFree             int            `json:"is_free" gorm:"default:0"`
+	Id               int    `json:"id"`
+	ModelName        string `json:"model_name" gorm:"size:128;not null;uniqueIndex:uk_model_name_delete_at,priority:1"`
+	Description      string `json:"description,omitempty" gorm:"type:text"`
+	Icon             string `json:"icon,omitempty" gorm:"type:varchar(128)"`
+	Tags             string `json:"tags,omitempty" gorm:"type:varchar(255)"`
+	Capabilities     string `json:"capabilities,omitempty" gorm:"type:varchar(255)"`
+	InputModalities  string `json:"input_modalities,omitempty" gorm:"type:varchar(128)"`
+	OutputModalities string `json:"output_modalities,omitempty" gorm:"type:varchar(128)"`
+	ContextLength    int    `json:"context_length,omitempty" gorm:"default:0"`
+	MaxOutputTokens  int    `json:"max_output_tokens,omitempty" gorm:"default:0"`
+	IsFree           int    `json:"is_free" gorm:"default:0"`
 	// Lifecycle 是厂商生命周期状态（空串=未知），与 Status（我方展示开关）语义不同。
 	Lifecycle          string         `json:"lifecycle,omitempty" gorm:"size:32;default:''"`
 	ReleaseDate        string         `json:"release_date,omitempty" gorm:"size:32;default:''"`
