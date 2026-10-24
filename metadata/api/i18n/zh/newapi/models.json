@@ -28,7 +28,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "legacy",
-      "release_date": "",
+      "release_date": "2026-06-07",
       "knowledge_cutoff": ""
     },
     {
@@ -60,7 +60,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "ga",
-      "release_date": "",
+      "release_date": "2026-09-01",
       "knowledge_cutoff": "2026-06"
     },
     {
@@ -150,7 +150,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "ga",
-      "release_date": "",
+      "release_date": "2026-10-07",
       "knowledge_cutoff": "2026-06"
     },
     {
@@ -179,7 +179,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "legacy",
-      "release_date": "",
+      "release_date": "2026-05-28",
       "knowledge_cutoff": ""
     },
     {
@@ -208,7 +208,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "legacy",
-      "release_date": "",
+      "release_date": "2025-11-24",
       "knowledge_cutoff": ""
     },
     {
@@ -237,7 +237,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "legacy",
-      "release_date": "",
+      "release_date": "2026-02-04",
       "knowledge_cutoff": ""
     },
     {
@@ -266,7 +266,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "legacy",
-      "release_date": "",
+      "release_date": "2026-04-14",
       "knowledge_cutoff": ""
     },
     {
@@ -298,7 +298,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "legacy",
-      "release_date": "",
+      "release_date": "2026-07-24",
       "knowledge_cutoff": ""
     },
     {
@@ -330,7 +330,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "ga",
-      "release_date": "",
+      "release_date": "2026-09-22",
       "knowledge_cutoff": "2026-06"
     },
     {
@@ -362,7 +362,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "legacy",
-      "release_date": "",
+      "release_date": "2026-06-30",
       "knowledge_cutoff": ""
     },
     {
@@ -394,7 +394,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "ga",
-      "release_date": "",
+      "release_date": "2026-09-28",
       "knowledge_cutoff": "2026-06"
     },
     {
@@ -451,7 +451,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-04-24",
       "knowledge_cutoff": ""
     },
     {
@@ -479,7 +479,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-10-17",
       "knowledge_cutoff": ""
     },
     {
@@ -540,7 +540,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "ga",
-      "release_date": "",
+      "release_date": "2026-06-18",
       "knowledge_cutoff": ""
     },
     {
@@ -571,7 +571,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2025-11-20",
       "knowledge_cutoff": ""
     },
     {
@@ -600,7 +600,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-06-18",
       "knowledge_cutoff": ""
     },
     {
@@ -629,7 +629,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-02-26",
       "knowledge_cutoff": ""
     },
     {
@@ -663,7 +663,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-10-13",
       "knowledge_cutoff": ""
     },
     {
@@ -693,7 +693,7 @@
       "is_free": true,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-04-03",
       "knowledge_cutoff": ""
     },
     {
@@ -722,7 +722,7 @@
       "is_free": true,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-04-02",
       "knowledge_cutoff": ""
     },
     {
@@ -840,7 +840,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-07-16",
       "knowledge_cutoff": ""
     },
     {
@@ -952,7 +952,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "deprecated",
-      "release_date": "",
+      "release_date": "2025-12-16",
       "knowledge_cutoff": ""
     },
     {
@@ -983,7 +983,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-03-05",
       "knowledge_cutoff": ""
     },
     {
@@ -1014,7 +1014,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-04-24",
       "knowledge_cutoff": ""
     },
     {
@@ -1046,7 +1046,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-07-09",
       "knowledge_cutoff": ""
     },
     {
@@ -1078,7 +1078,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-07-09",
       "knowledge_cutoff": ""
     },
     {
@@ -1110,7 +1110,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-07-09",
       "knowledge_cutoff": ""
     },
     {
@@ -1142,7 +1142,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-09-04",
       "knowledge_cutoff": ""
     },
     {
@@ -1174,7 +1174,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-09-22",
       "knowledge_cutoff": ""
     },
     {
@@ -1206,7 +1206,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-09-22",
       "knowledge_cutoff": ""
     },
     {
@@ -1238,7 +1238,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-09-29",
       "knowledge_cutoff": ""
     },
     {
@@ -1318,7 +1318,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2025-08-05",
       "knowledge_cutoff": ""
     },
     {
@@ -1517,7 +1517,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-02-11",
       "knowledge_cutoff": ""
     },
     {
@@ -1545,7 +1545,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-09-23",
       "knowledge_cutoff": ""
     },
     {
