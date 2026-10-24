@@ -302,7 +302,7 @@ function OverviewSummaryGrid(props: { model: PricingModel }) {
   const avgLatency = summary?.avg_latency_ms ?? 0
 
   return (
-    <div className='bg-muted/20 grid overflow-hidden rounded-lg border sm:grid-cols-3 sm:divide-x'>
+    <div className='bg-muted/20 grid grid-cols-3 divide-x overflow-hidden rounded-lg border'>
       <OverviewMetric
         icon={Timer}
         label='TPS'
@@ -1139,7 +1139,7 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
     <div className='overflow-hidden rounded-lg border'>
       <StaticDataTable
         className='rounded-none border-0'
-        tableClassName='text-sm [&_tbody>tr]:h-auto'
+        tableClassName='text-sm [&_tbody>tr]:h-auto [&_td]:px-1 [&_th]:px-1 sm:[&_td]:px-2 sm:[&_th]:px-2'
         headerRowClassName='hover:bg-transparent'
         data={rows}
         getRowKey={(row) => `${row.key}-${row.tier.label}`}
