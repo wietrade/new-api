@@ -252,12 +252,12 @@ export function Footer(props: FooterProps) {
       <div className='mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14'>
         {body}
 
-        <div className='border-border/80 mt-10 flex flex-col gap-3 border-t pt-6 sm:mt-12 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='border-border/80 mt-10 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t pt-6 sm:mt-12'>
           <p className='text-muted-foreground text-xs'>
             &copy; {currentYear} {displayName}.{' '}
             {props.copyright ?? t('footer.defaultCopyright')}
           </p>
-          <span className='text-muted-foreground inline-flex items-center gap-2 text-xs sm:justify-end'>
+          <span className='text-muted-foreground inline-flex items-center gap-2 text-xs'>
             <span className='relative flex size-2'>
               <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
               <span className='relative inline-flex size-2 rounded-full bg-emerald-500' />
