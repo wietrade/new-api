@@ -147,7 +147,7 @@ export function Footer(props: FooterProps) {
       {
         title: t('Developers'),
         links: [
-          { text: t('NowHub API Docs'), href: docsSiteHref },
+          { text: t('Docs'), href: docsSiteHref },
           { text: t('API reference'), href: docsHref },
           { text: t('FAQ'), href: '/help/faq/' },
         ],
@@ -180,7 +180,7 @@ export function Footer(props: FooterProps) {
             icon: Send,
           },
           {
-            text: 'NowHub.Org',
+            text: 'NowHub.org',
             href: '/',
             icon: EarthIcon,
           },
@@ -214,13 +214,6 @@ export function Footer(props: FooterProps) {
         <p className='text-muted-foreground mt-3 text-[13px] leading-6 sm:mt-4 sm:text-sm'>
           {t('footer.brandDescription')}
         </p>
-        <span className='text-muted-foreground mt-4 inline-flex items-center gap-2 text-xs sm:mt-5'>
-          <span className='relative flex size-2'>
-            <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
-            <span className='relative inline-flex size-2 rounded-full bg-emerald-500' />
-          </span>
-          {t('All systems operational')}
-        </span>
       </div>
 
       <div className='grid grid-cols-2 gap-x-6 gap-y-8 xl:grid-cols-4 xl:gap-x-8 xl:gap-y-9'>
@@ -259,14 +252,18 @@ export function Footer(props: FooterProps) {
       <div className='mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14'>
         {body}
 
-        <div className='border-border/80 mt-10 space-y-3 border-t pt-6 sm:mt-12'>
+        <div className='border-border/80 mt-10 flex flex-col gap-3 border-t pt-6 sm:mt-12 sm:flex-row sm:items-center sm:justify-between'>
           <p className='text-muted-foreground text-xs'>
             &copy; {currentYear} {displayName}.{' '}
             {props.copyright ?? t('footer.defaultCopyright')}
           </p>
-          <p className='text-muted-foreground/70 text-xs leading-5'>
-            {t('footer.trademarkNotice')}
-          </p>
+          <span className='text-muted-foreground inline-flex items-center gap-2 text-xs sm:justify-end'>
+            <span className='relative flex size-2'>
+              <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
+              <span className='relative inline-flex size-2 rounded-full bg-emerald-500' />
+            </span>
+            {t('All systems operational')}
+          </span>
         </div>
       </div>
     </footer>
