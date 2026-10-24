@@ -32,6 +32,20 @@ STAGE_GZ="$(mktemp -d)"
 STAGE_RAW="$(mktemp -d)"
 trap 'rm -rf "$STAGE_GZ" "$STAGE_RAW"' EXIT
 
+# 增量：产物文件名带内容 hash，已存在即内容相同，无需重复上传（省流量/时间）。
+# 需要强制全量覆盖时：SKIP_EXISTING=0 bash scripts/upload-static-to-oss.sh
+declare -A EXISTS=()
+skipped=0
+if [ "${SKIP_EXISTING:-1}" = "1" ]; then
+  echo "==> 读取 OSS 现有对象清单"
+  while IFS= read -r key; do
+    [ -n "$key" ] && EXISTS["$key"]=1
+  done < <(
+    ossutil ls "oss://$BUCKET/$PREFIX/" --endpoint "$ENDPOINT" -s 2>/dev/null | grep -v '/$'
+  )
+  echo "    已存在 ${#EXISTS[@]} 个对象"
+fi
+
 gz_count=0
 raw_count=0
 while IFS= read -r -d '' file; do
@@ -39,6 +53,10 @@ while IFS= read -r -d '' file; do
   case "$rel" in
     *.br) continue ;;
   esac
+  if [ -n "${EXISTS["oss://$BUCKET/$PREFIX/$rel"]:-}" ]; then
+    skipped=$((skipped + 1))
+    continue
+  fi
   case "$rel" in
     *.js | *.css | *.html | *.svg | *.json | *.xml | *.txt | *.webmanifest)
       mkdir -p "$(dirname "$STAGE_GZ/$rel")"
@@ -53,7 +71,12 @@ while IFS= read -r -d '' file; do
   esac
 done < <(find "$SRC_DIR" -type f -print0)
 
-echo "    gzip 文本 $gz_count 个 / 原样上传 $raw_count 个"
+echo "    gzip 文本 $gz_count 个 / 原样上传 $raw_count 个 / 跳过已存在 $skipped 个"
+
+if [ "$gz_count" -eq 0 ] && [ "$raw_count" -eq 0 ]; then
+  echo "==> 无新增文件，跳过上传"
+  exit 0
+fi
 
 # OSS 不做 Accept-Encoding 协商，因此把 gzip 字节直接作为对象内容，
 # 并用 Content-Encoding: gzip 告知浏览器解压（所有浏览器与主流爬虫都支持）。
