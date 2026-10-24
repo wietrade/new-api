@@ -122,6 +122,8 @@ func GetStatus(c *gin.Context) {
 		"setup":                       constant.Setup,
 		"user_agreement_enabled":      legalSetting.UserAgreement != "",
 		"privacy_policy_enabled":      legalSetting.PrivacyPolicy != "",
+		"acceptable_use_enabled":      legalSetting.AcceptableUse != "",
+		"service_level_enabled":       legalSetting.ServiceLevel != "",
 		"checkin_enabled":             operation_setting.GetCheckinSetting().Enabled,
 		"log_export_enabled":          operation_setting.GetLogSetting().UserExportEnabled,
 		"log_max_range_days":          operation_setting.GetLogSetting().MaxRangeDays,
@@ -196,6 +198,14 @@ func GetUserAgreement(c *gin.Context) {
 
 func GetPrivacyPolicy(c *gin.Context) {
 	serveRevalidatedJSON(c, system_setting.GetLegalSettings().PrivacyPolicy)
+}
+
+func GetAcceptableUse(c *gin.Context) {
+	serveRevalidatedJSON(c, system_setting.GetLegalSettings().AcceptableUse)
+}
+
+func GetServiceLevel(c *gin.Context) {
+	serveRevalidatedJSON(c, system_setting.GetLegalSettings().ServiceLevel)
 }
 
 func GetMidjourney(c *gin.Context) {

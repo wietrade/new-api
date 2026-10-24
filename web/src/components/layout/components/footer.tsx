@@ -130,6 +130,8 @@ export function Footer(props: FooterProps) {
         links: [
           { text: t('Terms of service'), href: '/user-agreement' },
           { text: t('Privacy policy'), href: '/privacy-policy' },
+          { text: t('Acceptable use'), href: '/acceptable-use' },
+          { text: t('Service level'), href: '/service-level' },
         ],
       },
       {

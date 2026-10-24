@@ -18,3 +18,5 @@ For commercial licensing, please contact support@quantumnous.com
 */
 export { UserAgreement } from './user-agreement'
 export { PrivacyPolicy } from './privacy-policy'
+export { AcceptableUse } from './acceptable-use'
+export { ServiceLevel } from './service-level'

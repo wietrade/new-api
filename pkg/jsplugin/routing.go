@@ -412,6 +412,8 @@ var reservedRouteNamespaces = []string{
 	"/reset",
 	"/privacy-policy",
 	"/user-agreement",
+	"/acceptable-use",
+	"/service-level",
 	"/about",
 	"/pricing",
 	"/rankings",
