@@ -90,11 +90,12 @@ if [ "$DRY_RUN" != "0" ]; then
 fi
 
 log "开始删除"
-chunk=50
-mapfile -t keys <"$WORK/todo.txt"
-for ((i = 0; i < ${#keys[@]}; i += chunk)); do
-  ossutil rm -f --endpoint "$ENDPOINT" "${keys[@]:i:chunk}" >/dev/null
-  printf '\r    已删除 %d/%d' "$((i + chunk < todo ? i + chunk : todo))" "$todo"
-done
+# ossutil v1 的 rm 一次只接受一个对象（多参数会报错），这里逐条删除
+done_count=0
+while IFS= read -r key; do
+  ossutil rm -f --endpoint "$ENDPOINT" "$key" >/dev/null
+  done_count=$((done_count + 1))
+  printf '\r    已删除 %d/%d' "$done_count" "$todo"
+done <"$WORK/todo.txt"
 echo
 log "完成"
