@@ -169,7 +169,7 @@ export function Footer(props: FooterProps) {
       dangerouslySetInnerHTML={{ __html: footerHtml }}
     />
   ) : (
-    <div className='grid gap-9 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)] lg:gap-14'>
+    <div className='grid gap-9 sm:gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,2.15fr)] lg:gap-14'>
       <div className='max-w-sm'>
         <Link to='/' className='inline-flex items-center gap-2.5'>
           <img
