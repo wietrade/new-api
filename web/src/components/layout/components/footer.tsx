@@ -194,14 +194,14 @@ export function Footer(props: FooterProps) {
         </span>
       </div>
 
-      <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8 sm:gap-y-9'>
+      <div className='grid grid-cols-2 gap-x-6 gap-y-8 xl:grid-cols-4 xl:gap-x-8 xl:gap-y-9'>
         {displayColumns.map((column, index) => (
           <div
             key={index}
             className={cn(
               'min-w-0',
               index === displayColumns.length - 1 &&
-                'sm:border-border/70 sm:border-l sm:pl-6'
+                'xl:border-border/70 xl:border-l xl:pl-6'
             )}
           >
             <h3 className='mb-2.5 text-[13px] font-semibold sm:mb-3'>
