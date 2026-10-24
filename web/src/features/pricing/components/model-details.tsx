@@ -1176,6 +1176,10 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
               ) : (
                 t(fieldEntry.shortLabel)
               )
+            // 移动端宽度有限，缓存写入列（最次要）先隐藏，避免价格表被裁切
+            const hideOnMobile =
+              fieldEntry.field === 'cacheCreatePrice' ||
+              fieldEntry.field === 'cacheCreate1hPrice'
             return {
               id: fieldEntry.field,
               header: unitLabel ? (
@@ -1186,8 +1190,14 @@ function DynamicGroupPricingTable(props: DynamicGroupPricingTableProps) {
               ) : (
                 fieldLabel
               ),
-              className: `${thClass} text-right`,
-              cellClassName: 'py-2.5 text-right font-mono',
+              className: cn(
+                `${thClass} text-right`,
+                hideOnMobile && 'max-sm:hidden'
+              ),
+              cellClassName: cn(
+                'py-2.5 text-right font-mono',
+                hideOnMobile && 'max-sm:hidden'
+              ),
               cell: (row: (typeof rows)[number]) =>
                 row.prices.get(row.tier)?.get(fieldEntry.field) ?? '-',
             }
