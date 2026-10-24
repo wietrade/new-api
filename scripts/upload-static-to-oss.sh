@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# 把前端静态产物上传到对象存储（配合构建期的 ASSET_PREFIX 使用）。
+# 把前端静态产物上传到阿里云 OSS（配合构建期的 ASSET_PREFIX 使用）。
 #
 # 用法：
 #   OSS_BUCKET=nowhub-static \
-#   OSS_ENDPOINT=oss-cn-hongkong.aliyuncs.com \
+#   OSS_ENDPOINT=oss-accelerate.aliyuncs.com \
 #   ./scripts/upload-static-to-oss.sh
 #
-# 前提：
-#   1) 已安装 ossutil 并完成 ossutil config（AK/SK 走本地配置，不写进仓库）；
-#   2) 构建时设置了 ASSET_PREFIX，且与这里的访问前缀一致：
-#        ASSET_PREFIX=https://<加速域名>/static/ bun run build
-#   3) 桶已配置 CORS：允许 https://www.nowhub.org 的 GET/HEAD。
+# 说明：
+#   * 使用 OSS 自带域名即可，不需要域名备案：
+#       默认：https://<bucket>.oss-<region>.aliyuncs.com
+#       加速：https://<bucket>.oss-accelerate.aliyuncs.com（需先在控制台开启「传输加速」）
+#   * OSS 不会根据 Accept-Encoding 内容协商，也不会返回 .br/.gz 变体，
+#     所以默认不上传 .br（上传了也没人请求）。需要 brotli 请在 OSS 前加 CDN，
+#     或设置 UPLOAD_BROTLI=1 配合自行配置的压缩规则。
+#   * 桶需允许公共读取，并配置 CORS：Origin=https://www.nowhub.org，Methods=GET,HEAD。
 set -euo pipefail
 
 BUCKET="${OSS_BUCKET:?需要设置 OSS_BUCKET}"
@@ -24,19 +27,49 @@ if [ ! -d "$SRC_DIR" ]; then
   exit 1
 fi
 
-echo "==> 上传普通文件到 oss://$BUCKET/$PREFIX"
-ossutil cp -r "$SRC_DIR" "oss://$BUCKET/$PREFIX" \
-  --endpoint "$ENDPOINT" -f -u \
-  --meta "Cache-Control:$CACHE_CONTROL"
+echo "==> 预处理：文本资源 gzip 压缩"
+STAGE_GZ="$(mktemp -d)"
+STAGE_RAW="$(mktemp -d)"
+trap 'rm -rf "$STAGE_GZ" "$STAGE_RAW"' EXIT
 
-# .br 预压缩文件需要标记 Content-Encoding，否则浏览器会把二进制当源码执行
-if find "$SRC_DIR" -name '*.br' -print -quit | grep -q .; then
-  echo "==> 上传 brotli 预压缩文件"
-  ossutil cp -r "$SRC_DIR" "oss://$BUCKET/$PREFIX" \
+gz_count=0
+raw_count=0
+while IFS= read -r -d '' file; do
+  rel="${file#"$SRC_DIR"/}"
+  case "$rel" in
+    *.br) continue ;;
+  esac
+  case "$rel" in
+    *.js | *.css | *.html | *.svg | *.json | *.xml | *.txt | *.webmanifest)
+      mkdir -p "$(dirname "$STAGE_GZ/$rel")"
+      gzip -9 -c "$file" >"$STAGE_GZ/$rel"
+      gz_count=$((gz_count + 1))
+      ;;
+    *)
+      mkdir -p "$(dirname "$STAGE_RAW/$rel")"
+      cp "$file" "$STAGE_RAW/$rel"
+      raw_count=$((raw_count + 1))
+      ;;
+  esac
+done < <(find "$SRC_DIR" -type f -print0)
+
+echo "    gzip 文本 $gz_count 个 / 原样上传 $raw_count 个"
+
+# OSS 不做 Accept-Encoding 协商，因此把 gzip 字节直接作为对象内容，
+# 并用 Content-Encoding: gzip 告知浏览器解压（所有浏览器与主流爬虫都支持）。
+echo "==> 上传 gzip 资源到 oss://$BUCKET/$PREFIX"
+if [ "$gz_count" -gt 0 ]; then
+  ossutil cp -r "$STAGE_GZ/." "oss://$BUCKET/$PREFIX" \
     --endpoint "$ENDPOINT" -f -u \
-    --include "*.br" \
-    --meta "Content-Encoding:br#Cache-Control:$CACHE_CONTROL"
+    --meta "Content-Encoding:gzip#Cache-Control:$CACHE_CONTROL"
 fi
 
-echo "==> 完成。确认加速域名下的 /static/ 与本地一致："
-echo "    curl -I https://<加速域名>/static/js/<file>.js"
+if [ "$raw_count" -gt 0 ]; then
+  echo "==> 上传其余资源到 oss://$BUCKET/$PREFIX"
+  ossutil cp -r "$STAGE_RAW/." "oss://$BUCKET/$PREFIX" \
+    --endpoint "$ENDPOINT" -f -u \
+    --meta "Cache-Control:$CACHE_CONTROL"
+fi
+
+echo "==> 完成。确认对象头（应有 Content-Encoding: gzip）："
+echo "    curl -I https://<域名>/$PREFIX/js/<file>.js"

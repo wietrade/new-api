@@ -16,8 +16,10 @@ export default defineConfig(({ envMode }) => {
     'http://localhost:3000'
 
   const isProd = envMode === 'production'
-  // 静态资源外链前缀（CDN）。未设置时保持同源引用，便于无 CDN 部署。
-  // 用法：ASSET_PREFIX=https://xxx.cdn.aliyun.com/ bun run build
+  // 静态资源外链前缀（CDN / OSS 域名）。未设置时保持同源引用，便于无 CDN 部署。
+  // 用法（注意：传根地址，不带 /static）：
+  //   ASSET_PREFIX=https://bucket.oss-accelerate.aliyuncs.com bun run build
+  // 产物引用会变成 https://<域名>/static/js/xxx.js
   const assetPrefix = process.env.ASSET_PREFIX?.trim()
     ? process.env.ASSET_PREFIX.trim().replace(/\/?$/, '/')
     : undefined

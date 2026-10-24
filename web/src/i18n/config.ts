@@ -21,29 +21,44 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 
 import { convertDetectedLanguage } from './languages'
-import en from './locales/en.json'
-import fr from './locales/fr.json'
-import ja from './locales/ja.json'
-import ru from './locales/ru.json'
-import vi from './locales/vi.json'
-import zhTW from './locales/zh-TW.json'
-import zhCN from './locales/zh.json'
 
-export const resources = {
-  en,
-  zhCN,
-  fr,
-  ru,
-  ja,
-  vi,
-  zhTW,
-} as const
+// 语言包按需加载：只在需要时下载当前语言（+ 英文兜底），
+// 避免把 7 份 JSON（约 4.5 MB）全部塞进首屏主 chunk。
+const localeLoaders = {
+  en: () => import('./locales/en.json'),
+  zhCN: () => import('./locales/zh.json'),
+  zhTW: () => import('./locales/zh-TW.json'),
+  ja: () => import('./locales/ja.json'),
+  fr: () => import('./locales/fr.json'),
+  ru: () => import('./locales/ru.json'),
+  vi: () => import('./locales/vi.json'),
+}
 
-i18n
+type LocaleLoader = () => Promise<{ default: Record<string, unknown> }>
+
+const lazyJSONBackend = {
+  type: 'backend' as const,
+  init: () => undefined,
+  read: (
+    language: string,
+    _namespace: string,
+    callback: (error: unknown, data: Record<string, unknown> | null) => void
+  ) => {
+    const loader =
+      (localeLoaders as Record<string, LocaleLoader>)[language] ??
+      localeLoaders.en
+    loader()
+      .then((module) => callback(null, module.default))
+      .catch((error) => callback(error, null))
+  },
+}
+
+/** i18n 初始化完成（含当前语言包加载）后再渲染，避免首帧出现 key。 */
+export const i18nReady = i18n
   .use(LanguageDetector)
+  .use(lazyJSONBackend)
   .use(initReactI18next)
   .init({
-    resources,
     fallbackLng: 'en',
     supportedLngs: ['en', 'zhCN', 'fr', 'ru', 'ja', 'vi', 'zhTW'],
     load: 'currentOnly',
