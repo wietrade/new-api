@@ -577,7 +577,7 @@
         "text",
         "image"
       ],
-      "context_length": 65536,
+      "context_length": 131072,
       "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null

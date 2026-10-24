@@ -96,7 +96,7 @@
       "price_kind": "vendor_official",
       "source_kind": "official_doc",
       "source": "vendor_official",
-      "source_model_id": "claude-haiku-5.5",
+      "source_model_id": "claude-haiku-5-5",
       "currency": "USD",
       "unit": "per_1m_tokens",
       "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
