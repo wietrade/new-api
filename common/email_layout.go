@@ -26,7 +26,6 @@ func emailSiteLink() string {
 	return addr
 }
 
-// emailLogoURL 把站点 Logo 配置解析成邮件可用的绝对地址，无法解析时返回空。
 // 邮件不使用任何外部图片（很多客户端默认不加载远程图片），
 // 头部品牌标记用纯 CSS 方块 + 首字母渲染。
 func emailBrandInitial() string {
