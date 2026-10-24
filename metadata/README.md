@@ -188,6 +188,21 @@ systemctl restart new-api
 模型的增删改名同理，见 `scripts/ops/README.md`。每一步都可重复执行，线上状态
 因此能从 git 复现，而不依赖谁还记得后台点过什么。
 
+### 校验（改完必跑）
+
+```bash
+python -m scripts.model_sync.validate            # 元数据 + 价格快照自洽性
+python -m scripts.model_sync.validate --live /tmp/expr.json   # 额外比对线上实际生效价格
+```
+
+检查项：名称唯一、vendor 存在、枚举闭集、`max_output ≤ context`、`:free` 与 `is_free` 一致、
+阶梯阈值落在上下文内、`billing_expr` 可由价格字段复现、快照与 `pricing.official.json` 一致、
+三份 i18n 文件是否同步。CI 会在每日同步后自动执行。
+
+> **改价红线**：任何价格变更都必须先改 `pricing.official.json` / `pricing.json`，再走
+> `scripts/ops/apply_billing.py` 落库。直接调 `PATCH /api/option/model_pricing` 或改数据库会绕过
+> 官方原文校验，`--live` 校验会把这类漂移报成错误。
+
 ## 原始第三方快照（metadata/raw/）
 
 `raw/` 存放**未合并**的第三方抓取快照，供人工比对后决定是否并入 `api/newapi/models.json`：
