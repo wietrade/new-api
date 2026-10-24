@@ -61,7 +61,6 @@ const (
 
 	MsgEmailPasswordResetSubject      = "email.password_reset.subject"
 	MsgEmailPasswordResetGreeting     = "email.password_reset.greeting"
-	MsgEmailPasswordResetLink         = "email.password_reset.link"
 	MsgEmailPasswordResetButton       = "email.password_reset.button"
 	MsgEmailPasswordResetLinkFallback = "email.password_reset.link_fallback"
 	MsgEmailPasswordResetValidity     = "email.password_reset.validity"

@@ -20,6 +20,15 @@ func emailSiteURL() string {
 	return strings.TrimRight(addr, "/") + "/"
 }
 
+// EmailCodeBlock 渲染「小字标签 + 居中验证码」区块，用于验证码类邮件。
+// 标签与验证码分开渲染，保证数字在邮件里居中且易于复制。
+func EmailCodeBlock(label, code string) string {
+	return fmt.Sprintf(
+		`<p style="margin:24px 0 8px;text-align:center;color:#5b6472;font-size:13px;line-height:1.5">%s</p>`+
+			`<p style="margin:0 0 24px;text-align:center"><span class="email-code">%s</span></p>`,
+		label, code)
+}
+
 // 邮件不使用任何外部图片（很多客户端默认不加载远程图片），
 // 头部品牌标记用纯 CSS 方块 + 首字母渲染。
 func emailBrandInitial() string {
