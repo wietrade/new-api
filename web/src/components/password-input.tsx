@@ -67,7 +67,9 @@ export function PasswordInput({
         variant='ghost'
         disabled={disabled}
         className={cn(
-          'text-muted-foreground hover:text-foreground absolute end-1 top-1/2 h-7 w-7 -translate-y-1/2 rounded-md',
+          // 用 inset-y-0 + my-auto 做垂直居中，避免依赖 translate（按钮基类的
+          // active:translate-y-px 会在按下瞬间覆盖 -translate-y-1/2，图标会“跳”一下）。
+          'text-muted-foreground hover:text-foreground absolute end-1 inset-y-0 my-auto h-7 w-7 rounded-md active:translate-y-0',
           buttonClassName
         )}
         aria-label={toggleLabel}
