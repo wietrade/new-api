@@ -31,6 +31,7 @@ export function PrivacyPolicy() {
       emptyMessage={t(
         'The administrator has not configured a privacy policy yet.'
       )}
+      fallbackDocsPath='privacy.html'
     />
   )
 }

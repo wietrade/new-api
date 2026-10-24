@@ -25,6 +25,7 @@ import { RichContent } from '@/components/rich-content'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { DocsEmbed } from '@/features/docs-embed'
 import { isHttpUrl, isLikelyHtml } from '@/lib/content-format'
 
 import type { LegalDocumentResponse } from './types'
@@ -34,6 +35,8 @@ type LegalDocumentProps = {
   queryKey: string
   fetchDocument: () => Promise<LegalDocumentResponse>
   emptyMessage: string
+  /** 后台未配置内容时回退到文档站页面（与「关于我们」一致），例如 "terms.html" */
+  fallbackDocsPath?: string
 }
 
 export function LegalDocument({
@@ -41,6 +44,7 @@ export function LegalDocument({
   queryKey,
   fetchDocument,
   emptyMessage,
+  fallbackDocsPath,
 }: LegalDocumentProps) {
   const { t } = useTranslation()
   const { data, isLoading } = useQuery({
@@ -69,6 +73,9 @@ export function LegalDocument({
   }
 
   if (!success || !hasContent) {
+    if (fallbackDocsPath) {
+      return <DocsEmbed path={fallbackDocsPath} />
+    }
     return (
       <PublicLayout>
         <div className='mx-auto max-w-2xl py-12'>

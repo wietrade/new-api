@@ -31,6 +31,7 @@ export function UserAgreement() {
       emptyMessage={t(
         'The administrator has not configured a user agreement yet.'
       )}
+      fallbackDocsPath='terms.html'
     />
   )
 }

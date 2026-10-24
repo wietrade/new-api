@@ -60,8 +60,6 @@ const _systemInfoSchema = z.object({
   legal: z.object({
     user_agreement: z.string().optional(),
     privacy_policy: z.string().optional(),
-    acceptable_use: z.string().optional(),
-    service_level: z.string().optional(),
   }),
 })
 
@@ -94,8 +92,6 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     legal: {
       user_agreement: normalizeValue(defaultValues.legal?.user_agreement),
       privacy_policy: normalizeValue(defaultValues.legal?.privacy_policy),
-      acceptable_use: normalizeValue(defaultValues.legal?.acceptable_use),
-      service_level: normalizeValue(defaultValues.legal?.service_level),
     },
   }
 
@@ -120,8 +116,6 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     legal: z.object({
       user_agreement: z.string().optional(),
       privacy_policy: z.string().optional(),
-      acceptable_use: z.string().optional(),
-      service_level: z.string().optional(),
     }),
   })
 
@@ -350,7 +344,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                     </FormControl>
                     <FormDescription>
                       {t(
-                        'Leave empty to disable the agreement requirement. Supports Markdown, HTML, or a full URL to redirect users.'
+                        'Leave empty to use the built-in docs page. Supports Markdown, HTML, or a full URL for custom content.'
                       )}
                     </FormDescription>
                     <FormMessage />
@@ -375,57 +369,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                     </FormControl>
                     <FormDescription>
                       {t(
-                        'Leave empty to disable the privacy policy requirement. Supports Markdown, HTML, or a full URL to redirect users.'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='legal.acceptable_use'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Acceptable Use Policy')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={t(
-                          'Provide Markdown, HTML, or an external URL for the acceptable use policy'
-                        )}
-                        rows={6}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Leave empty to disable the requirement. Supports Markdown, HTML, or a full URL to redirect users.'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='legal.service_level'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Service Level Agreement')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={t(
-                          'Provide Markdown, HTML, or an external URL for the service level agreement'
-                        )}
-                        rows={6}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Leave empty to disable the requirement. Supports Markdown, HTML, or a full URL to redirect users.'
+                        'Leave empty to use the built-in docs page. Supports Markdown, HTML, or a full URL for custom content.'
                       )}
                     </FormDescription>
                     <FormMessage />

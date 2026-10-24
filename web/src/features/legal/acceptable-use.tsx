@@ -16,21 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useTranslation } from 'react-i18next'
+import { DocsEmbed } from '@/features/docs-embed'
 
-import { getAcceptableUse } from './api'
-import { LegalDocument } from './legal-document'
-
+// 与「关于我们」一致：正文直接来自文档站（docs-site/aup.md），随代码发布，无需后台配置。
 export function AcceptableUse() {
-  const { t } = useTranslation()
-  return (
-    <LegalDocument
-      title={t('Acceptable Use Policy')}
-      queryKey='acceptable-use'
-      fetchDocument={getAcceptableUse}
-      emptyMessage={t(
-        'The administrator has not configured this document yet.'
-      )}
-    />
-  )
+  return <DocsEmbed path='aup.html' />
 }
