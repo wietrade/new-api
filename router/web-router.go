@@ -48,10 +48,32 @@ func SetWebRouter(router *gin.Engine, assets WebAssets, pluginDispatcher gin.Han
 		middleware.Cache(),
 		middleware.ServeFrontendFiles(frontendFS),
 		func(c *gin.Context) {
+			urlPath := c.Request.URL.Path
 			if strings.HasPrefix(c.Request.RequestURI, "/v1") || strings.HasPrefix(c.Request.RequestURI, "/api") || strings.HasPrefix(c.Request.RequestURI, "/assets") {
 				controller.RelayNotFound(c)
 				return
 			}
+
+			// 文档站是静态站点：缺失页面返回真正的 404 页，而不是 SPA 首页，
+			// 否则搜索引擎会把不存在的页面当成有效页面收录。
+			if strings.HasPrefix(urlPath, "/docs/") {
+				c.Header("Cache-Control", "no-cache")
+				if page, err := assets.BuildFS.ReadFile("web/dist/docs/404.html"); err == nil {
+					c.Data(http.StatusNotFound, "text/html; charset=utf-8", page)
+					return
+				}
+				c.Status(http.StatusNotFound)
+				return
+			}
+
+			// 带扩展名的静态资源缺失时必须 404：返回 HTML 会触发 MIME 报错，
+			// 且 middleware.Cache 给的 immutable 头会让浏览器把这次失败缓存一年。
+			if strings.HasPrefix(urlPath, "/static/") {
+				c.Header("Cache-Control", "no-store")
+				c.Status(http.StatusNotFound)
+				return
+			}
+
 			c.Header("Cache-Control", "no-cache")
 			c.Data(http.StatusOK, "text/html; charset=utf-8", assets.IndexPage)
 		},
