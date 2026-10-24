@@ -21,11 +21,13 @@ import { useTranslation } from 'react-i18next'
 
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
+import { useMediaQuery } from '@/hooks'
 
 import {
   LoadingSkeleton,
   EmptyState,
   PricingFilterBar,
+  ModelCardGrid,
   ModelTable,
   ModelDetailsDrawer,
 } from './components'
@@ -39,6 +41,8 @@ export function Pricing() {
   const [selectedModelName, setSelectedModelName] = useState<string | null>(
     null
   )
+  // 窄屏用卡片（七列表格在 400px 内无法阅读），宽屏保留表格
+  const isCompact = useMediaQuery('(max-width: 767px)')
 
   const {
     models,
@@ -119,6 +123,20 @@ export function Pricing() {
           searchQuery={searchInput}
           hasActiveFilters={hasActiveFilters}
           onClearFilters={handleClearAll}
+        />
+      )
+    }
+
+    if (isCompact) {
+      return (
+        <ModelCardGrid
+          models={filteredModels}
+          onModelClick={handleModelClick}
+          priceRate={priceRate}
+          usdExchangeRate={usdExchangeRate}
+          tokenUnit={tokenUnit}
+          showRechargePrice={showRechargePrice}
+          selectedGroup={groupFilter[0]}
         />
       )
     }

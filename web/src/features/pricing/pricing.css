@@ -303,4 +303,28 @@
   .pricing-page .pricing-hero {
     padding-top: 24px;
   }
+
+  /* 窄屏筛选栏：搜索独占一行，其余两列排布，避免七个字段各占一行拉出 200px 高度 */
+  .pricing-page .pricing-filterbar {
+    gap: 8px 10px;
+  }
+  .pricing-page .pf-field {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 0;
+  }
+  .pricing-page .pf-field.pf-search {
+    flex-basis: 100%;
+  }
+  /* 下拉壳的宽度来自内联 style，需要 !important 才能撑满 */
+  .pricing-page .pf-select-shell {
+    width: 100% !important;
+  }
+  .pricing-page .pf-label {
+    font-size: 10.5px;
+  }
+
+  /* 卡片模式下的外边距与详情抽屉留白 */
+  .pricing-page .pricing-cards {
+    gap: 12px;
+  }
 }
