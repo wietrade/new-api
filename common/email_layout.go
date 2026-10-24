@@ -27,25 +27,8 @@ func emailSiteLink() string {
 }
 
 // emailLogoURL 把站点 Logo 配置解析成邮件可用的绝对地址，无法解析时返回空。
-// 未配置 Logo 时回退到站点根目录的 /logo.png。
-func emailLogoURL() string {
-	logo := strings.TrimSpace(Logo)
-	if logo == "" {
-		logo = "/logo.png"
-	}
-	if strings.HasPrefix(logo, "http://") || strings.HasPrefix(logo, "https://") {
-		return logo
-	}
-	base := strings.TrimSpace(SiteAddress)
-	if !strings.HasPrefix(base, "http://") && !strings.HasPrefix(base, "https://") {
-		return ""
-	}
-	if !strings.HasPrefix(logo, "/") {
-		logo = "/" + logo
-	}
-	return strings.TrimRight(base, "/") + logo
-}
-
+// 邮件不使用任何外部图片（很多客户端默认不加载远程图片），
+// 头部品牌标记用纯 CSS 方块 + 首字母渲染。
 func emailBrandInitial() string {
 	name := strings.TrimSpace(SystemName)
 	if name == "" {
@@ -81,16 +64,9 @@ func BuildEmailHTML(subject string, content string) string {
 	safeSubject := html.EscapeString(subject)
 	year := time.Now().Year()
 
-	var brandMark string
-	if logo := emailLogoURL(); logo != "" {
-		brandMark = fmt.Sprintf(
-			`<img src="%s" width="28" height="28" alt="%s" style="display:block;width:28px;height:28px;border-radius:6px;object-fit:contain" />`,
-			html.EscapeString(logo), safeBrand)
-	} else {
-		brandMark = fmt.Sprintf(
-			`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="28" height="28" align="center" valign="middle" style="width:28px;height:28px;background:#1f883d;border-radius:6px;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600">%s</td></tr></table>`,
-			html.EscapeString(emailBrandInitial()))
-	}
+	brandMark := fmt.Sprintf(
+		`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="28" height="28" align="center" valign="middle" style="width:28px;height:28px;background:#1f883d;border-radius:6px;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600">%s</td></tr></table>`,
+		html.EscapeString(emailBrandInitial()))
 
 	metaLinks := make([]string, 0, 2)
 	if site := emailSiteLink(); site != "" {
@@ -116,13 +92,13 @@ func BuildEmailHTML(subject string, content string) string {
   body,table,td,a{-webkit-text-size-adjust:100%%;-ms-text-size-adjust:100%%}
   table,td{mso-table-lspace:0pt;mso-table-rspace:0pt}
   img{-ms-interpolation-mode:bicubic;border:0;outline:none;text-decoration:none}
-  body{margin:0!important;padding:0!important;width:100%%!important;background:#f2f3f5}
+  body{margin:0!important;padding:0!important;width:100%%!important;background:#ffffff}
   .email-body{color:#1f2328;font-size:14px;line-height:1.6}
   .email-body p{margin:0 0 12px}
   .email-body p:last-child{margin-bottom:0}
   .email-body a{color:#0969da;text-decoration:none;word-break:break-word}
   .email-body strong{font-weight:600;color:#1f2328}
-  .email-code{display:inline-block;margin:4px 0 0;padding:8px 14px;background:#f2f3f5;border-radius:8px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;line-height:1.5;letter-spacing:2px;font-weight:600;color:#1f2328}
+  .email-code{display:inline-block;margin:4px 0 0;padding:8px 14px;background:#ffffff;border:1px solid #e3e6ea;border-radius:8px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;line-height:1.5;letter-spacing:2px;font-weight:600;color:#1f2328}
   .email-btn{display:inline-block;padding:9px 18px;background:#1f883d;border-radius:8px;color:#ffffff!important;font-size:14px;line-height:20px;font-weight:500;text-decoration:none!important}
   @media (max-width:600px){
     .email-shell{padding:20px 12px!important}
@@ -131,9 +107,9 @@ func BuildEmailHTML(subject string, content string) string {
   }
 </style>
 </head>
-<body style="margin:0;padding:0;background:#f2f3f5">
+<body style="margin:0;padding:0;background:#ffffff">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">%s</div>
-<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;background:#f2f3f5">
+<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;background:#ffffff">
   <tr>
     <td class="email-shell" align="center" style="padding:28px 16px">
       <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%%;max-width:600px">
@@ -148,7 +124,7 @@ func BuildEmailHTML(subject string, content string) string {
           </td>
         </tr>
         <tr>
-          <td class="email-card" style="background:#ffffff;border-radius:14px;padding:24px 26px">
+          <td class="email-card" style="background:#f6f7f8;border-radius:14px;padding:24px 26px">
             <h1 class="email-title" style="margin:0 0 14px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.5;font-weight:600;color:#1f2328">%s</h1>
             <div class="email-body" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#1f2328;font-size:14px;line-height:1.6">%s</div>
           </td>
@@ -157,7 +133,7 @@ func BuildEmailHTML(subject string, content string) string {
           <td height="12" style="height:12px;line-height:12px;font-size:0">&nbsp;</td>
         </tr>
         <tr>
-          <td style="background:#e9edf2;border-radius:14px;padding:16px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
+          <td style="background:#eef1f4;border-radius:14px;padding:16px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
             %s
           </td>
         </tr>
