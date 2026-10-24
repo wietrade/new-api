@@ -63,7 +63,11 @@
 
 - 当前 `cr`：`deepseek-flash` = 0.006（2.0%）、`deepseek-v4.1-flash-1017` = 0.006（2.0%）、`deepseek-v4-pro` = 0.044（3.3%）
 - 当前时段：表达式把**工作日 09:00–12:00、14:00–18:00（Asia/Shanghai）** 视为原价（peak），其余时间 5 折
-- 需查：① 官方「缓存命中」单价（应为输入价的固定比例？）；② 官方优惠时段的**准确区间与时区**（据公开资料为 00:30–08:30 北京时间 5 折/2.5 折），与我方自定义时段不同 —— 请确认以哪套为准
+- 需查：① 官方「缓存命中」单价（应为输入价的固定比例？）；② 官方优惠时段的**准确区间与时区**
+
+> **2026-10-25 已核实**：官方页明确「北京时间周一至周五（不含法定节假日）9:00-12:00、14:00-18:00 为高峰时段，
+> 其余（含周末与节假日）为空闲半价」，与我方表达式一致；缓存命中价 flash ¥0.04 / v4-pro ¥0.30，
+> 对应输入未命中的 2% / 3.33%，与我方 0.006 / 0.044 一致，**无需修改**。
 - 官方入口：https://api-docs.deepseek.com/quick_start/pricing
 
 ### T6 MiniMax 两档缓存价不一致
@@ -130,6 +134,23 @@
 - `official_value` 查不到时填 `null`，并在 `unresolved` 写明查过哪些页面、为何没有结论。
 - 一个任务涉及多个字段时，按字段拆成多条（`field` 用 `models.json` / `pricing.json` 的字段名）。
 - `quote` 必须是原文（可截断，但要含数字与单位），不要转述。
+
+## 5. 核实结果（2026-10-25，外部核实回填）
+
+| 任务 | 结论 | 落地动作 |
+|:--|:--|:--|
+| T1 `chatgpt-image-latest` | 官方 **Deprecated**（建议改用 `gpt-image-2.5-sunburst`）；输入 text/image、输出 image/text；价格分项与我方完全一致；官方未公布 token 上限 | 已补 `capabilities=[image_generation,vision]`、`output_modalities=[image,text]`、`tags=已弃用`（写入 overrides 固化） |
+| T2 `free` | 无任何厂商收录，判定为内部占位模型 | 已加入 `overrides.excluded`，并从元数据/价格目录/数据库下线 |
+| T3 `dots-3-note-preview:free` / `inkling:free` | 官方无公开 max output | 保持 0（已知空缺） |
+| T4 OpenAI `cc` 项 | **成立**：缓存写入是独立输入 token 类别（1.25×），非额外加费 | 无需修改 |
+| T5 DeepSeek | 高峰时段 **9-12/14-18（北京时间工作日）** 与缓存命中 2% / 3.33% 均与我方一致 | 无需修改；官方抄录补复核记录 |
+| T6 MiniMax | 两个值都正确（M3.1-Flash 10%、M3 20%），非同一模型 | 无需修改 |
+| T7 `qwen3.8-flash` | 未查到官方缓存单价 | 保持无 `cr`，待补 |
+| T8 `gpt-oss-120b` | OpenAI 不托管该模型，价格来自托管方 | 保留 `aggregator_reference`，不视为官方价 |
+| T9 `kimi-k3` | 5m 写 = 1× 输入、1h 写 = 2× 输入 | 无需修改 |
+| T10 `grok-4.7` | cached input $0.50（25%） | 无需修改 |
+| T11 Gemini 图像 | 按张价随分辨率固定映射，无最低收费；Batch 5 折同样适用于图像输出 | 保留 token 表达式，`meters`/notes 记录按张价 |
+| T12 `gemini-4-argon` | 2026-12-01 涨价计划未变 | 保留 `upcoming`，到期切换表达式（需排期） |
 
 ## 4. 核实完成后的落地流程（维护者执行）
 

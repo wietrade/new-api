@@ -17,10 +17,26 @@
         "context_length": 65536,
         "max_output_tokens": 32768
       }
+    },
+    {
+      "model_name": "chatgpt-image-latest",
+      "note": "OpenAI 模型页（developers.openai.com/api/docs/models/chatgpt-image-latest，2026-10-25 复核）：Status=Deprecated，官方建议改用 gpt-image-2.5-sunburst；输入 text/image，输出 image/text；官方未公布该模型的 token 上下文/输出上限。",
+      "fields": {
+        "capabilities": [
+          "image_generation",
+          "vision"
+        ],
+        "output_modalities": [
+          "image",
+          "text"
+        ],
+        "tags": "已弃用"
+      }
     }
   ],
   "excluded": [
     "Qwen3-235B-A22B-Thinking-2507",
-    "Qwen3-Coder-480B-A35B-Instruct-FP8"
+    "Qwen3-Coder-480B-A35B-Instruct-FP8",
+    "free"
   ]
 }

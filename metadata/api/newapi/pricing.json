@@ -888,7 +888,8 @@
         }
       ],
       "billing_mode": "tiered_expr",
-      "billing_expr": "tier(\"standard\", p * 5 + c * 10 + img_o * 32 + cr * 1.25 + img_cr * 2 + img * 8)"
+      "billing_expr": "tier(\"standard\", p * 5 + c * 10 + img_o * 32 + cr * 1.25 + img_cr * 2 + img * 8)",
+      "notes": "OpenAI 模型页（developers.openai.com/api/docs/models/chatgpt-image-latest，2026-10-25 复核）：Status=Deprecated，官方建议改用 gpt-image-2.5-sunburst；输入 text/image，输出 image/text；官方未公布该模型的 token 上下文/输出上限。"
     },
     {
       "model_name": "gpt-5.4",
@@ -1333,20 +1334,6 @@
       "cache_read": 0.5,
       "billing_mode": "tiered_expr",
       "billing_expr": "tier(\"standard\", p * 2 + c * 6 + cr * 0.5)"
-    },
-    {
-      "model_name": "free",
-      "vendor_name": "自建渠道",
-      "price_kind": "free",
-      "source_kind": "catalog",
-      "source": "metadata:is_free",
-      "currency": "USD",
-      "unit": "per_1m_tokens",
-      "input": 0.0,
-      "output": 0.0,
-      "cache_read": 0.0,
-      "billing_mode": "tiered_expr",
-      "billing_expr": "tier(\"free\", p * 0 + c * 0)"
     }
   ]
 }
