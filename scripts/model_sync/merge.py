@@ -30,6 +30,9 @@ FACTUAL_FIELDS = (
     "context_length",
     "max_output_tokens",
     "is_free",
+    "lifecycle",
+    "release_date",
+    "knowledge_cutoff",
 )
 
 DEFAULT_MODEL = {
@@ -42,6 +45,9 @@ DEFAULT_MODEL = {
     "capabilities": [],
     "input_modalities": [],
     "output_modalities": [],
+    "lifecycle": "",
+    "release_date": "",
+    "knowledge_cutoff": "",
     "context_length": 0,
     "max_output_tokens": 0,
     "is_free": False,

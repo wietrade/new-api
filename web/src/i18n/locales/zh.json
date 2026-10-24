@@ -7439,6 +7439,8 @@
     "Structured Output": "结构化输出",
     "Implicit Caching": "隐式缓存",
     "Explicit Caching": "显式缓存",
-    "Input capabilities": "输入能力"
+    "Input capabilities": "输入能力",
+    "Legacy": "旧款",
+    "Retired": "已关停"
   }
 }

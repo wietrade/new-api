@@ -37,7 +37,27 @@ func lockMetadataMutation(tx *gorm.DB) error {
 
 var ErrMetadataSyncConflict = errors.New("metadata changed; preview again before applying")
 
-var MetadataSyncFields = []string{"description", "icon", "tags", "capabilities", "input_modalities", "output_modalities", "context_length", "max_output_tokens", "is_free", "vendor", "endpoints", "name_rule", "status"}
+var MetadataSyncFields = []string{"description", "icon", "tags", "capabilities", "input_modalities", "output_modalities", "context_length", "max_output_tokens", "is_free", "vendor", "endpoints", "name_rule", "status", "lifecycle", "release_date", "knowledge_cutoff"}
+
+// MetadataLifecycleVocabulary 是厂商生命周期状态的闭集；空串表示未知。
+var MetadataLifecycleVocabulary = map[string]bool{
+	"":           true,
+	"ga":         true,
+	"preview":    true,
+	"legacy":     true,
+	"deprecated": true,
+	"retired":    true,
+}
+
+// MetadataLifecycleVocabulary 是厂商生命周期间的闭集；空串表示未知。
+var MetadataLifecycleVocabulary = map[string]bool{
+     "":           true,
+     "ga":         true,
+     "preview":    true,
+     "legacy":     true,
+     "deprecated": true,
+     "retired":    true,
+}
 
 // MetadataCapabilityVocabulary is the closed set of structured capability keys.
 // Keep it in sync with web/src/features/pricing/constants.ts (MODEL_CAPABILITIES).
@@ -203,10 +223,12 @@ type MetadataValues struct {
 	Endpoints        string `json:"endpoints"`
 	NameRule         int    `json:"name_rule"`
 	Status           int    `json:"status"`
-}
-
-type MetadataSyncSelection struct {
-	ModelName     string   `json:"model_name"`
+	Lifecycle        string `json:"lifecycle"`
+	ReleaseDate      string `json:"release_date"`
+	KnowledgeCutoff  string `json:"knowledge_cutoff"`
+     Lifecycle        string `json:"lifecycle"`
+     ReleaseDate      string `json:"release_date"`
+     KnowledgeCutoff  string `json:"knowledge_cutoff"`
 	RecordVersion string   `json:"record_version"`
 	Create        bool     `json:"create"`
 	Fields        []string `json:"fields"`
@@ -263,6 +285,10 @@ func ValidateMetadataValues(values MetadataValues) error {
 	}
 	if values.ContextLength > 0 && values.MaxOutputTokens > values.ContextLength {
 		return errors.New("max_output_tokens must not exceed context_length")
+	}
+	lifecycle := strings.ToLower(strings.TrimSpace(values.Lifecycle))
+	if !MetadataLifecycleVocabulary[lifecycle] {
+		return fmt.Errorf("invalid lifecycle: %s", values.Lifecycle)
 	}
 	if err := ValidateModelCapabilities(values.Capabilities); err != nil {
 		return err
@@ -407,6 +433,12 @@ func ApplyMetadataSync(updates []MetadataSyncUpdate, upstreamVendors map[string]
 					fields[field] = update.Values.MaxOutputTokens
 				case "is_free":
 					fields[field] = update.Values.IsFree
+				case "lifecycle":
+					fields[field] = strings.ToLower(strings.TrimSpace(update.Values.Lifecycle))
+				case "release_date":
+					fields[field] = strings.TrimSpace(update.Values.ReleaseDate)
+				case "knowledge_cutoff":
+					fields[field] = strings.TrimSpace(update.Values.KnowledgeCutoff)
 				case "endpoints":
 					fields[field] = update.Values.Endpoints
 				case "name_rule":

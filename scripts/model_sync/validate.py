@@ -35,6 +35,7 @@ META = ROOT / "metadata" / "api"
 INPUT_MODALITIES = {"text", "image", "audio", "video", "file"}
 OUTPUT_MODALITIES = {"text", "image", "audio", "video"}
 PRICE_KINDS = {"vendor_official", "aggregator_reference", "free"}
+LIFECYCLES = {"", "ga", "preview", "legacy", "deprecated", "retired"}
 
 
 class Report:
@@ -114,6 +115,17 @@ def check_metadata(models, vendors, report: Report):
 
         if name.endswith(":free") and not item.get("is_free"):
             report.error(f"{name}: 名称以 :free 结尾，但 is_free 不是 true")
+
+        lifecycle = (item.get("lifecycle") or "").strip().lower()
+        if lifecycle not in LIFECYCLES:
+            report.error(f"{name}: lifecycle 取值非法「{lifecycle}」（可选 ga/preview/legacy/deprecated/retired）")
+        tags_text = item.get("tags") or ""
+        if "已弃用" in tags_text and lifecycle != "deprecated":
+            report.error(
+                f"{name}: tags 写着「已弃用」但 lifecycle={lifecycle or '空'}，请统一用 lifecycle 表达"
+            )
+        if lifecycle == "deprecated" and "已弃用" not in tags_text:
+            report.info(f"{name}: lifecycle=deprecated，建议同时加 tags「已弃用」方便展示")
         status = item.get("status", 1)
         if status not in (0, 1):
             report.error(f"{name}: status 只能是 0/1，实际 {status}")

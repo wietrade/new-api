@@ -36,6 +36,9 @@ type Pricing struct {
 	ContextLength          int                                  `json:"context_length,omitempty"`
 	MaxOutputTokens        int                                  `json:"max_output_tokens,omitempty"`
 	IsFree                 bool                                 `json:"is_free,omitempty"`
+	Lifecycle              string                               `json:"lifecycle,omitempty"`
+	ReleaseDate            string                               `json:"release_date,omitempty"`
+	KnowledgeCutoff        string                               `json:"knowledge_cutoff,omitempty"`
 	VendorID               int                                  `json:"vendor_id,omitempty"`
 	QuotaType              int                                  `json:"quota_type"`
 	ModelRatio             float64                              `json:"model_ratio"`
@@ -353,6 +356,9 @@ func updatePricing() {
 			pricing.ContextLength = meta.ContextLength
 			pricing.MaxOutputTokens = meta.MaxOutputTokens
 			pricing.IsFree = meta.IsFree == 1
+			pricing.Lifecycle = meta.Lifecycle
+			pricing.ReleaseDate = meta.ReleaseDate
+			pricing.KnowledgeCutoff = meta.KnowledgeCutoff
 			pricing.VendorID = meta.VendorID
 		}
 		modelPrice, findPrice := ratio_setting.GetModelPrice(model, false)

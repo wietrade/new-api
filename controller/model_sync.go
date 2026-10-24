@@ -74,6 +74,9 @@ type upstreamModel struct {
 	Status           int             `json:"status"`
 	Tags             string          `json:"tags"`
 	VendorName       string          `json:"vendor_name"`
+	Lifecycle        string          `json:"lifecycle"`
+	ReleaseDate      string          `json:"release_date"`
+	KnowledgeCutoff  string          `json:"knowledge_cutoff"`
 }
 
 type upstreamVendor struct {
@@ -327,6 +330,9 @@ func fetchMetadataCatalog(c *gin.Context, locale string) (metadataSyncSource, ma
 			Endpoints:        endpoints,
 			NameRule:         item.NameRule,
 			Status:           item.Status,
+			Lifecycle:        item.Lifecycle,
+			ReleaseDate:      item.ReleaseDate,
+			KnowledgeCutoff:  item.KnowledgeCutoff,
 		}
 		if err := model.ValidateMetadataValues(values); err != nil {
 			return source, nil, nil, fmt.Errorf("model %s: %w", item.ModelName, err)
@@ -430,6 +436,9 @@ func SyncUpstreamPreview(c *gin.Context) {
 				Endpoints:        local.Endpoints,
 				NameRule:         local.NameRule,
 				Status:           local.Status,
+				Lifecycle:        local.Lifecycle,
+				ReleaseDate:      local.ReleaseDate,
+				KnowledgeCutoff:  local.KnowledgeCutoff,
 			}
 			if localVendor != nil {
 				localValues.Vendor = localVendor.Name

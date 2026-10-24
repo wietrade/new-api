@@ -85,6 +85,34 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
     }
   }
   const badges = Array.from(badgeMap, ([key, label]) => ({ key, label }))
+  // 厂商生命周期徽标：只在非 GA 且有明确官方状态时展示
+  const lifecycleBadge = (() => {
+    switch (props.model.lifecycle) {
+      case 'deprecated':
+        return {
+          label: t('Deprecated'),
+          className:
+            'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+        }
+      case 'legacy':
+        return {
+          label: t('Legacy'),
+          className: 'bg-muted text-muted-foreground',
+        }
+      case 'preview':
+        return {
+          label: t('Preview'),
+          className: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+        }
+      case 'retired':
+        return {
+          label: t('Retired'),
+          className: 'bg-red-500/10 text-red-600 dark:text-red-400',
+        }
+      default:
+        return null
+    }
+  })()
   const groups = props.model.enable_groups || []
   const groupRatios = props.model.group_ratio ?? {}
   const highlightedGroup = props.selectedGroup
@@ -384,6 +412,16 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           {props.model.is_free && (
             <span className='w-fit rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400'>
               {t('Free of charge')}
+            </span>
+          )}
+          {lifecycleBadge && (
+            <span
+              className={cn(
+                'w-fit rounded-md px-1.5 py-0.5 text-[11px] font-medium',
+                lifecycleBadge.className
+              )}
+            >
+              {lifecycleBadge.label}
             </span>
           )}
           {dynamicSummary?.providerCount && (

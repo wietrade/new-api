@@ -96,9 +96,10 @@ export type PricingModel = {
   context_length?: number
   max_output_tokens?: number
   is_free?: boolean
-  knowledge_cutoff?: string
+  /** 厂商生命周期状态：空串=未知。与后台可见性开关无关。 */
+  lifecycle?: ModelLifecycle
   release_date?: string
-  parameter_count?: string
+  knowledge_cutoff?: string
   input_modalities?: Modality[]
   output_modalities?: Modality[]
   capabilities?: ModelCapability[]
@@ -106,6 +107,9 @@ export type PricingModel = {
 
 /** Input/output modalities supported by a model. */
 export type Modality = 'text' | 'image' | 'audio' | 'video' | 'file'
+
+/** 厂商声明的模型生命周期（空串表示未知）。 */
+export type ModelLifecycle = 'ga' | 'preview' | 'legacy' | 'deprecated' | 'retired'
 
 /**
  * Model capabilities exposed by the catalog.

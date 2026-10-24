@@ -7439,6 +7439,8 @@
     "Structured Output": "Structured Output",
     "Implicit Caching": "Implicit Caching",
     "Explicit Caching": "Explicit Caching",
-    "Input capabilities": "Input capabilities"
+    "Input capabilities": "Input capabilities",
+    "Legacy": "Legacy",
+    "Retired": "Retired"
   }
 }

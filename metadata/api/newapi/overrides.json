@@ -7,7 +7,8 @@
       "note": "官方模型页 ai.google.dev/gemini-api/docs/models/gemini-3-pro-image（2026-09-08 更新）：输入 token 上限 65,536，输出 32,768；官方价格表 >200K 档对本模型不可达。",
       "fields": {
         "context_length": 65536,
-        "max_output_tokens": 32768
+        "max_output_tokens": 32768,
+        "lifecycle": "ga"
       }
     },
     {
@@ -30,7 +31,107 @@
           "image",
           "text"
         ],
-        "tags": "已弃用"
+        "tags": "已弃用",
+        "lifecycle": "deprecated"
+      }
+    },
+    {
+      "model_name": "claude-haiku-4-5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy",
+        "knowledge_cutoff": "2025-02",
+        "release_date": "2025-10-15"
+      }
+    },
+    {
+      "model_name": "claude-haiku-4-5-20251001",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy",
+        "knowledge_cutoff": "2025-02",
+        "release_date": "2025-10-15"
+      }
+    },
+    {
+      "model_name": "claude-fable-5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy"
+      }
+    },
+    {
+      "model_name": "claude-opus-5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy"
+      }
+    },
+    {
+      "model_name": "claude-opus-4-8",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy"
+      }
+    },
+    {
+      "model_name": "claude-opus-4.5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy"
+      }
+    },
+    {
+      "model_name": "claude-opus-4.6",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy"
+      }
+    },
+    {
+      "model_name": "claude-opus-4.7",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy"
+      }
+    },
+    {
+      "model_name": "claude-sonnet-5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "legacy"
+      }
+    },
+    {
+      "model_name": "claude-fable-5-1",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-06"
+      }
+    },
+    {
+      "model_name": "claude-opus-5-5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-06"
+      }
+    },
+    {
+      "model_name": "claude-sonnet-5-5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-06"
+      }
+    },
+    {
+      "model_name": "claude-haiku-5-5",
+      "note": "Anthropic Models overview（2026-10-25 复核）：标注为 legacy（仍可调用）或当前阵容；知识截止 Jun 2026 / Feb 2025（Haiku 4.5）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-06"
       }
     }
   ],
