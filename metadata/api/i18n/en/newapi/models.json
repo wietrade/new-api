@@ -560,7 +560,7 @@
       "icon": "Gemini.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "",
+      "tags": "图像生成,多模态,推理",
       "capabilities": [
         "reasoning",
         "tools",
@@ -577,7 +577,7 @@
         "text",
         "image"
       ],
-      "context_length": 131072,
+      "context_length": 65536,
       "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null
@@ -589,7 +589,7 @@
       "icon": "Gemini.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "",
+      "tags": "图像生成,多模态,推理",
       "capabilities": [
         "reasoning",
         "structured_output",
@@ -686,35 +686,6 @@
       ],
       "context_length": 1048576,
       "max_output_tokens": 943718,
-      "is_free": false,
-      "endpoints": null
-    },
-    {
-      "model_name": "claude-haiku-5.5",
-      "vendor_name": "Anthropic",
-      "description": "Claude Haiku 5.5 is Anthropic's small, fast model for high-volume, cost-sensitive work such as summarization, subagents, and browser use. It succeeds Claude Haiku 4.5 with stronger coding, computer us",
-      "icon": "Claude.Color",
-      "name_rule": 0,
-      "status": 1,
-      "tags": "推理,工具,文件,多模态",
-      "capabilities": [
-        "reasoning",
-        "tools",
-        "structured_output",
-        "web_search",
-        "cache_implicit",
-        "cache_explicit"
-      ],
-      "input_modalities": [
-        "text",
-        "image",
-        "file"
-      ],
-      "output_modalities": [
-        "text"
-      ],
-      "context_length": 1000000,
-      "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null
     },

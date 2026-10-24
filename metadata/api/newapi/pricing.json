@@ -123,38 +123,6 @@
       "billing_expr": "len <= 100000 ? tier(\"standard\", p * 0.1 + c * 0.5 + cr * 0.01 + cc * 0.125 + cc1h * 0.2) : tier(\"long_context\", p * 0.5 + c * 2.5 + cr * 0.05 + cc * 0.625 + cc1h * 1)"
     },
     {
-      "model_name": "claude-haiku-5.5",
-      "vendor_name": "Anthropic",
-      "price_kind": "vendor_official",
-      "source_kind": "official_doc",
-      "source": "vendor_official",
-      "source_model_id": "claude-haiku-5.5",
-      "currency": "USD",
-      "unit": "per_1m_tokens",
-      "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "retrieved_at": "2026-10-23T18:58:15+08:00",
-      "confidence": "high",
-      "input": 0.1,
-      "output": 0.5,
-      "cache_read": 0.01,
-      "cache_write": 0.125,
-      "cache_write_1h": 0.2,
-      "tiers": [
-        {
-          "prompt_tokens_at_least": 100000,
-          "input": 0.5,
-          "output": 2.5,
-          "output_text": null,
-          "output_image": null,
-          "cache_read": 0.05,
-          "cache_write": 0.625,
-          "cache_write_1h": 1.0
-        }
-      ],
-      "billing_mode": "tiered_expr",
-      "billing_expr": "len <= 100000 ? tier(\"standard\", p * 0.1 + c * 0.5 + cr * 0.01 + cc * 0.125 + cc1h * 0.2) : tier(\"long_context\", p * 0.5 + c * 2.5 + cr * 0.05 + cc * 0.625 + cc1h * 1)"
-    },
-    {
       "model_name": "claude-opus-4-8",
       "vendor_name": "Anthropic",
       "price_kind": "vendor_official",

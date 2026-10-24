@@ -144,8 +144,9 @@ def check_i18n(base_models, report: Report):
             if name in base and rows[name].get("description") == base[name].get("description")
         ]
         if same:
-            report.warn(
-                f"{locale} 语言包有 {len(same)} 条描述与基准完全相同（未翻译），例如 {same[:3]}"
+            # 当前业务只面向大陆（中文），英文包暂不翻译；降为 INFO 避免长期告警。
+            report.info(
+                f"{locale} 语言包有 {len(same)} 条描述与基准相同（未翻译），例如 {same[:3]}"
             )
 
 
@@ -173,15 +174,15 @@ def check_pricing(models, pricing, official, context_by_name, report: Report):
                 f"{name}: billing_expr 无法由价格字段复现\n      字段生成: {expected}\n      文件内容: {row.get('billing_expr')}"
             )
 
-        # 阶梯阈值应当落在上下文窗口内，否则该档永远不会触发。
-        # 这里只报警告：context_length 与官方档位孰对孰错需要人工确认。
+        # 阶梯阈值高于上下文窗口：官方价目表可能按同系列更大模型给出高档价，
+        # 本模型的输入上限却达不到阈值（如 gemini-3-pro-image 上限 65,536 但有 200K 档）。
+        # 保留官方对齐，仅提示该档不可达。
         ctx = context_by_name.get(name) or 0
         for tier in row.get("tiers") or []:
             threshold = tier.get("prompt_tokens_at_least") or 0
             if ctx and threshold >= ctx:
-                report.warn(
-                    f"{name}: 阶梯阈值 {threshold} 不小于 context_length {ctx}"
-                    "（长档不会触发，请核对上下文或阈值）"
+                report.info(
+                    f"{name}: 阶梯阈值 {threshold} 高于输入上限 {ctx}（该档不可达，保留以对齐官方价目表）"
                 )
 
         if kind == "free" and any((row.get(k) or 0) > 0 for k in ("input", "output")):

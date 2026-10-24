@@ -177,42 +177,6 @@
       "notes": "官方 pricing 页：提示词 ≤100K token 时 $0.10/$0.50；>100K token 时输入 $0.50/输出 $2.50。cache_read=$0.01（命中），cache_write=$0.125（5分钟缓存写入）。"
     },
     {
-      "model_name": "claude-haiku-5.5",
-      "vendor_name": "Anthropic",
-      "price_kind": "vendor_official",
-      "source_kind": "official_doc",
-      "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "retrieved_at": "2026-10-23T18:58:15+08:00",
-      "currency": "USD",
-      "unit": "per_1m_tokens",
-      "input": 0.1,
-      "output": 0.5,
-      "output_text": null,
-      "output_image": null,
-      "cache_read": 0.01,
-      "cache_write": 0.125,
-      "cache_write_1h": 0.2,
-      "per_image": null,
-      "tiers": [
-        {
-          "prompt_tokens_at_least": 100000,
-          "input": 0.5,
-          "output": 2.5,
-          "output_text": null,
-          "output_image": null,
-          "cache_read": 0.05,
-          "cache_write": 0.625,
-          "cache_write_1h": 1.0
-        }
-      ],
-      "effective_from": null,
-      "effective_to": null,
-      "upcoming": null,
-      "confidence": "high",
-      "quote": "Claude Haiku 5.5 (for prompts up to 100,000 tokens): $0.10 input / $0.125 5m write / $0.20 1h write / $0.01 read / $0.50 output. Over 100K: $0.50 / $0.625 / $1.00 / $0.05 / $2.50.",
-      "notes": "官方 pricing 页：提示词 ≤100K token 时 $0.10/$0.50；>100K token 时输入 $0.50/输出 $2.50。cache_read=$0.01（命中），cache_write=$0.125（5分钟缓存写入）。"
-    },
-    {
       "model_name": "claude-opus-4-8",
       "vendor_name": "Anthropic",
       "price_kind": "vendor_official",
@@ -548,7 +512,7 @@
       "upcoming": null,
       "confidence": "high",
       "quote": "输入 $2.00（≤20万token）/ $4.00（>20万）；输出文本 $12.00（≤20万）/ $18.00（>20万）；图像输出 $120.00 固定。文本部分沿用 Gemini 3.1 Pro 的 200K 两档。",
-      "notes": "Standard 档：输入 $2.00(text/image)；文本与思考输出 $12.00、图像输出 $120.00/1M tokens；按图折算 1K/2K $0.134、4K $0.24；图像输入 $0.0011/张；Batch 档输入 $1.00、图像输出 $60.00（即 Standard 的 50%）；不支持 Caching；无免费档。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。",
+      "notes": "Standard 档：输入 $2.00(text/image)；文本与思考输出 $12.00、图像输出 $120.00/1M tokens；按图折算 1K/2K $0.134、4K $0.24；图像输入 $0.0011/张；Batch 档输入 $1.00、图像输出 $60.00（即 Standard 的 50%）；不支持 Caching；无免费档。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。\n官方模型页（ai.google.dev/.../models/gemini-3-pro-image，2026-09-08 更新）：输入 token 上限 65,536、输出 32,768。官方价格表按“文本部分沿用 Gemini 3.1 Pro 的 200K 两档”列出 >200K 价，但本模型达不到该阈值，故 long 档仅在表达式中保留对齐、实际不可达。",
       "meters": [
         {
           "dim": "input_image",
@@ -607,7 +571,7 @@
       "upcoming": null,
       "confidence": "medium",
       "quote": "输入 $2.00（≤20万token）/ $4.00（>20万）；输出文本 $12.00（≤20万）/ $18.00（>20万）；图像输出 $120.00 固定。文本部分沿用 Gemini 3.1 Pro 的 200K 两档。",
-      "notes": "官方已不收录该别名（单模型页 404），按同款稳定版 gemini-3-pro-image Standard 档对齐：输入 $2.00；文本/思考 $12.00、图像 $120.00；1K/2K $0.134、4K $0.24/张；Batch 5 折。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。",
+      "notes": "官方已不收录该别名（单模型页 404），按同款稳定版 gemini-3-pro-image Standard 档对齐：输入 $2.00；文本/思考 $12.00、图像 $120.00；1K/2K $0.134、4K $0.24/张；Batch 5 折。 文本部分沿用 Gemini 3.1 Pro 的 200K 两档（12→18）；图像输出固定 120。 高档缓存价官方未明确（该图像模型不支持 Caching，cache_read 恒为 null）。\n官方模型页（ai.google.dev/.../models/gemini-3-pro-image，2026-09-08 更新）：输入 token 上限 65,536、输出 32,768。官方价格表按“文本部分沿用 Gemini 3.1 Pro 的 200K 两档”列出 >200K 价，但本模型达不到该阈值，故 long 档仅在表达式中保留对齐、实际不可达。",
       "meters": [
         {
           "dim": "input_image",
