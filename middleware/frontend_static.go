@@ -31,9 +31,11 @@ type precompressedFile struct {
 // every request. The cache holds at most one entry per build file. Clients
 // without gzip, the image types the gzip middleware skips, directories, and
 // the index.html redirect keep using http.FileServer.
+// 构建期生成的 *.br 文件优先于运行时 gzip。
 func ServeFrontendFiles(frontendFS static.ServeFileSystem) gin.HandlerFunc {
 	fileServer := http.FileServer(frontendFS)
 	var cache sync.Map // URL path -> *precompressedFile
+	var brotliCache sync.Map
 	return func(c *gin.Context) {
 		urlPath := c.Request.URL.Path
 
@@ -59,9 +61,19 @@ func ServeFrontendFiles(frontendFS static.ServeFileSystem) gin.HandlerFunc {
 			return
 		}
 		c.Abort()
-		if !strings.Contains(c.GetHeader("Accept-Encoding"), "gzip") ||
-			ginGzip.DefaultExcludedExtentions.Contains(path.Ext(urlPath)) ||
-			strings.HasSuffix(urlPath, "/index.html") {
+
+		acceptEncoding := c.GetHeader("Accept-Encoding")
+		excluded := ginGzip.DefaultExcludedExtentions.Contains(path.Ext(urlPath)) ||
+			strings.HasSuffix(urlPath, "/index.html")
+
+		// 优先使用构建期预压缩的 brotli 文件
+		if !excluded && strings.Contains(acceptEncoding, "br") && frontendFS.Exists("/", urlPath+".br") {
+			if serveBrotli(c, frontendFS, &brotliCache, urlPath) {
+				return
+			}
+		}
+
+		if !strings.Contains(acceptEncoding, "gzip") || excluded {
 			fileServer.ServeHTTP(c.Writer, c.Request)
 			return
 		}
@@ -125,4 +137,54 @@ func ServeFrontendFiles(frontendFS static.ServeFileSystem) gin.HandlerFunc {
 			_, _ = c.Writer.Write(file.body)
 		}
 	}
+}
+
+// brotliFile 缓存构建期生成的 .br 文件，避免每次请求都重新读取嵌入文件系统。
+type brotliFile struct {
+	once        sync.Once
+	body        []byte
+	contentType string
+	err         error
+}
+
+// serveBrotli 直接返回预压缩文件；失败时返回 false，由调用方回退到 gzip/原文件。
+func serveBrotli(c *gin.Context, frontendFS static.ServeFileSystem, cache *sync.Map, urlPath string) bool {
+	value, ok := cache.Load(urlPath)
+	if !ok {
+		value, _ = cache.LoadOrStore(urlPath, &brotliFile{})
+	}
+	file := value.(*brotliFile)
+	file.once.Do(func() {
+		f, err := frontendFS.Open(urlPath + ".br")
+		if err != nil {
+			file.err = err
+			return
+		}
+		defer f.Close()
+		body, err := io.ReadAll(f)
+		if err != nil {
+			file.err = err
+			return
+		}
+		file.body = body
+		file.contentType = mime.TypeByExtension(path.Ext(urlPath))
+		if file.contentType == "" {
+			file.contentType = "application/octet-stream"
+		}
+	})
+	if file.err != nil {
+		cache.Delete(urlPath)
+		return false
+	}
+
+	header := c.Writer.Header()
+	header.Set("Content-Encoding", "br")
+	header.Set("Vary", "Accept-Encoding")
+	header.Set("Content-Type", file.contentType)
+	header.Set("Content-Length", strconv.Itoa(len(file.body)))
+	c.Writer.WriteHeader(http.StatusOK)
+	if c.Request.Method != http.MethodHead {
+		_, _ = c.Writer.Write(file.body)
+	}
+	return true
 }

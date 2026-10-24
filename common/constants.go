@@ -12,6 +12,9 @@ import (
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
+
+// BuildID 由构建脚本通过 -ldflags 注入（构建时间戳），用于让前端缓存版本随发版失效。
+var BuildID = ""
 var SystemName = "New API"
 var Footer = ""
 var Logo = ""

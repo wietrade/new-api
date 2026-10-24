@@ -128,6 +128,8 @@ export function Footer(props: FooterProps) {
   const docsSiteHref = docsHref.startsWith('http')
     ? docsHref
     : 'https://www.nowhub.org/docs/'
+  // 快速开始固定指向文档站的同名页面
+  const quickStartHref = `${docsSiteHref.replace(/\/+$/, '')}/guide/quick-start.html`
 
   const [nameHead, nameTail] = useMemo(() => {
     const name = displayName || ''
@@ -149,6 +151,7 @@ export function Footer(props: FooterProps) {
       {
         title: t('Developers'),
         links: [
+          { text: t('Quick start'), href: quickStartHref },
           { text: t('Docs'), href: docsSiteHref },
           { text: t('API reference'), href: docsHref },
           { text: t('FAQ'), href: '/help/faq/' },
@@ -189,7 +192,7 @@ export function Footer(props: FooterProps) {
         ],
       },
     ],
-    [t, docsHref, docsSiteHref, supportEmail]
+    [t, docsHref, docsSiteHref, supportEmail, quickStartHref]
   )
 
   const displayColumns = props.columns ?? fallbackColumns

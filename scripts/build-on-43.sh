@@ -38,6 +38,9 @@ ok "web 依赖就绪"
 log "前端构建"
 ( cd web && bun run build )
 
+log "前端预压缩"
+( cd web && node scripts/precompress.mjs )
+
 log "文档站依赖"
 [ -d docs-site/node_modules ] || ( cd docs-site && bun install --registry="$BUN_REGISTRY" )
 
@@ -54,7 +57,10 @@ fi
 ok "产物: web/dist $(du -sh web/dist | cut -f1) / docs $(du -sh web/dist/docs | cut -f1)"
 
 log "编译二进制"
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o /tmp/new-api-build .
+BUILD_ID="$(date -u +%Y%m%d%H%M%S)"
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
+  -ldflags "-s -w -X github.com/QuantumNous/new-api/common.BuildID=$BUILD_ID" \
+  -o /tmp/new-api-build .
 ok "$(ls -lh /tmp/new-api-build | awk '{print $5}')"
 
 log "部署并重启"
