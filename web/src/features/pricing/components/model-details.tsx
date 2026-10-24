@@ -1596,7 +1596,7 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
         </TabsList>
 
         <TabsContent value='overview' className='outline-none'>
-          <div className='grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] xl:items-start'>
+          <div className='grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] xl:items-start [&>*]:min-w-0'>
             <section className='bg-card/60 space-y-4 rounded-xl border p-3 shadow-sm sm:space-y-5 sm:p-4'>
             <SectionTitle>
               {t('Pricing')}
