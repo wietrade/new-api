@@ -12,9 +12,9 @@ import {
   Image as ImageIcon,
   ListOrdered,
   MessageSquare,
+  MessageSquareText,
   Paperclip,
   Save,
-  Type,
   Video,
   Wrench,
 } from 'lucide-react'
@@ -79,7 +79,7 @@ const MODALITY_META: Record<
   Modality,
   { icon: typeof MessageSquare; label: string }
 > = {
-  text: { icon: Type, label: '文本输入' },
+  text: { icon: MessageSquareText, label: '文本输入' },
   image: { icon: ImageIcon, label: '图片输入' },
   file: { icon: FileText, label: '文件输入' },
   audio: { icon: AudioLines, label: '音频输入' },
