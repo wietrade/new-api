@@ -7,25 +7,6 @@ import (
 	"time"
 )
 
-// SiteAddress 与 system_setting.ServerAddress 保持同步，供邮件模板拼接绝对链接。
-// 之所以复制一份，是因为 setting/system_setting 依赖 common，反向引用会造成循环依赖。
-var SiteAddress = ""
-
-// emailSiteLink 返回用于页脚展示的站点地址（去掉协议与结尾斜杠）。
-func emailSiteLink() string {
-	addr := strings.TrimSpace(SiteAddress)
-	if addr == "" {
-		return ""
-	}
-	if !strings.HasPrefix(addr, "http://") && !strings.HasPrefix(addr, "https://") {
-		return ""
-	}
-	addr = strings.TrimRight(addr, "/")
-	addr = strings.TrimPrefix(addr, "https://")
-	addr = strings.TrimPrefix(addr, "http://")
-	return addr
-}
-
 // 邮件不使用任何外部图片（很多客户端默认不加载远程图片），
 // 头部品牌标记用纯 CSS 方块 + 首字母渲染。
 func emailBrandInitial() string {
@@ -67,15 +48,6 @@ func BuildEmailHTML(subject string, content string) string {
 		`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#ffffff;border-radius:6px;color:#2e9c45;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700">%s</td></tr></table>`,
 		html.EscapeString(emailBrandInitial()))
 
-	metaLinks := make([]string, 0, 2)
-	if site := emailSiteLink(); site != "" {
-		href := html.EscapeString(strings.TrimRight(strings.TrimSpace(SiteAddress), "/") + "/")
-		metaLinks = append(metaLinks, fmt.Sprintf(
-			`<a href="%s" style="color:#5b6472;text-decoration:none">%s</a>`,
-			href, html.EscapeString(site)))
-	}
-	metaLinks = append(metaLinks, `<a href="mailto:support@nowhub.org" style="color:#5b6472;text-decoration:none">support@nowhub.org</a>`)
-	metaLine := strings.Join(metaLinks, ` &nbsp;·&nbsp; `)
 	copyright := fmt.Sprintf("&copy; %d %s", year, safeBrand)
 
 	return fmt.Sprintf(`<!DOCTYPE html>
@@ -132,12 +104,7 @@ func BuildEmailHTML(subject string, content string) string {
           <td height="12" style="height:12px;line-height:12px;font-size:0">&nbsp;</td>
         </tr>
         <tr>
-          <td style="background:#eef1f4;border-radius:14px;padding:16px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
-            %s
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:14px 4px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#6b7280">
+          <td style="background:#eef1f4;border-radius:14px;padding:14px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
             %s
           </td>
         </tr>
@@ -146,5 +113,5 @@ func BuildEmailHTML(subject string, content string) string {
   </tr>
 </table>
 </body>
-</html>`, safeSubject, safeSubject, brandMark, safeBrand, safeSubject, content, metaLine, copyright)
+</html>`, safeSubject, safeSubject, brandMark, safeBrand, safeSubject, content, copyright)
 }
