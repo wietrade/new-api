@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next'
 
 import { useSystemConfig } from '@/hooks/use-system-config'
 
+/** 社交分享图（与 index.html 的静态标签一致，切换路由时不丢失） */
+const OG_IMAGE = 'https://www.nowhub.org/og-image.png'
+
 /**
  * 主站是纯前端渲染，这里按路由补上可被搜索引擎与分享卡片读取的元信息。
  * 文案取自语言包（meta.*），中英文各一份，其余语言回落到英文。
@@ -62,6 +65,11 @@ export function useDocumentMeta() {
     upsertMeta('property', 'og:description', description)
     upsertMeta('property', 'og:type', 'website')
     upsertMeta('property', 'og:url', window.location.href)
-    upsertMeta('name', 'twitter:card', 'summary')
+    upsertMeta('property', 'og:site_name', brand)
+    upsertMeta('property', 'og:image', OG_IMAGE)
+    upsertMeta('property', 'og:image:width', '1200')
+    upsertMeta('property', 'og:image:height', '630')
+    upsertMeta('name', 'twitter:card', 'summary_large_image')
+    upsertMeta('name', 'twitter:image', OG_IMAGE)
   }, [brand, pathname, t, i18n.language])
 }

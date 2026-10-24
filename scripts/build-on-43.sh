@@ -38,6 +38,18 @@ fi
 
 cd "$SRC_DIR"
 
+# OSS 模式下可以把 web/dist/static 从二进制里排除（由 OSS 提供），
+# 二进制大小会从 ~150MB 降到 ~60MB。回滚到同源部署时必须 EMBED_STATIC=1。
+STATIC_BAK=""
+restore_static() {
+  if [ -n "$STATIC_BAK" ] && [ -d "$STATIC_BAK" ]; then
+    rm -rf web/dist/static
+    mv "$STATIC_BAK" web/dist/static
+    STATIC_BAK=""
+  fi
+}
+trap restore_static EXIT
+
 if [ "${1:-}" != "--no-pull" ]; then
   log "同步代码"
   git pull --ff-only
@@ -80,10 +92,20 @@ if [ -n "${ASSET_PREFIX:-}" ] && [ -n "${OSS_BUCKET:-}" ]; then
 fi
 
 log "编译二进制"
+if [ "${EMBED_STATIC:-1}" = "0" ]; then
+  if [ -z "${ASSET_PREFIX:-}" ]; then
+    echo "EMBED_STATIC=0 需要同时设置 ASSET_PREFIX，否则页面引用的静态资源将无处可取" >&2
+    exit 1
+  fi
+  STATIC_BAK="$(mktemp -d)/static"
+  mv web/dist/static "$STATIC_BAK"
+  ok "不内嵌 web/dist/static（由 $ASSET_PREFIX 提供）"
+fi
 BUILD_ID="$(date -u +%Y%m%d%H%M%S)"
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
   -ldflags "-s -w -X github.com/QuantumNous/new-api/common.BuildID=$BUILD_ID" \
   -o /tmp/new-api-build .
+restore_static
 ok "$(ls -lh /tmp/new-api-build | awk '{print $5}')"
 
 log "部署并重启"

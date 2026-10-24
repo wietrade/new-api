@@ -60,7 +60,32 @@ OSS 不做 `Accept-Encoding` 内容协商，也不会自动返回 `.br`/`.gz` �
 原样上传。浏览器与主流爬虫都支持。代价是相比 brotli 大约多 5~10% 体积，但换来「零额外配置」。
 如果以后在 OSS 前面挂 CDN，可以改成上传原始字节 + 让 CDN 开启 brotli/gzip 回源压缩。
 
-## 5. 验证
+## 5. 清理旧版本文件
+
+每次发版都会新增 hash 文件，旧文件没人引用后需要手动清理：
+
+```bash
+# 预演（默认不删）：每组逻辑文件保留最新 2 个版本，当前构建用到的永远保留
+OSS_BUCKET=nowhub bash scripts/prune-oss-static.sh
+# 确认无误后真正删除
+OSS_BUCKET=nowhub DRY_RUN=0 bash scripts/prune-oss-static.sh
+```
+
+可用 `KEEP_VERSIONS=3` 调整保留版本数，`OSS_PREFIX` 指定前缀。
+
+## 6. 二进制瘦身（可选）
+
+`web/dist/static` 会被 `go:embed` 进二进制（约 89MB，含 `.br` 副本）。走 OSS 后这份内嵌副本
+只在回滚时用得上，可以在 `deploy.env` 里设置：
+
+```bash
+EMBED_STATIC=0
+```
+
+构建脚本会临时把 `web/dist/static` 移出（带 `trap` 保证恢复），二进制从 **150MB 降到 60MB**，
+部署与重启更快。代价：同源 `/static/*` 不再可用（返回 404），因此回滚时必须去掉该项重新构建。
+
+## 7. 验证
 
 ```bash
 # 对象头：应为 200 / Content-Encoding: gzip / immutable / 允许站点跨域
@@ -77,12 +102,12 @@ curl -sS http://127.0.0.1:3000/ | grep -oE 'src="[^"]*index[^"]*\.js"'
 浏览器侧检查：DevTools → Network 里 `static/*` 的 Domain 是否为 `nowhub.oss-*.aliyuncs.com`，
 控制台无混合内容/CORS 报错。
 
-## 6. 回滚
+## 8. 回滚
 
 改回同源只需注释掉 `deploy.env` 里的 `ASSET_PREFIX`（或整个文件改名），重新执行
 `./scripts/build-on-43.sh --no-pull`。Go 服务会继续用内嵌的 `web/dist`，并带 brotli 预压缩。
 
-## 7. 已知坑
+## 9. 已知坑
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
@@ -92,7 +117,7 @@ curl -sS http://127.0.0.1:3000/ | grep -oE 'src="[^"]*index[^"]*\.js"'
 | 体积没变小 | 上传了 `.br` 变体但没配 CDN | 见第 4 节，改为上传 gzip 字节 + `Content-Encoding` |
 | OSS 上旧 hash 文件越积越多 | 每版新增文件、旧文件不再被引用 | 定期清理：`ossutil ls oss://<bucket>/static/` 后按需 `ossutil rm`（保留最近若干个版本即可） |
 
-## 8. 安全
+## 10. 安全
 
 `~/.ossutilconfig` 里的 AK/SK 必须是**最小权限 RAM 子账号**（只允许 PUT/GET/LIST 该 bucket 前缀），
 不要用主账号 AK。密钥一旦在聊天/日志里出现过，应立即轮换。
