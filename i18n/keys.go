@@ -70,6 +70,7 @@ const (
 	MsgEmailBindingNewIntro    = "email.binding.new_intro"
 	MsgEmailBindingOldIntro    = "email.binding.old_intro"
 	MsgEmailBindingCode        = "email.binding.code"
+	MsgEmailBindingCodeLabel   = "email.binding.code_label"
 	MsgEmailBindingNewValidity = "email.binding.new_validity"
 	MsgEmailBindingOldValidity = "email.binding.old_validity"
 

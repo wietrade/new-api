@@ -50,7 +50,9 @@ func NotifyAccountSecurityChange(lang, email, eventKey string, eventArgs ...map[
 	}
 	event := html.EscapeString(i18n.Translate(lang, eventKey, eventArgs...))
 	subject := i18n.Translate(lang, i18n.MsgEmailSecurityNoticeSubject, map[string]any{"SystemName": common.SystemName})
-	content := fmt.Sprintf("<p>%s</p><p>%s</p>",
+	// 与验证码邮件保持同一结构：正文在上，提示文字弱化为次要信息
+	content := fmt.Sprintf("<p style=\"margin:0 0 16px\">%s</p>"+
+		"<p style=\"margin:0;color:#5b6472;font-size:13px;line-height:1.6\">%s</p>",
 		i18n.Translate(lang, i18n.MsgEmailSecurityNoticeChanged, map[string]any{"Event": event}),
 		i18n.Translate(lang, i18n.MsgEmailSecurityNoticeAdvice))
 	return common.SendEmail(subject, email, content)
