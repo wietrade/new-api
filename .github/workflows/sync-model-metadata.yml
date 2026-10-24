@@ -66,6 +66,9 @@ jobs:
           python scripts/model_sync/sync_models.py --only metadata --official $flags
           python scripts/model_sync/sync_models.py --only pricing
 
+      - name: Validate metadata and pricing
+        run: python -m scripts.model_sync.validate
+
       - name: Detect changes
         id: diff
         run: |

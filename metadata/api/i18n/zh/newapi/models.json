@@ -902,7 +902,7 @@
       ],
       "context_length": 262144,
       "max_output_tokens": 235929,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -928,7 +928,7 @@
       ],
       "context_length": 262144,
       "max_output_tokens": 16384,
-      "is_free": false,
+      "is_free": true,
       "endpoints": null
     },
     {
@@ -1402,7 +1402,7 @@
     },
     {
       "model_name": "free",
-      "vendor_name": "",
+      "vendor_name": "自建渠道",
       "description": "",
       "icon": "",
       "name_rule": 0,

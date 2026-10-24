@@ -49,6 +49,8 @@ jsDelivr 备选 `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`，�
 | `vision` / `files` / `audio` | 旧值，等价信息请写进 `input_modalities` |
 | `image_generation` / `video_generation` | 旧值，等价信息请写进 `output_modalities` |
 | `embedding` / `rerank` | **用途判别键**：向量 / 重排模型必填其一 |
+| `cache_implicit` | 上下文自动缓存（如 OpenAI / DeepSeek 的提示缓存），无需显式声明 |
+| `cache_explicit` | 需要显式开启的缓存（如 Anthropic `cache_control`、Gemini cached content） |
 
 ## modalities（模态，闭集）
 

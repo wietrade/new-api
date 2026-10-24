@@ -373,6 +373,11 @@ def merge_metadata(existing, index, allow_new=False, min_release_date="",
         for name in by_name
         if normalize_key(name) not in index
     )
+    # 模型名里的 ``:free`` 是明确的免计费契约：聚合源价格缺失或冲突时
+    # 也必须标记为免费，否则前端会漏掉“免费”徽标和筛选。
+    for record in existing:
+        if str(record.get("model_name", "")).endswith(":free"):
+            record["is_free"] = True
     return existing, changes, added, ambiguous, missing, tie_broken
 
 
