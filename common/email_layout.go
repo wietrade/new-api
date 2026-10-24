@@ -69,7 +69,7 @@ func BuildEmailHTML(subject string, content string) string {
   .email-body p:last-child{margin-bottom:0}
   .email-body a{color:#0969da;text-decoration:none;word-break:break-word}
   .email-body strong{font-weight:600;color:#1f2328}
-  .email-code{display:inline-block;margin:4px 0 0;padding:8px 14px;background:#ffffff;border:1px solid #e3e6ea;border-radius:8px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;line-height:1.5;letter-spacing:2px;font-weight:600;color:#1f2328}
+  .email-code{display:inline-block;margin:0 auto;padding:10px 20px;background:#ffffff;border:1px solid #e3e6ea;border-radius:8px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:24px;line-height:1.4;letter-spacing:4px;font-weight:600;color:#1f2328}
   .email-btn{display:inline-block;padding:9px 18px;background:#2e9c45;border-radius:8px;color:#ffffff!important;font-size:14px;line-height:20px;font-weight:500;text-decoration:none!important}
   @media (max-width:600px){
     .email-shell{padding:20px 12px!important}

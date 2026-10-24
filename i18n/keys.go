@@ -53,10 +53,11 @@ const (
 const (
 	MsgUserDefaultTokenName = "user.default_token_name"
 
-	MsgEmailVerificationSubject  = "email.verification.subject"
-	MsgEmailVerificationGreeting = "email.verification.greeting"
-	MsgEmailVerificationCode     = "email.verification.code"
-	MsgEmailVerificationValidity = "email.verification.validity"
+	MsgEmailVerificationSubject   = "email.verification.subject"
+	MsgEmailVerificationGreeting  = "email.verification.greeting"
+	MsgEmailVerificationCode      = "email.verification.code"
+	MsgEmailVerificationCodeLabel = "email.verification.code_label"
+	MsgEmailVerificationValidity  = "email.verification.validity"
 
 	MsgEmailPasswordResetSubject      = "email.password_reset.subject"
 	MsgEmailPasswordResetGreeting     = "email.password_reset.greeting"
