@@ -50,9 +50,9 @@ function Field(props: {
   children: React.ReactNode
   className?: string
 }) {
+  // 标签只给读屏软件用：桌面端这排小标题是多余的视觉噪声
   return (
-    <div className={`pf-field ${props.className ?? ''}`}>
-      <span className='pf-label'>{props.label}</span>
+    <div className={`pf-field ${props.className ?? ''}`} aria-label={props.label}>
       {props.children}
     </div>
   )
@@ -84,6 +84,8 @@ function NativeSelect(props: {
   onChange: (value: string) => void
   options: Record<string, string>
   placeholder: string
+  /** 无障碍名称（桌面端不再显示可见标签） */
+  label?: string
   width?: string
   /** 选项命中数；为 0 时置灰禁用，避免选完必然空结果 */
   counts?: Record<string, number>
@@ -92,6 +94,7 @@ function NativeSelect(props: {
     <SelectShell width={props.width}>
       <select
         className='pf-select'
+        aria-label={props.label ?? props.placeholder}
         value={props.value[0] ?? ''}
         onChange={(e) => props.onChange(e.target.value)}
       >
@@ -194,6 +197,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(vendorOptions, vendorCounts)}
           counts={vendorCounts}
           placeholder='全部供应商'
+          label={t('Vendor')}
           width='144px'
         />
       </Field>
@@ -205,6 +209,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(MODEL_TYPE_LABELS, modelTypeCounts)}
           counts={modelTypeCounts}
           placeholder='全部类型'
+          label={t('Model Types')}
           width='120px'
         />
       </Field>
@@ -216,6 +221,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(INPUT_TYPE_LABELS, inputTypeCounts)}
           counts={inputTypeCounts}
           placeholder='全部输入'
+          label={t('Input')}
           width='120px'
         />
       </Field>
@@ -227,6 +233,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(CONTEXT_LABELS, contextCounts)}
           counts={contextCounts}
           placeholder='不限'
+          label='上下文'
           width='134px'
         />
       </Field>
@@ -238,6 +245,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(PRICE_TIER_LABELS, priceCounts)}
           counts={priceCounts}
           placeholder='不限'
+          label={t('Price')}
           width='108px'
         />
       </Field>
@@ -246,6 +254,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
         <SelectShell width='128px'>
           <select
             className='pf-select'
+            aria-label={t('Sort')}
             value={props.sortBy}
             onChange={(e) => props.onSortChange(e.target.value)}
           >
