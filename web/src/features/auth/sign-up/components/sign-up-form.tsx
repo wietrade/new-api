@@ -280,7 +280,7 @@ export function SignUpForm({
               <FormLabel className='text-[0.825rem] leading-5 font-medium'>{t('Password')}</FormLabel>
               <FormControl>
                 <PasswordInput
-                  placeholder={t('Enter password (8–128 characters)')}
+                  placeholder={t('Enter password (6–128 characters)')}
                   inputClassName='h-9 rounded-lg px-3 py-1 pr-10 text-[0.825rem] leading-5 shadow-none md:text-[0.825rem]'
                   buttonClassName='end-3 h-4 w-4 rounded-none hover:bg-transparent'
                   visibilityIcon='action'
