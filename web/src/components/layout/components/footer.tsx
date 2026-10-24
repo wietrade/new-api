@@ -17,13 +17,41 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import { CodeXml, LifeBuoy, Mail, Send } from 'lucide-react'
-import { useMemo, type ComponentType, type ReactNode } from 'react'
+import { LifeBuoy, Mail, Send } from 'lucide-react'
+import {
+  useMemo,
+  type ComponentType,
+  type CSSProperties,
+  type ReactNode,
+} from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { cn } from '@/lib/utils'
+
+// 地球图标：用 mask 方式着色，跟随主题文字颜色
+const EARTH_ICON_URL = '/earth-americas.svg'
+
+function EarthIcon({ className }: { className?: string }) {
+  const style: CSSProperties = {
+    maskImage: `url(${EARTH_ICON_URL})`,
+    WebkitMaskImage: `url(${EARTH_ICON_URL})`,
+    maskSize: 'contain',
+    WebkitMaskSize: 'contain',
+    maskRepeat: 'no-repeat',
+    WebkitMaskRepeat: 'no-repeat',
+    maskPosition: 'center',
+    WebkitMaskPosition: 'center',
+  }
+  return (
+    <span
+      aria-hidden
+      className={cn('inline-block bg-current', className)}
+      style={style}
+    />
+  )
+}
 
 interface FooterLink {
   text: string
@@ -89,7 +117,7 @@ export function Footer(props: FooterProps) {
   const { status } = useStatus()
 
   const displayLogo = systemLogo || props.logo || '/logo.png'
-  const displayName = systemName || props.name || 'New API'
+  const displayName = systemName || props.name || 'NowHub.Org'
   const currentYear = new Date().getFullYear()
   const rawDocsLink = status?.docs_link as string | undefined
   const docsHref =
@@ -117,10 +145,7 @@ export function Footer(props: FooterProps) {
         links: [
           { text: t('Documentation'), href: docsHref },
           { text: t('API reference'), href: docsHref },
-          {
-            text: 'GitHub',
-            href: 'https://github.com/wietrade/new-api',
-          },
+          { text: t('FAQ'), href: '/help/faq/' },
         ],
       },
       {
@@ -141,19 +166,19 @@ export function Footer(props: FooterProps) {
             icon: Mail,
           },
           {
-            text: t('Support tickets'),
-            href: '/dashboard/tickets',
+            text: t('About us'),
+            href: '/about',
             icon: LifeBuoy,
           },
           {
-            text: 'Telegram @wietrade',
+            text: '@wietrade',
             href: 'https://t.me/wietrade',
             icon: Send,
           },
           {
-            text: 'GitHub',
-            href: 'https://github.com/wietrade/new-api',
-            icon: CodeXml,
+            text: 'NowHub.Org',
+            href: '/',
+            icon: EarthIcon,
           },
         ],
       },
