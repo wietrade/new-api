@@ -147,7 +147,7 @@ export function Footer(props: FooterProps) {
       {
         title: t('Developers'),
         links: [
-          { text: t('Documentation'), href: docsSiteHref },
+          { text: t('NowHub API Docs'), href: docsSiteHref },
           { text: t('API reference'), href: docsHref },
           { text: t('FAQ'), href: '/help/faq/' },
         ],
@@ -187,7 +187,7 @@ export function Footer(props: FooterProps) {
         ],
       },
     ],
-    [t, docsHref]
+    [t, docsHref, docsSiteHref]
   )
 
   const displayColumns = props.columns ?? fallbackColumns
