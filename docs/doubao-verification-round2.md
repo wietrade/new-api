@@ -56,22 +56,21 @@ nemotron-3.5-content-safety:free, nemotron-3.5-lightning:free, nemotron-3.5-supe
 | `dots-3-note-preview:free` | 524288 | 0 | 最大输出 |
 | `inkling:free` | 1048576 | 0 | 最大输出 |
 
-## 4. 待核实：发布日期与知识截止（目前几乎全空）
+## 4. 待核实：发布日期与知识截止
 
-51 个模型缺 `release_date`，47 个缺 `knowledge_cutoff`。**优先级只做已上线渠道的模型**（能真实调用的这些）：
+当前 `release_date` 已有 36/53 条（多来自 OpenRouter 的 `created` 时间戳），**缺 17 条**；`knowledge_cutoff` 只有 6/53，**缺 47 条**。
+
+**缺 `release_date` 的 17 个模型**（优先已上线渠道）：
 
 ```
-claude-fable-5-1, claude-opus-5-5, claude-sonnet-5-5, claude-haiku-5-5,
-claude-fable-5, claude-opus-5, claude-opus-4-8, claude-sonnet-5,
-claude-haiku-4-5, claude-haiku-4-5-20251001,
-gpt-5.6-luna, gpt-5.6-sol, gpt-5.6-terra, gpt-6-luna, gpt-6-sol, gpt-6-astra, gpt-6.1-sol,
-chatgpt-image-latest,
-gemini-3-pro-image, gemini-3.1-flash-image,
-deepseek-flash, deepseek-v4-pro, deepseek-v4.1-flash-1017,
-glm-5, glm-5.3-prime, kimi-k3, MiniMax-M3, minimax-m3.1-flash, qwen3.8-flash, grok-4.7, gpt-oss-120b
+deepseek-flash, MiniMax-M3, minimax-m3.1-flash, qwen3.8-flash, grok-4.7,
+gpt-image-2.5-sunburst, gpt-image-2.5-sunburst-2026-09-08,
+dots-3-note-preview:free, lfm-2.5-2.6b:free, laguna-s-2.1:free, laguna-xs-2.1:free,
+inkling:free, inkling-small:free, xing4.0-29b-a4b:free,
+nemotron-3.5-content-safety:free, nemotron-3.5-lightning:free, nemotron-3.5-super-vl:free
 ```
 
-Claude 五款（fable-5-1 / opus-5-5 / sonnet-5-5 / haiku-5-5 / haiku-4-5）已确认 knowledge cutoff 与 haiku-4-5 的发布日期，其余请补 release date 与 cutoff。
+**缺 `knowledge_cutoff` 的 47 个模型**：除已确认的 6 条（Claude 四款 2026-06、haiku-4-5 系列 2025-02）外全部，清单即上表 §2 的 38 个 lifecycle 待核实模型 + Anthropic 旧款 7 个（fable-5 / opus-5 / opus-4.5 / opus-4.6 / opus-4.7 / opus-4-8 / sonnet-5）+ `chatgpt-image-latest` + `gemini-3-pro-image`。
 
 ## 5. 上一轮遗留、仍未解决
 
