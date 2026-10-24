@@ -58,7 +58,7 @@ func BuildEmailHTML(subject string, content string) string {
 	year := time.Now().Year()
 
 	brandMark := fmt.Sprintf(
-		`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#ffffff;border-radius:6px;color:#2e9c45;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700">%s</td></tr></table>`,
+		`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#ffffff;color:#2e9c45;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700">%s</td></tr></table>`,
 		html.EscapeString(emailBrandInitial()))
 
 	copyright := fmt.Sprintf(
@@ -84,8 +84,8 @@ func BuildEmailHTML(subject string, content string) string {
   .email-body p:last-child{margin-bottom:0}
   .email-body a{color:#0969da;text-decoration:none;word-break:break-word}
   .email-body strong{font-weight:600;color:#1f2328}
-  .email-code{display:inline-block;margin:0 auto;padding:10px 20px;background:#ffffff;border:1px solid #e3e6ea;border-radius:8px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:24px;line-height:1.4;letter-spacing:4px;font-weight:600;color:#1f2328}
-  .email-btn{display:inline-block;padding:9px 18px;background:#2e9c45;border-radius:8px;color:#ffffff!important;font-size:14px;line-height:20px;font-weight:500;text-decoration:none!important}
+  .email-code{display:inline-block;margin:0 auto;padding:10px 20px;background:#ffffff;border:1px solid #e3e6ea;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:24px;line-height:1.4;letter-spacing:4px;font-weight:600;color:#1f2328}
+  .email-btn{display:inline-block;padding:9px 18px;background:#2e9c45;color:#ffffff!important;font-size:14px;line-height:20px;font-weight:500;text-decoration:none!important}
   @media (max-width:600px){
     .email-shell{padding:20px 12px!important}
     .email-card{padding:20px!important}
@@ -110,7 +110,7 @@ func BuildEmailHTML(subject string, content string) string {
           </td>
         </tr>
         <tr>
-          <td class="email-card" style="background:#f6f7f8;border-radius:0 0 14px 14px;padding:24px 26px">
+          <td class="email-card" style="background:#f6f7f8;padding:24px 26px">
             <h1 class="email-title" style="margin:0 0 14px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.5;font-weight:600;color:#1f2328">%s</h1>
             <div class="email-body" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#1f2328;font-size:14px;line-height:1.6">%s</div>
           </td>
@@ -119,7 +119,7 @@ func BuildEmailHTML(subject string, content string) string {
           <td height="12" style="height:12px;line-height:12px;font-size:0">&nbsp;</td>
         </tr>
         <tr>
-          <td style="background:#eef1f4;border-radius:14px;padding:14px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
+          <td style="background:#eef1f4;padding:14px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
             %s
           </td>
         </tr>
