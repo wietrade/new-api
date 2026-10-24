@@ -38,9 +38,6 @@ ok "web 依赖就绪"
 log "前端构建"
 ( cd web && bun run build )
 
-log "前端预压缩"
-( cd web && node scripts/precompress.mjs )
-
 log "文档站依赖"
 [ -d docs-site/node_modules ] || ( cd docs-site && bun install --registry="$BUN_REGISTRY" )
 
@@ -51,6 +48,10 @@ log "文档站构建"
 if [ -f web/dist/docs/sitemap.xml ]; then
   sed -i 's#https://www\.nowhub\.org/#https://www.nowhub.org/docs/#g' web/dist/docs/sitemap.xml
 fi
+
+# 前端 + 文档站一起生成 brotli 预压缩文件（须在两份产物都构建完之后执行）
+log "brotli 预压缩"
+( cd web && node scripts/precompress.mjs )
 
 [ -f web/dist/index.html ] || { echo "web/dist/index.html 缺失"; exit 1; }
 [ -f web/dist/docs/index.html ] || { echo "web/dist/docs/index.html 缺失"; exit 1; }
