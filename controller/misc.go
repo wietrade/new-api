@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"net/http"
 
 	"github.com/QuantumNous/new-api/common"
@@ -268,12 +269,14 @@ func SendPasswordResetEmail(c *gin.Context) {
 		systemName := map[string]any{"SystemName": common.SystemName}
 		linkParams := map[string]any{"Link": link}
 		subject := i18n.Translate(lang, i18n.MsgEmailPasswordResetSubject, systemName)
+		// 邮件正文：问候 → 主按钮 → 备用链接 → 有效期提示
 		content := fmt.Sprintf("<p>%s</p>"+
-			"<p>%s</p>"+
-			"<p>%s </p>"+
-			"<p>%s</p>",
+			"<p><a class=\"email-btn\" href=\"%s\">%s</a></p>"+
+			"<p style=\"margin-top:22px;color:#8a94a6;font-size:13px;line-height:1.7\">%s</p>"+
+			"<p style=\"color:#8a94a6;font-size:13px;line-height:1.7\">%s</p>",
 			i18n.Translate(lang, i18n.MsgEmailPasswordResetGreeting, systemName),
-			i18n.Translate(lang, i18n.MsgEmailPasswordResetLink, linkParams),
+			html.EscapeString(link),
+			i18n.Translate(lang, i18n.MsgEmailPasswordResetButton),
 			i18n.Translate(lang, i18n.MsgEmailPasswordResetLinkFallback, linkParams),
 			i18n.Translate(lang, i18n.MsgEmailPasswordResetValidity, map[string]any{"Minutes": common.VerificationValidMinutes}))
 		err := common.SendEmail(subject, email, content)

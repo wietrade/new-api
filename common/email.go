@@ -86,6 +86,8 @@ func SendEmail(subject string, receiver string, content string) error {
 	if SMTPServer == "" && SMTPAccount == "" {
 		return NewMessage("SMTP server is not configured")
 	}
+	// 统一套用品牌邮件模板（已包含完整 HTML 文档的内容不再重复包裹）
+	content = BuildEmailHTML(subject, content)
 	encodedSubject := fmt.Sprintf("=?UTF-8?B?%s?=", base64.StdEncoding.EncodeToString([]byte(subject)))
 	mail := []byte(fmt.Sprintf("To: %s\r\n"+
 		"From: %s <%s>\r\n"+
