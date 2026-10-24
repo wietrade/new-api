@@ -20,8 +20,21 @@ export GOPROXY="${GOPROXY:-https://goproxy.cn,direct}"
 export GOMAXPROCS="${GOMAXPROCS:-2}"
 export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1400}"
 
+# 可选部署参数（不提交到仓库）：$SRC_DIR/deploy.env
+# 例：ASSET_PREFIX=https://nowhub.oss-cn-beijing.aliyuncs.com
+if [ -f "$SRC_DIR/deploy.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . "$SRC_DIR/deploy.env"
+  set +a
+fi
+
 log() { printf '\033[1;36m==> %s\033[0m\n' "$*"; }
 ok()  { printf '\033[1;32m  ✓ %s\033[0m\n' "$*"; }
+
+if [ -n "${ASSET_PREFIX:-}" ]; then
+  log "静态资源前缀: $ASSET_PREFIX"
+fi
 
 cd "$SRC_DIR"
 
