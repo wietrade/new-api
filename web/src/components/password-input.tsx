@@ -21,7 +21,6 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-import { Button } from './ui/button'
 import { Input } from './ui/input'
 
 type PasswordInputProps = Omit<
@@ -61,15 +60,13 @@ export function PasswordInput({
         className={inputClassName}
         {...props}
       />
-      <Button
+      {/* 不用 Button 组件：它的基类带 active:translate-y-px，按下时会让图标下移 1~2px。
+          原生 button + 自己的样式最可控。 */}
+      <button
         type='button'
-        size='icon'
-        variant='ghost'
         disabled={disabled}
         className={cn(
-          // 用 inset-y-0 + my-auto 做垂直居中，避免依赖 translate（按钮基类的
-          // active:translate-y-px 会在按下瞬间覆盖 -translate-y-1/2，图标会“跳”一下）。
-          'text-muted-foreground hover:text-foreground absolute end-1 inset-y-0 my-auto h-7 w-7 rounded-md active:translate-y-0',
+          'text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute end-1 inset-y-0 my-auto flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
           buttonClassName
         )}
         aria-label={toggleLabel}
@@ -84,7 +81,7 @@ export function PasswordInput({
         ) : (
           <EyeOff size={16} aria-hidden='true' />
         )}
-      </Button>
+      </button>
     </div>
   )
 }
