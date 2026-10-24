@@ -89,15 +89,8 @@ func SendEmail(subject string, receiver string, content string) error {
 	// 统一套用品牌邮件模板（已包含完整 HTML 文档的内容不再重复包裹）
 	content = BuildEmailHTML(subject, content)
 	encodedSubject := fmt.Sprintf("=?UTF-8?B?%s?=", base64.StdEncoding.EncodeToString([]byte(subject)))
-	mail := []byte(fmt.Sprintf("To: %s\r\n"+
-		"From: %s <%s>\r\n"+
-		"Subject: %s\r\n"+
-		"Date: %s\r\n"+
-		"Message-ID: %s\r\n"+ // 添加 Message-ID 头
-		"Auto-Submitted: auto-generated\r\n"+
-		"MIME-Version: 1.0\r\n"+
-		"Content-Type: text/html; charset=UTF-8\r\n\r\n%s\r\n",
-		receiver, SystemName, SMTPFrom, encodedSubject, time.Now().Format(time.RFC1123Z), id, content))
+	// multipart/alternative：纯文本 + HTML 两份正文，兼容纯文本客户端并改善送达率
+	mail := buildEmailMessage(receiver, encodedSubject, BuildEmailText(content), content, id)
 	auth := getSMTPAuth()
 	addr := fmt.Sprintf("%s:%d", SMTPServer, SMTPPort)
 	to := strings.Split(receiver, ";")

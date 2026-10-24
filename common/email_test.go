@@ -9,7 +9,9 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"math/big"
+	"mime/quotedprintable"
 	"net"
 	"net/smtp"
 	"strconv"
@@ -19,6 +21,23 @@ import (
 
 	"github.com/stretchr/testify/require"
 )
+
+// decodeMIMEPart 从 multipart/alternative 报文中取出指定 Content-Type 的正文并解码（quoted-printable）。
+func decodeMIMEPart(t *testing.T, raw, contentType string) string {
+	t.Helper()
+	index := strings.Index(raw, "Content-Type: "+contentType)
+	require.GreaterOrEqual(t, index, 0, "missing %s part", contentType)
+	rest := raw[index:]
+	separator := strings.Index(rest, "\r\n\r\n")
+	require.GreaterOrEqual(t, separator, 0, "malformed %s part", contentType)
+	body := rest[separator+4:]
+	if end := strings.Index(body, "\r\n--"); end >= 0 {
+		body = body[:end]
+	}
+	decoded, err := io.ReadAll(quotedprintable.NewReader(strings.NewReader(body)))
+	require.NoError(t, err, "decode %s part", contentType)
+	return string(decoded)
+}
 
 type fakeSMTPServer struct {
 	listener          net.Listener
@@ -288,8 +307,10 @@ func TestSendEmailUsesExplicitStartTLSWithInsecureCertificate(t *testing.T) {
 
 	select {
 	case message := <-server.messages:
+		require.Contains(t, message, "multipart/alternative")
 		require.Contains(t, message, "Subject: =?UTF-8?B?")
-		require.Contains(t, message, "<p>123456</p>")
+		require.Contains(t, decodeMIMEPart(t, message, "text/html"), "<p>123456</p>")
+		require.Contains(t, decodeMIMEPart(t, message, "text/plain"), "123456")
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for SMTP DATA")
 	}
