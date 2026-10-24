@@ -1,82 +1,23 @@
 import { useRouterState } from '@tanstack/react-router'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useSystemConfig } from '@/hooks/use-system-config'
 
-type PageMeta = {
-  title: string
-  description: string
-}
-
-const DEFAULT_META: PageMeta = {
-  title: 'NowHub API · 统一的模型 API 接入层',
-  description:
-    '一个 API 接入主流大模型：兼容 OpenAI、Anthropic、Gemini 协议，按实际用量计费，价格透明。',
-}
-
-// 主站是纯前端渲染，这里按路由补上可被搜索引擎与分享卡片读取的元信息。
-const ROUTE_META: Array<{ match: RegExp; meta: PageMeta }> = [
-  {
-    match: /^\/$/,
-    meta: DEFAULT_META,
-  },
-  {
-    match: /^\/pricing/,
-    meta: {
-      title: '模型广场 · NowHub API',
-      description:
-        '浏览全部可用大模型与实时结算价格，支持按供应商、上下文长度、输入类型和价格筛选。',
-    },
-  },
-  {
-    match: /^\/rankings/,
-    meta: {
-      title: '排行榜 · NowHub API',
-      description: '按模型调用量、成功率与延迟查看大模型表现，选择更稳更快的接入线路。',
-    },
-  },
-  {
-    match: /^\/about/,
-    meta: {
-      title: '关于我们 · NowHub API',
-      description: 'NowHub API 是独立的模型接口聚合与技术服务方，为开发者提供统一的大模型接入。',
-    },
-  },
-  {
-    match: /^\/help/,
-    meta: {
-      title: '帮助中心 · NowHub API',
-      description: '接入指南、常见问题与故障排查：鉴权、额度、超时、缓存与计费说明。',
-    },
-  },
-  {
-    match: /^\/user-agreement/,
-    meta: {
-      title: '服务条款 · NowHub API',
-      description: 'NowHub API 服务条款，说明服务范围、账号责任、计费与终止条件。',
-    },
-  },
-  {
-    match: /^\/privacy-policy/,
-    meta: {
-      title: '隐私政策 · NowHub API',
-      description: 'NowHub API 隐私政策，说明我们收集哪些数据、如何使用与保护这些数据。',
-    },
-  },
-  {
-    match: /^\/acceptable-use/,
-    meta: {
-      title: '可接受使用政策 · NowHub API',
-      description: 'NowHub API 可接受使用政策，列明禁止的使用方式与违规处理规则。',
-    },
-  },
-  {
-    match: /^\/service-level/,
-    meta: {
-      title: '服务等级说明 · NowHub API',
-      description: 'NowHub API 服务等级说明：可用性目标、故障响应流程与统计口径。',
-    },
-  },
+/**
+ * 主站是纯前端渲染，这里按路由补上可被搜索引擎与分享卡片读取的元信息。
+ * 文案取自语言包（meta.*），中英文各一份，其余语言回落到英文。
+ */
+const ROUTE_META: Array<{ match: RegExp; key: string }> = [
+  { match: /^\/$/, key: 'site' },
+  { match: /^\/pricing/, key: 'pricing' },
+  { match: /^\/rankings/, key: 'rankings' },
+  { match: /^\/about/, key: 'about' },
+  { match: /^\/help/, key: 'help' },
+  { match: /^\/user-agreement/, key: 'terms' },
+  { match: /^\/privacy-policy/, key: 'privacy' },
+  { match: /^\/acceptable-use/, key: 'aup' },
+  { match: /^\/service-level/, key: 'sla' },
 ]
 
 function upsertMeta(
@@ -102,19 +43,25 @@ function upsertMeta(
 export function useDocumentMeta() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const { systemName } = useSystemConfig()
+  const { t, i18n } = useTranslation()
   const brand = systemName || 'NowHub API'
 
   useEffect(() => {
     const matched = ROUTE_META.find((route) => route.match.test(pathname))
-    const meta = matched?.meta ?? { title: brand, description: DEFAULT_META.description }
+    const key = matched?.key ?? 'site'
+    const pageTitle = t(`meta.${key}.title`)
+    const description = t(`meta.${key}.description`)
+    // 首页以品牌开头，其余页面为「页面名 · 品牌」
+    const title =
+      key === 'site' ? `${brand} · ${pageTitle}` : `${pageTitle} · ${brand}`
 
-    document.title = meta.title
-    upsertMeta('name', 'title', meta.title)
-    upsertMeta('name', 'description', meta.description)
-    upsertMeta('property', 'og:title', meta.title)
-    upsertMeta('property', 'og:description', meta.description)
+    document.title = title
+    upsertMeta('name', 'title', title)
+    upsertMeta('name', 'description', description)
+    upsertMeta('property', 'og:title', title)
+    upsertMeta('property', 'og:description', description)
     upsertMeta('property', 'og:type', 'website')
     upsertMeta('property', 'og:url', window.location.href)
     upsertMeta('name', 'twitter:card', 'summary')
-  }, [brand, pathname])
+  }, [brand, pathname, t, i18n.language])
 }
