@@ -77,7 +77,7 @@ function FooterLinkItem(props: { link: FooterLink }) {
   const label = t(props.link.text)
   const Icon = props.link.icon
   const className =
-    'inline-flex min-w-0 items-start gap-2 text-[13px] leading-5 text-white/60 transition-colors hover:text-white sm:text-sm'
+    'inline-flex min-w-0 items-start gap-2 text-[13px] leading-5 font-medium text-muted-foreground transition-colors hover:text-foreground'
   const content = (
     <>
       {Icon ? <Icon className='mt-0.5 size-4 shrink-0 opacity-70' /> : null}
@@ -194,7 +194,7 @@ export function Footer(props: FooterProps) {
 
   const body: ReactNode = footerHtml ? (
     <div
-      className='custom-footer text-sm text-white/60'
+      className='custom-footer text-sm text-muted-foreground'
       dangerouslySetInnerHTML={{ __html: footerHtml }}
     />
   ) : (
@@ -206,15 +206,15 @@ export function Footer(props: FooterProps) {
             alt={displayName}
             className='size-7 rounded-md object-contain'
           />
-          <span className='text-lg font-semibold tracking-tight text-white'>
+          <span className='text-lg font-semibold tracking-tight text-foreground'>
             {nameHead}
-            <span className='text-white/50'>{nameTail}</span>
+            <span className='text-muted-foreground'>{nameTail}</span>
           </span>
         </Link>
-        <p className='mt-3 text-[13px] leading-6 text-white/60 sm:mt-4 sm:text-sm'>
+        <p className='text-muted-foreground mt-3 text-[13px] leading-6 sm:mt-4 sm:text-sm'>
           {t('footer.brandDescription')}
         </p>
-        <span className='mt-4 inline-flex items-center gap-2 text-xs text-white/60 sm:mt-5'>
+        <span className='text-muted-foreground mt-4 inline-flex items-center gap-2 text-xs sm:mt-5'>
           <span className='relative flex size-2'>
             <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
             <span className='relative inline-flex size-2 rounded-full bg-emerald-500' />
@@ -230,10 +230,10 @@ export function Footer(props: FooterProps) {
             className={cn(
               'min-w-0',
               index === displayColumns.length - 1 &&
-                'xl:border-white/15 xl:border-l xl:pl-6'
+                'xl:border-border xl:border-l xl:pl-6'
             )}
           >
-            <h3 className='mb-2.5 text-[13px] font-semibold text-white sm:mb-3'>
+            <h3 className='text-foreground mb-2.5 text-[13px] font-semibold sm:mb-3'>
               {t(column.title)}
             </h3>
             <ul className='space-y-2 sm:space-y-2.5'>
@@ -252,19 +252,19 @@ export function Footer(props: FooterProps) {
   return (
     <footer
       className={cn(
-        'relative border-t border-white/10 bg-black',
+        'bg-background border-border/80 relative border-t',
         props.className
       )}
     >
       <div className='mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14'>
         {body}
 
-        <div className='mt-10 space-y-3 border-t border-white/10 pt-6 sm:mt-12'>
-          <p className='text-xs text-white/50'>
+        <div className='border-border/80 mt-10 space-y-3 border-t pt-6 sm:mt-12'>
+          <p className='text-muted-foreground text-xs'>
             &copy; {currentYear} {displayName}.{' '}
             {props.copyright ?? t('footer.defaultCopyright')}
           </p>
-          <p className='text-xs leading-5 text-white/40'>
+          <p className='text-muted-foreground/70 text-xs leading-5'>
             {t('footer.trademarkNotice')}
           </p>
         </div>
