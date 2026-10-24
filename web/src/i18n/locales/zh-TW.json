@@ -2828,6 +2828,8 @@
     "footer.columns.related.links.oneApi": "One API",
     "footer.columns.related.title": "相關項目",
     "footer.defaultCopyright": "版權所有。",
+    "footer.brandDescription": "統一的模型 API 接入層，聚合主流大模型，按實際用量計費。",
+    "footer.trademarkNotice": "OpenAI、Anthropic、Google 等公司名稱，以及 GPT、Claude、Gemini 等產品名稱與商標，歸各自權利人所有。NowHub 為獨立的模型介面聚合與技術服務方，並非上述公司的官方授權代理商或關聯公司。",
     "footer.new\u0061pi.projectAttributionSuffix": "版權所有，由項目貢獻者設計與開發。",
     "For advanced custom channels this applies only to /v1/responses routes without protocol conversion.": "進階自訂渠道僅對 /v1/responses 且不做協定轉換的路由生效。",
     "GitHub ID is empty!": "GitHub ID 為空！",

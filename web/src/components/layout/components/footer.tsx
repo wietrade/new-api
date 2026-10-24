@@ -17,7 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import { useMemo, type ReactNode } from 'react'
+import { Github, LifeBuoy, Mail, Send } from 'lucide-react'
+import { useMemo, type ComponentType, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStatus } from '@/hooks/use-status'
@@ -27,6 +28,7 @@ import { cn } from '@/lib/utils'
 interface FooterLink {
   text: string
   href: string
+  icon?: ComponentType<{ className?: string }>
 }
 
 interface FooterColumnProps {
@@ -45,8 +47,15 @@ interface FooterProps {
 function FooterLinkItem(props: { link: FooterLink }) {
   const { t } = useTranslation()
   const label = t(props.link.text)
+  const Icon = props.link.icon
   const className =
-    'inline-flex text-sm text-muted-foreground transition-colors hover:text-foreground'
+    'inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground'
+  const content = (
+    <>
+      {Icon ? <Icon className='size-4 shrink-0 opacity-70' /> : null}
+      {label}
+    </>
+  )
 
   const href = props.link.href
   const isExternal = href.startsWith('http') || href.startsWith('mailto')
@@ -61,14 +70,14 @@ function FooterLinkItem(props: { link: FooterLink }) {
         rel={isExternal || isStatic ? 'noopener noreferrer' : undefined}
         className={className}
       >
-        {label}
+        {content}
       </a>
     )
   }
 
   return (
     <Link to={props.link.href} className={className}>
-      {label}
+      {content}
     </Link>
   )
 }
@@ -115,17 +124,6 @@ export function Footer(props: FooterProps) {
         ],
       },
       {
-        title: t('Company'),
-        links: [
-          { text: t('About us'), href: '/about' },
-          { text: t('Support tickets'), href: '/dashboard/tickets' },
-          {
-            text: t('Contact us'),
-            href: 'mailto:support@nowhub.org',
-          },
-        ],
-      },
-      {
         title: t('Legal'),
         links: [
           { text: t('Terms of service'), href: '/user-agreement' },
@@ -135,15 +133,27 @@ export function Footer(props: FooterProps) {
         ],
       },
       {
-        title: t('Community'),
+        title: t('Contact us'),
         links: [
+          {
+            text: 'support@nowhub.org',
+            href: 'mailto:support@nowhub.org',
+            icon: Mail,
+          },
+          {
+            text: t('Support tickets'),
+            href: '/dashboard/tickets',
+            icon: LifeBuoy,
+          },
+          {
+            text: 'Telegram @wietrade',
+            href: 'https://t.me/wietrade',
+            icon: Send,
+          },
           {
             text: 'GitHub',
             href: 'https://github.com/wietrade/new-api',
-          },
-          {
-            text: 'AGPL-3.0',
-            href: 'https://github.com/wietrade/new-api/blob/main/LICENSE',
+            icon: Github,
           },
         ],
       },
@@ -159,19 +169,53 @@ export function Footer(props: FooterProps) {
       dangerouslySetInnerHTML={{ __html: footerHtml }}
     />
   ) : (
-    <div className='grid grid-cols-2 gap-x-8 gap-y-9 md:grid-cols-5'>
-      {displayColumns.map((column, index) => (
-        <div key={index}>
-          <h3 className='mb-3 text-[13px] font-semibold'>{t(column.title)}</h3>
-          <ul className='space-y-2'>
-            {column.links.map((link, linkIndex) => (
-              <li key={linkIndex}>
-                <FooterLinkItem link={link} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+    <div className='grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)] lg:gap-14'>
+      <div className='max-w-sm'>
+        <Link to='/' className='inline-flex items-center gap-2.5'>
+          <img
+            src={displayLogo}
+            alt={displayName}
+            className='size-7 rounded-md object-contain'
+          />
+          <span className='text-lg font-semibold tracking-tight'>
+            {nameHead}
+            <span className='text-muted-foreground'>{nameTail}</span>
+          </span>
+        </Link>
+        <p className='text-muted-foreground mt-4 text-sm leading-6'>
+          {t('footer.brandDescription')}
+        </p>
+        <span className='text-muted-foreground mt-5 inline-flex items-center gap-2 text-xs'>
+          <span className='relative flex size-2'>
+            <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
+            <span className='relative inline-flex size-2 rounded-full bg-emerald-500' />
+          </span>
+          {t('All systems operational')}
+        </span>
+      </div>
+
+      <div className='grid grid-cols-2 gap-x-8 gap-y-9 sm:grid-cols-4'>
+        {displayColumns.map((column, index) => (
+          <div
+            key={index}
+            className={cn(
+              index === displayColumns.length - 1 &&
+                'sm:border-border/70 sm:border-l sm:pl-6'
+            )}
+          >
+            <h3 className='mb-3 text-[13px] font-semibold'>
+              {t(column.title)}
+            </h3>
+            <ul className='space-y-2.5'>
+              {column.links.map((link, linkIndex) => (
+                <li key={linkIndex}>
+                  <FooterLinkItem link={link} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     </div>
   )
 
@@ -185,32 +229,13 @@ export function Footer(props: FooterProps) {
       <div className='mx-auto w-full max-w-6xl px-5 py-12 sm:px-6 sm:py-14'>
         {body}
 
-        <div className='border-border mt-12 flex flex-col items-start justify-between gap-4 border-t pt-8 sm:flex-row sm:items-center'>
-          <div className='flex items-center gap-4'>
-            <Link to='/' className='flex items-center gap-2'>
-              <img
-                src={displayLogo}
-                alt={displayName}
-                className='size-6 rounded-md object-contain'
-              />
-              <span className='text-base font-semibold'>
-                {nameHead}
-                <span className='text-zinc-500 dark:text-zinc-400'>
-                  {nameTail}
-                </span>
-              </span>
-            </Link>
-            <span className='text-muted-foreground inline-flex items-center gap-1.5 text-xs'>
-              <span className='relative flex size-2'>
-                <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
-                <span className='relative inline-flex size-2 rounded-full bg-emerald-500' />
-              </span>
-              {t('All systems operational')}
-            </span>
-          </div>
+        <div className='border-border/70 mt-12 space-y-3 border-t pt-6'>
           <p className='text-muted-foreground text-xs'>
             &copy; {currentYear} {displayName}.{' '}
             {props.copyright ?? t('footer.defaultCopyright')}
+          </p>
+          <p className='text-muted-foreground/80 text-xs leading-5'>
+            {t('footer.trademarkNotice')}
           </p>
         </div>
       </div>

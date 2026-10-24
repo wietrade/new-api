@@ -2828,6 +2828,8 @@
     "footer.columns.related.links.oneApi": "One API",
     "footer.columns.related.title": "Projets liés",
     "footer.defaultCopyright": "Tous droits réservés.",
+    "footer.brandDescription": "Une passerelle API unifiée vers les principaux modèles d'IA, facturée à l'usage réel.",
+    "footer.trademarkNotice": "Les noms de sociétés tels que OpenAI, Anthropic et Google, ainsi que les noms de produits et marques tels que GPT, Claude et Gemini, appartiennent à leurs propriétaires respectifs. NowHub est un fournisseur indépendant d'agrégation d'API de modèles et de services techniques, et n'est ni un agent agréé, ni un revendeur, ni une société affiliée de ces entreprises.",
     "footer.new\u0061pi.projectAttributionSuffix": "Tous droits réservés. Conçu et développé par les contributeurs du projet.",
     "For advanced custom channels this applies only to /v1/responses routes without protocol conversion.": "Pour les canaux personnalisés avancés, ceci ne s’applique qu’aux routes /v1/responses sans conversion de protocole.",
     "GitHub ID is empty!": "L’ID GitHub est vide !",
