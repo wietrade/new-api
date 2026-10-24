@@ -134,6 +134,10 @@ def _incoming_values(model):
         "context_length": int(model.context_length or 0),
         "max_output_tokens": int(model.max_output_tokens or 0),
         "is_free": model.is_free,
+        # 聚合源目前不提供生命周期信息；用 getattr 兼容测试里的简化 model 对象
+        "lifecycle": getattr(model, "lifecycle", "") or "",
+        "release_date": getattr(model, "release_date", "") or "",
+        "knowledge_cutoff": getattr(model, "knowledge_cutoff", "") or "",
     }
 
 
