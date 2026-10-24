@@ -155,16 +155,6 @@ export default defineConfig({
 
     walk(docsRoot)
     fs.writeFileSync(path.join(out, 'llms-full.txt'), parts.join('\n\n---\n\n') + '\n')
-
-    // 文档站挂在 /docs/ 下，把 sitemap 里的绝对地址补上前缀
-    const sitemapPath = path.join(out, 'sitemap.xml')
-    if (fs.existsSync(sitemapPath)) {
-      const sitemap = fs.readFileSync(sitemapPath, 'utf8')
-      fs.writeFileSync(
-        sitemapPath,
-        sitemap.replaceAll('https://www.nowhub.org/', 'https://www.nowhub.org/docs/')
-      )
-    }
   },
 
 })

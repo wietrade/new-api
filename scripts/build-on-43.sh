@@ -44,6 +44,11 @@ log "文档站依赖"
 log "文档站构建"
 ( cd docs-site && bun run build )
 
+# sitemap 由 VitePress 在 buildEnd 之后写入，这里统一补上 /docs 前缀
+if [ -f web/dist/docs/sitemap.xml ]; then
+  sed -i 's#https://www\.nowhub\.org/#https://www.nowhub.org/docs/#g' web/dist/docs/sitemap.xml
+fi
+
 [ -f web/dist/index.html ] || { echo "web/dist/index.html 缺失"; exit 1; }
 [ -f web/dist/docs/index.html ] || { echo "web/dist/docs/index.html 缺失"; exit 1; }
 ok "产物: web/dist $(du -sh web/dist | cut -f1) / docs $(du -sh web/dist/docs | cut -f1)"
