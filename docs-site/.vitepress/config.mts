@@ -17,6 +17,15 @@ export default defineConfig({
   cleanUrls: false,
   lastUpdated: true,
   srcExclude: ['README.md'],
+  // 文档站 SEO：生成 sitemap，并给每页追加 canonical
+  sitemap: {
+    hostname: 'https://www.nowhub.org',
+  },
+  transformHead({ pageData }) {
+    const relative = pageData.relativePath.replace(/\.md$/, '.html')
+    const canonical = `https://www.nowhub.org/docs/${relative}`
+    return [['link', { rel: 'canonical', href: canonical }]]
+  },
   head: [
     ['meta', { name: 'theme-color', content: '#0d1117' }],
     // 主站用 iframe 嵌套时进入嵌入模式：?embed=1 或被 iframe 加载都算，

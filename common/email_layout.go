@@ -80,8 +80,8 @@ func BuildEmailHTML(subject string, content string) string {
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="x-apple-disable-message-reformatting" />
-<meta name="color-scheme" content="light" />
-<meta name="supported-color-schemes" content="light" />
+<meta name="color-scheme" content="light dark" />
+<meta name="supported-color-schemes" content="light dark" />
 <title>%s</title>
 <style type="text/css">
   body,table,td,a{-webkit-text-size-adjust:100%%;-ms-text-size-adjust:100%%}
@@ -100,20 +100,31 @@ func BuildEmailHTML(subject string, content string) string {
     .email-card{padding:20px!important}
     .email-title{font-size:15px!important}
   }
+  @media (prefers-color-scheme: dark){
+    .email-page{background:#0d1117!important}
+    .email-brandbar{background:#238636!important}
+    .email-card{background:#161b22!important}
+    .email-info{background:#161b22!important}
+    .email-title,.email-brand,.email-body{color:#e6edf3!important}
+    .email-body a{color:#4493f8!important}
+    .email-info,.email-info a{color:#9198a1!important}
+    .email-code{background:#0d1117!important;border-color:#30363d!important;color:#e6edf3!important}
+    .email-btn{background:#238636!important}
+  }
 </style>
 </head>
-<body style="margin:0;padding:0;background:#ffffff">
+<body class="email-page" style="margin:0;padding:0;background:#ffffff">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">%s</div>
-<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;background:#ffffff">
+<table role="presentation" class="email-page" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;background:#ffffff">
   <tr>
     <td class="email-shell" align="center" style="padding:28px 16px">
       <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%%;max-width:600px">
         <tr>
-          <td style="background:#2e9c45;padding:14px 24px">
+          <td class="email-brandbar" style="background:#2e9c45;padding:14px 24px">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
               <tr>
                 <td style="padding-right:8px" valign="middle">%s</td>
-                <td valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600;color:#ffffff;letter-spacing:0.2px">%s</td>
+                <td class="email-brand" valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600;color:#ffffff;letter-spacing:0.2px">%s</td>
               </tr>
             </table>
           </td>
@@ -128,7 +139,7 @@ func BuildEmailHTML(subject string, content string) string {
           <td height="12" style="height:12px;line-height:12px;font-size:0">&nbsp;</td>
         </tr>
         <tr>
-          <td style="background:#eef1f4;padding:14px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
+          <td class="email-info" style="background:#eef1f4;padding:14px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#5b6472">
             %s
           </td>
         </tr>
