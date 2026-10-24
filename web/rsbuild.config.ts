@@ -16,6 +16,11 @@ export default defineConfig(({ envMode }) => {
     'http://localhost:3000'
 
   const isProd = envMode === 'production'
+  // 静态资源外链前缀（CDN）。未设置时保持同源引用，便于无 CDN 部署。
+  // 用法：ASSET_PREFIX=https://xxx.cdn.aliyun.com/ bun run build
+  const assetPrefix = process.env.ASSET_PREFIX?.trim()
+    ? process.env.ASSET_PREFIX.trim().replace(/\/?$/, '/')
+    : undefined
   const devProxy = Object.fromEntries(
     (['/api', '/v1', '/mj', '/pg'] as const).map((key) => [
       key,
@@ -75,6 +80,7 @@ export default defineConfig(({ envMode }) => {
       // Production optimizations
       minify: isProd,
       target: 'web',
+      assetPrefix,
       distPath: {
         root: 'dist',
       },
