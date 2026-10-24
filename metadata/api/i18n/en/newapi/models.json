@@ -560,7 +560,7 @@
       "icon": "Gemini.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "图像生成,多模态,推理",
+      "tags": "",
       "capabilities": [
         "reasoning",
         "tools",
@@ -589,7 +589,7 @@
       "icon": "Gemini.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "图像生成,多模态,推理",
+      "tags": "",
       "capabilities": [
         "reasoning",
         "structured_output",
