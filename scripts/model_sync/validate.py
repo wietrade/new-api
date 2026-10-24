@@ -188,6 +188,17 @@ def check_pricing(models, pricing, official, context_by_name, report: Report):
         if kind == "free" and any((row.get(k) or 0) > 0 for k in ("input", "output")):
             report.error(f"{name}: price_kind=free 但基础价不为 0")
 
+        # upcoming 已过生效日却没提升，说明定时任务没跑或漏了
+        from datetime import date as _date
+
+        for item in row.get("upcoming") or []:
+            start = item.get("effective_from")
+            if start and _date.fromisoformat(start) <= _date.today():
+                report.warn(
+                    f"{name}: upcoming 价格自 {start} 起生效但尚未提升"
+                    "（执行 scripts/ops/promote_upcoming_pricing.py --apply）"
+                )
+
         # 官方抄录是最高优先级，快照必须与之一致
         listed = official_by_name.get(name)
         if listed:
