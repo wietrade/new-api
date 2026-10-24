@@ -122,6 +122,10 @@ export function Footer(props: FooterProps) {
   const rawDocsLink = status?.docs_link as string | undefined
   const docsHref =
     rawDocsLink && /^https?:\/\//i.test(rawDocsLink) ? rawDocsLink : '/help'
+  // 文档站绝对地址（而不是 SPA 内嵌的 /help），便于搜索引擎直接抓取真实页面
+  const docsSiteHref = docsHref.startsWith('http')
+    ? docsHref
+    : 'https://www.nowhub.org/docs/'
 
   const [nameHead, nameTail] = useMemo(() => {
     const name = displayName || ''
@@ -143,7 +147,7 @@ export function Footer(props: FooterProps) {
       {
         title: t('Developers'),
         links: [
-          { text: t('Documentation'), href: docsHref },
+          { text: t('Documentation'), href: docsSiteHref },
           { text: t('API reference'), href: docsHref },
           { text: t('FAQ'), href: '/help/faq/' },
         ],
