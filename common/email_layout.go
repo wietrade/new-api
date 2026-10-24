@@ -64,7 +64,7 @@ func BuildEmailHTML(subject string, content string) string {
 	year := time.Now().Year()
 
 	brandMark := fmt.Sprintf(
-		`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="28" height="28" align="center" valign="middle" style="width:28px;height:28px;background:#1f883d;border-radius:6px;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600">%s</td></tr></table>`,
+		`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#ffffff;border-radius:6px;color:#2e9c45;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700">%s</td></tr></table>`,
 		html.EscapeString(emailBrandInitial()))
 
 	metaLinks := make([]string, 0, 2)
@@ -98,7 +98,7 @@ func BuildEmailHTML(subject string, content string) string {
   .email-body a{color:#0969da;text-decoration:none;word-break:break-word}
   .email-body strong{font-weight:600;color:#1f2328}
   .email-code{display:inline-block;margin:4px 0 0;padding:8px 14px;background:#ffffff;border:1px solid #e3e6ea;border-radius:8px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;line-height:1.5;letter-spacing:2px;font-weight:600;color:#1f2328}
-  .email-btn{display:inline-block;padding:9px 18px;background:#1f883d;border-radius:8px;color:#ffffff!important;font-size:14px;line-height:20px;font-weight:500;text-decoration:none!important}
+  .email-btn{display:inline-block;padding:9px 18px;background:#2e9c45;border-radius:8px;color:#ffffff!important;font-size:14px;line-height:20px;font-weight:500;text-decoration:none!important}
   @media (max-width:600px){
     .email-shell{padding:20px 12px!important}
     .email-card{padding:20px!important}
@@ -113,17 +113,17 @@ func BuildEmailHTML(subject string, content string) string {
     <td class="email-shell" align="center" style="padding:28px 16px">
       <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%%;max-width:600px">
         <tr>
-          <td style="padding:0 4px 16px">
+          <td style="background:#2e9c45;border-radius:14px 14px 0 0;padding:14px 24px">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
               <tr>
                 <td style="padding-right:8px" valign="middle">%s</td>
-                <td valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600;color:#1f2328">%s</td>
+                <td valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600;color:#ffffff;letter-spacing:0.2px">%s</td>
               </tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td class="email-card" style="background:#f6f7f8;border-radius:14px;padding:24px 26px">
+          <td class="email-card" style="background:#f6f7f8;border-radius:0 0 14px 14px;padding:24px 26px">
             <h1 class="email-title" style="margin:0 0 14px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.5;font-weight:600;color:#1f2328">%s</h1>
             <div class="email-body" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#1f2328;font-size:14px;line-height:1.6">%s</div>
           </td>
