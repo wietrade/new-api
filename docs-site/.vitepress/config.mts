@@ -19,7 +19,8 @@ export default defineConfig({
   srcExclude: ['README.md'],
   // 文档站 SEO：生成 sitemap，并给每页追加 canonical
   sitemap: {
-    hostname: 'https://www.nowhub.org',
+    // VitePress 只拼接 hostname + 页面路径（不含 base），因此这里带上 /docs
+    hostname: 'https://www.nowhub.org/docs',
   },
   transformHead({ pageData }) {
     const relative = pageData.relativePath.replace(/\.md$/, '.html')
