@@ -34,6 +34,7 @@ import { saveAffiliateCode } from '@/features/auth/lib/storage'
 import { GeneralError } from '@/features/errors/general-error'
 import { NotFoundError } from '@/features/errors/not-found-error'
 import { getSetupStatus } from '@/features/setup/api'
+import { useDocumentMeta } from '@/hooks/use-document-meta'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import {
   bootstrapAuthentication,
@@ -50,6 +51,9 @@ function RootComponent() {
 
   // Load system configuration (logo, system name, etc.) from backend
   useSystemConfig({ autoLoad: true })
+
+  // 按路由同步 title / description / OG，便于搜索与分享
+  useDocumentMeta()
 
   useEffect(() => {
     const aff = new URLSearchParams(window.location.search).get('aff')?.trim()
