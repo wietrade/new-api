@@ -56,6 +56,7 @@ const _systemInfoSchema = z.object({
   HomePageContent: z.string().optional(),
   general_setting: z.object({
     docs_link: z.string(),
+    support_email: z.string(),
   }),
   legal: z.object({
     user_agreement: z.string().optional(),
@@ -88,6 +89,9 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     HomePageContent: normalizeValue(defaultValues.HomePageContent),
     general_setting: {
       docs_link: normalizeValue(defaultValues.general_setting?.docs_link),
+      support_email: normalizeValue(
+        defaultValues.general_setting?.support_email
+      ),
     },
     legal: {
       user_agreement: normalizeValue(defaultValues.legal?.user_agreement),
@@ -112,6 +116,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     HomePageContent: z.string().optional(),
     general_setting: z.object({
       docs_link: z.string(),
+      support_email: z.string(),
     }),
     legal: z.object({
       user_agreement: z.string().optional(),
@@ -248,6 +253,28 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                     </FormControl>
                     <FormDescription>
                       {t('Link to your documentation site')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='general_setting.support_email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('Support Email')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='support@example.com'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        'Email address shown in the site footer for support contact'
+                      )}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

@@ -2829,7 +2829,6 @@
     "footer.columns.related.title": "Các Dự Án Liên Quan",
     "footer.defaultCopyright": "Bản quyền được bảo lưu.",
     "footer.brandDescription": "Cổng API hợp nhất cho các mô hình AI phổ biến, tính phí theo mức sử dụng thực tế.",
-    "footer.trademarkNotice": "Tên công ty như OpenAI, Anthropic, Google và tên sản phẩm, nhãn hiệu như GPT, Claude, Gemini thuộc về chủ sở hữu tương ứng. NowHub là đơn vị độc lập cung cấp dịch vụ tổng hợp API mô hình và dịch vụ kỹ thuật, không phải đại lý được ủy quyền, nhà phân phối hay công ty liên kết của các công ty trên.",
     "footer.new\u0061pi.projectAttributionSuffix": "Bản quyền được bảo lưu. Được thiết kế và phát triển bởi các cộng tác viên dự án.",
     "For advanced custom channels this applies only to /v1/responses routes without protocol conversion.": "Với kênh tùy chỉnh nâng cao, thiết lập này chỉ áp dụng cho các route /v1/responses không chuyển đổi giao thức.",
     "GitHub ID is empty!": "ID GitHub trống!",

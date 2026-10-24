@@ -120,6 +120,8 @@ export function Footer(props: FooterProps) {
   const displayName = systemName || props.name || 'NowHub.Org'
   const currentYear = new Date().getFullYear()
   const rawDocsLink = status?.docs_link as string | undefined
+  const supportEmail =
+    (status?.support_email as string) || 'support@nowhub.org'
   const docsHref =
     rawDocsLink && /^https?:\/\//i.test(rawDocsLink) ? rawDocsLink : '/help'
   // 文档站绝对地址（而不是 SPA 内嵌的 /help），便于搜索引擎直接抓取真实页面
@@ -165,8 +167,8 @@ export function Footer(props: FooterProps) {
         title: t('Contact us'),
         links: [
           {
-            text: 'support@nowhub.org',
-            href: 'mailto:support@nowhub.org',
+            text: supportEmail,
+            href: `mailto:${supportEmail}`,
             icon: Mail,
           },
           {
@@ -187,7 +189,7 @@ export function Footer(props: FooterProps) {
         ],
       },
     ],
-    [t, docsHref, docsSiteHref]
+    [t, docsHref, docsSiteHref, supportEmail]
   )
 
   const displayColumns = props.columns ?? fallbackColumns

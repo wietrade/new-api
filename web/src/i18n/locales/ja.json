@@ -2829,7 +2829,6 @@
     "footer.columns.related.title": "関連プロジェクト",
     "footer.defaultCopyright": "すべての権利を留保します。",
     "footer.brandDescription": "主要な AI モデルをまとめた統合 API ゲートウェイ。実際の使用量に応じて課金します。",
-    "footer.trademarkNotice": "OpenAI、Anthropic、Google などの会社名、および GPT、Claude、Gemini などの製品名・商標は、それぞれの権利者に帰属します。NowHub は独立したモデル API の集約・技術サービス提供者であり、これらの会社の公式代理店、販売代理店、関連会社ではありません。",
     "footer.new\u0061pi.projectAttributionSuffix": "すべての権利を留保します。プロジェクトコントリビューターにより設計・開発されています。",
     "For advanced custom channels this applies only to /v1/responses routes without protocol conversion.": "高度なカスタムチャネルでは、プロトコル変換を行わない /v1/responses ルートにのみ適用されます。",
     "GitHub ID is empty!": "GitHub ID が空です！",
