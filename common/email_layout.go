@@ -27,10 +27,11 @@ func emailSiteLink() string {
 }
 
 // emailLogoURL 把站点 Logo 配置解析成邮件可用的绝对地址，无法解析时返回空。
+// 未配置 Logo 时回退到站点根目录的 /logo.png。
 func emailLogoURL() string {
 	logo := strings.TrimSpace(Logo)
 	if logo == "" {
-		return ""
+		logo = "/logo.png"
 	}
 	if strings.HasPrefix(logo, "http://") || strings.HasPrefix(logo, "https://") {
 		return logo
@@ -83,23 +84,23 @@ func BuildEmailHTML(subject string, content string) string {
 	var brandMark string
 	if logo := emailLogoURL(); logo != "" {
 		brandMark = fmt.Sprintf(
-			`<img src="%s" width="32" height="32" alt="%s" style="display:block;width:32px;height:32px;border-radius:8px;object-fit:contain" />`,
+			`<img src="%s" width="28" height="28" alt="%s" style="display:block;width:28px;height:28px;border-radius:6px;object-fit:contain" />`,
 			html.EscapeString(logo), safeBrand)
 	} else {
 		brandMark = fmt.Sprintf(
-			`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background:#111827;border-radius:8px;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600">%s</td></tr></table>`,
+			`<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tr><td width="28" height="28" align="center" valign="middle" style="width:28px;height:28px;background:#1f883d;border-radius:6px;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600">%s</td></tr></table>`,
 			html.EscapeString(emailBrandInitial()))
 	}
 
-	var footerParts []string
-	footerParts = append(footerParts, fmt.Sprintf("© %d %s", year, safeBrand))
+	var footerLinks []string
 	if site := emailSiteLink(); site != "" {
 		href := html.EscapeString(strings.TrimRight(strings.TrimSpace(SiteAddress), "/") + "/")
-		footerParts = append(footerParts, fmt.Sprintf(
-			`<a href="%s" style="color:#8a94a6;text-decoration:none">%s</a>`,
+		footerLinks = append(footerLinks, fmt.Sprintf(
+			`<a href="%s" style="color:#59636e;text-decoration:none">%s</a>`,
 			href, html.EscapeString(site)))
 	}
-	footer := strings.Join(footerParts, ` &nbsp;·&nbsp; `)
+	footerLinks = append(footerLinks, `<a href="mailto:support@nowhub.org" style="color:#59636e;text-decoration:none">support@nowhub.org</a>`)
+	footer := fmt.Sprintf("&copy; %d %s<br />%s", year, safeBrand, strings.Join(footerLinks, ` &nbsp;·&nbsp; `))
 
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="zh">
@@ -114,45 +115,44 @@ func BuildEmailHTML(subject string, content string) string {
   body,table,td,a{-webkit-text-size-adjust:100%%;-ms-text-size-adjust:100%%}
   table,td{mso-table-lspace:0pt;mso-table-rspace:0pt}
   img{-ms-interpolation-mode:bicubic;border:0;outline:none;text-decoration:none}
-  body{margin:0!important;padding:0!important;width:100%%!important;background:#f4f5f7}
-  .email-body{color:#1f2733;font-size:15px;line-height:1.75}
-  .email-body p{margin:0 0 14px}
+  body{margin:0!important;padding:0!important;width:100%%!important;background:#ffffff}
+  .email-body{color:#1f2328;font-size:14px;line-height:1.6}
+  .email-body p{margin:0 0 12px}
   .email-body p:last-child{margin-bottom:0}
-  .email-body a{color:#2563eb;text-decoration:underline;word-break:break-word}
-  .email-body strong{color:#0f172a}
-  .email-code{display:inline-block;margin:6px 0 0;padding:10px 18px;background:#f1f3f7;border:1px solid #e2e6ee;border-radius:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:22px;line-height:1.4;letter-spacing:3px;font-weight:600;color:#0f172a}
-  .email-btn{display:inline-block;padding:12px 26px;background:#111827;border-radius:10px;color:#ffffff!important;font-size:15px;font-weight:600;letter-spacing:0;text-decoration:none!important}
+  .email-body a{color:#0969da;text-decoration:none;word-break:break-word}
+  .email-body strong{font-weight:600;color:#1f2328}
+  .email-code{display:inline-block;margin:4px 0 0;padding:6px 12px;background:#f6f8fa;border:1px solid #d8dee4;border-radius:6px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;line-height:1.5;letter-spacing:2px;font-weight:600;color:#1f2328}
+  .email-btn{display:inline-block;padding:8px 16px;background:#1f883d;border-radius:6px;color:#ffffff!important;font-size:14px;line-height:20px;font-weight:500;text-decoration:none!important}
   @media (max-width:600px){
-    .email-shell{padding:20px 12px!important}
-    .email-pad{padding:22px 20px!important}
-    .email-title{font-size:19px!important}
+    .email-shell{padding:20px 16px!important}
+    .email-title{font-size:15px!important}
   }
 </style>
 </head>
-<body style="margin:0;padding:0;background:#f4f5f7">
+<body style="margin:0;padding:0;background:#ffffff">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">%s</div>
-<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;background:#f4f5f7">
+<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;background:#ffffff">
   <tr>
-    <td class="email-shell" align="center" style="padding:36px 16px">
-      <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;width:100%%;max-width:600px;background:#ffffff;border:1px solid #e6e9ef;border-radius:16px;overflow:hidden">
+    <td class="email-shell" align="center" style="padding:32px 16px">
+      <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%%;max-width:600px">
         <tr>
-          <td class="email-pad" style="padding:22px 32px;border-bottom:1px solid #eef1f5">
+          <td style="padding-bottom:16px;border-bottom:1px solid #d8dee4">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
               <tr>
-                <td style="padding-right:10px" valign="middle">%s</td>
-                <td valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;font-weight:600;color:#0f172a;letter-spacing:-0.2px">%s</td>
+                <td style="padding-right:8px" valign="middle">%s</td>
+                <td valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;font-weight:600;color:#1f2328">%s</td>
               </tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td class="email-pad" style="padding:30px 32px 32px">
-            <h1 class="email-title" style="margin:0 0 18px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:21px;line-height:1.4;font-weight:600;color:#0f172a;letter-spacing:-0.2px">%s</h1>
-            <div class="email-body" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#1f2733;font-size:15px;line-height:1.75">%s</div>
+          <td style="padding:20px 0 24px">
+            <h1 class="email-title" style="margin:0 0 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.5;font-weight:600;color:#1f2328">%s</h1>
+            <div class="email-body" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#1f2328;font-size:14px;line-height:1.6">%s</div>
           </td>
         </tr>
         <tr>
-          <td class="email-pad" style="padding:16px 32px;background:#fafbfc;border-top:1px solid #eef1f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.7;color:#8a94a6">
+          <td style="padding-top:16px;border-top:1px solid #d8dee4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;line-height:1.6;color:#59636e">
             %s
           </td>
         </tr>

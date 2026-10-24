@@ -272,8 +272,8 @@ func SendPasswordResetEmail(c *gin.Context) {
 		// 邮件正文：问候 → 主按钮 → 备用链接 → 有效期提示
 		content := fmt.Sprintf("<p>%s</p>"+
 			"<p><a class=\"email-btn\" href=\"%s\">%s</a></p>"+
-			"<p style=\"margin-top:22px;color:#8a94a6;font-size:13px;line-height:1.7\">%s</p>"+
-			"<p style=\"color:#8a94a6;font-size:13px;line-height:1.7\">%s</p>",
+			"<p style=\"margin-top:20px;color:#59636e;font-size:13px;line-height:1.6\">%s</p>"+
+			"<p style=\"color:#59636e;font-size:13px;line-height:1.6\">%s</p>",
 			i18n.Translate(lang, i18n.MsgEmailPasswordResetGreeting, systemName),
 			html.EscapeString(link),
 			i18n.Translate(lang, i18n.MsgEmailPasswordResetButton),
