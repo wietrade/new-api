@@ -49,16 +49,6 @@ var MetadataLifecycleVocabulary = map[string]bool{
 	"retired":    true,
 }
 
-// MetadataLifecycleVocabulary 是厂商生命周期间的闭集；空串表示未知。
-var MetadataLifecycleVocabulary = map[string]bool{
-     "":           true,
-     "ga":         true,
-     "preview":    true,
-     "legacy":     true,
-     "deprecated": true,
-     "retired":    true,
-}
-
 // MetadataCapabilityVocabulary is the closed set of structured capability keys.
 // Keep it in sync with web/src/features/pricing/constants.ts (MODEL_CAPABILITIES).
 var MetadataCapabilityVocabulary = map[string]bool{
@@ -226,9 +216,10 @@ type MetadataValues struct {
 	Lifecycle        string `json:"lifecycle"`
 	ReleaseDate      string `json:"release_date"`
 	KnowledgeCutoff  string `json:"knowledge_cutoff"`
-     Lifecycle        string `json:"lifecycle"`
-     ReleaseDate      string `json:"release_date"`
-     KnowledgeCutoff  string `json:"knowledge_cutoff"`
+}
+
+type MetadataSyncSelection struct {
+	ModelName     string   `json:"model_name"`
 	RecordVersion string   `json:"record_version"`
 	Create        bool     `json:"create"`
 	Fields        []string `json:"fields"`

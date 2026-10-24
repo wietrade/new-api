@@ -44,6 +44,10 @@ type Model struct {
 	ContextLength      int            `json:"context_length,omitempty" gorm:"default:0"`
 	MaxOutputTokens    int            `json:"max_output_tokens,omitempty" gorm:"default:0"`
 	IsFree             int            `json:"is_free" gorm:"default:0"`
+	// Lifecycle 是厂商生命周期状态（空串=未知），与 Status（我方展示开关）语义不同。
+	Lifecycle          string         `json:"lifecycle,omitempty" gorm:"size:32;default:''"`
+	ReleaseDate        string         `json:"release_date,omitempty" gorm:"size:32;default:''"`
+	KnowledgeCutoff    string         `json:"knowledge_cutoff,omitempty" gorm:"size:32;default:''"`
 	VendorID           int            `json:"vendor_id,omitempty" gorm:"index"`
 	Endpoints          string         `json:"endpoints,omitempty" gorm:"type:text"`
 	SupportedEndpoints []string       `json:"supported_endpoints,omitempty" gorm:"-"`

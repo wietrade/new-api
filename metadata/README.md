@@ -33,9 +33,34 @@ jsDelivr 备选 `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`，�
 | `context_length` | int | 上下文窗口（输入 token 数），如 `1100000` |
 | `max_output_tokens` | int | 最大输出 token 数；0 表示未知 |
 | `is_free` | bool | 是否免费（免计费模型） |
+| `lifecycle` | string | 厂商生命周期：`ga` / `preview` / `legacy` / `deprecated` / `retired`；**空串=未知** |
+| `release_date` | string | 官方发布日期 `YYYY-MM-DD`，未知为空 |
+| `knowledge_cutoff` | string | 官方知识截止 `YYYY-MM`，未知为空 |
 | `endpoints` | null / array / object | 显式协议端点；`null` 表示按渠道类型推断 |
 | `name_rule` | int | 0=精确匹配，1=前缀，2=后缀，3=包含 |
 | `status` | int | 1=上架，0=下架 |
+
+## 数据确定性原则
+
+目录里只放**能追溯到官方原文**的值：
+
+1. 官方没写就留空（`""` / `null` / `0`），**不要**按同系列比例或历史習慣推断；
+2. 每条事实都应能对应到 `pricing.official.json` 的 `quote` 或 `overrides.json` 的 `note`（含来源链接与核对日期）；
+3. 聚合源（models.dev / OpenRouter）只能当旁证，不得覆盖官方值，且 `confidence` 最多 `medium`；
+4. 拿不准的项写进 `docs/doubao-verification-round2.md` 交外部核实，不要先猜一个填上。
+
+### `lifecycle` 取值映射
+
+| 官方原文措辞 | 写入值 |
+|:--|:--|
+| current lineup / generally available / 稳定版 | `ga` |
+| preview / 预览版 / experimental | `preview` |
+| legacy / previous generation / 仍可调用旧款 | `legacy` |
+| deprecated / 已弃用 | `deprecated` |
+| retired / shut down / 已关停 | `retired` |
+| 含糊不清 / 无状态说明 | `""`（未知） |
+
+> 注意：`lifecycle` 与 `status`（我方展示开关，1=展示）不同。官方把模型标为 deprecated 但仍在售时，应保留 `status=1`、只改 `lifecycle`。
 
 ## capabilities（功能特性，闭集）
 
