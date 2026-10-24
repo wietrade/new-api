@@ -70,6 +70,15 @@ log "brotli 预压缩"
 [ -f web/dist/docs/index.html ] || { echo "web/dist/docs/index.html 缺失"; exit 1; }
 ok "产物: web/dist $(du -sh web/dist | cut -f1) / docs $(du -sh web/dist/docs | cut -f1)"
 
+# 可选：静态资源同步到 OSS（deploy.env 里同时给出 ASSET_PREFIX 与 OSS_BUCKET 时启用）。
+# 必须在部署二进制之前完成：新 index.html 引用的 hash 文件要先在 OSS 上可用。
+if [ -n "${ASSET_PREFIX:-}" ] && [ -n "${OSS_BUCKET:-}" ]; then
+  log "上传静态资源 -> oss://$OSS_BUCKET"
+  OSS_BUCKET="$OSS_BUCKET" \
+    OSS_ENDPOINT="${OSS_ENDPOINT:-oss-cn-beijing.aliyuncs.com}" \
+    bash "$SRC_DIR/scripts/upload-static-to-oss.sh"
+fi
+
 log "编译二进制"
 BUILD_ID="$(date -u +%Y%m%d%H%M%S)"
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
