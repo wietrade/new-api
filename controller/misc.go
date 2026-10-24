@@ -234,12 +234,12 @@ func SendEmailVerification(c *gin.Context) {
 	// request language.
 	systemName := map[string]any{"SystemName": common.SystemName}
 	subject := i18n.T(c, i18n.MsgEmailVerificationSubject, systemName)
-		// 邮件正文：问候 → 标签 + 居中验证码 → 有效期提示
-		content := fmt.Sprintf("<p>%s</p>%s<p>%s</p>",
-			i18n.T(c, i18n.MsgEmailVerificationGreeting, systemName),
-			common.EmailCodeBlock(
-				i18n.T(c, i18n.MsgEmailVerificationCodeLabel),
-				i18n.T(c, i18n.MsgEmailVerificationCode, map[string]any{"Code": code})),
+	// 邮件正文：问候 → 标签 + 居中验证码 → 有效期提示
+	content := fmt.Sprintf("<p>%s</p>%s<p>%s</p>",
+		i18n.T(c, i18n.MsgEmailVerificationGreeting, systemName),
+		common.EmailCodeBlock(
+			i18n.T(c, i18n.MsgEmailVerificationCodeLabel),
+			i18n.T(c, i18n.MsgEmailVerificationCode, map[string]any{"Code": code})),
 		i18n.T(c, i18n.MsgEmailVerificationValidity, map[string]any{"Minutes": common.VerificationValidMinutes}))
 	err = common.SendEmail(subject, email, content)
 	if err != nil {
