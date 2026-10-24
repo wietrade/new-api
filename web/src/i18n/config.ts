@@ -36,6 +36,16 @@ const localeLoaders = {
 
 type LocaleLoader = () => Promise<{ default: Record<string, unknown> }>
 
+/**
+ * 语言包 JSON 的外层是 `{ "translation": { ...实际 key... } }`，
+ * 而 i18next 后端要求返回「当前 namespace 的键值对」，因此必须剥掉外壳，
+ * 否则所有 t() 都会查不到 key（页面会直接显示 key 文本）。
+ */
+function unwrapLocale(module: Record<string, unknown>) {
+  const inner = module.translation
+  return (inner ?? module) as Record<string, unknown>
+}
+
 const lazyJSONBackend = {
   type: 'backend' as const,
   init: () => undefined,
@@ -48,7 +58,7 @@ const lazyJSONBackend = {
       (localeLoaders as Record<string, LocaleLoader>)[language] ??
       localeLoaders.en
     loader()
-      .then((module) => callback(null, module.default))
+      .then((module) => callback(null, unwrapLocale(module.default)))
       .catch((error) => callback(error, null))
   },
 }
