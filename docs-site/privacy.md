@@ -2,7 +2,7 @@
 
 **版本：v1.0｜最近更新：以本页展示为准**
 **服务提供方：NowHub（nowhub.org）运营方**
-**联系邮箱：support@nowhub.org**
+**联系邮箱：**[support@nowhub.org](mailto:support@nowhub.org)
 
 本政策说明我们在您使用 nowhub.org 及 `api.nowhub.org` 服务时如何收集、使用、存储与共享信息，以及您享有的权利。本政策是《用户协议》的组成部分；两者不一致时，就个人信息处理事项以本政策为准。
 
@@ -127,7 +127,7 @@
 
 ## 13. 联系我们
 
-隐私相关问题、权利行使请求或投诉，请联系：**support@nowhub.org**。
+隐私相关问题、权利行使请求或投诉，请联系：[**support@nowhub.org**](mailto:support@nowhub.org)。
 
 我们会在收到请求后尽快处理；如您对处理结果不满意，可向有管辖权的监管机构投诉。
 

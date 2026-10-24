@@ -2,7 +2,7 @@
 
 **版本：v1.0｜最近更新：以本页展示为准**
 **服务提供方：NowHub（nowhub.org）运营方**
-**联系邮箱：support@nowhub.org**
+**联系邮箱：**[support@nowhub.org](mailto:support@nowhub.org)
 
 本协议适用于您访问 nowhub.org（含 www.nowhub.org、api.nowhub.org 及其子域）并使用 NowHub 提供的 API 接入服务。请在注册、充值或发起 API 请求前完整阅读。您完成注册、充值或实际调用，即视为已阅读并同意本协议及《隐私政策》。
 
@@ -172,7 +172,7 @@
 
 ---
 
-**联系与投诉**：support@nowhub.org
+**联系与投诉**：[support@nowhub.org](mailto:support@nowhub.org)
 **文档仓库（开源许可与版本记录）**：<https://github.com/wietrade/new-api>
 
 相关文档：[隐私政策](/privacy) · [可接受使用政策](/aup) · [服务等级与支持说明](/sla)

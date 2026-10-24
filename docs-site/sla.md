@@ -1,6 +1,6 @@
 # 服务等级与支持说明
 
-本页说明 NowHub API 的可用性目标、维护与故障处理方式、支持响应范围。**本页不构成带赔付承诺的 SLA**，如需签署正式 SLA，请通过 support@nowhub.org 联系我们。
+本页说明 NowHub API 的可用性目标、维护与故障处理方式、支持响应范围。**本页不构成带赔付承诺的 SLA**，如需签署正式 SLA，请通过 [support@nowhub.org](mailto:support@nowhub.org) 联系我们。
 
 ## 1. 服务定位
 
@@ -32,7 +32,7 @@
 
 ## 4. 支持范围与响应
 
-- **支持渠道**：support@nowhub.org、控制台工单。
+- **支持渠道**：[support@nowhub.org](mailto:support@nowhub.org)、控制台工单。
 - **响应时间**：工作日内一般 24 小时内首次响应；重大故障优先处理。
 - **排查所需信息**：请求时间（含时区）、模型 ID、令牌名称、请求 ID、完整响应体（**请勿粘贴完整 API Key**）。
 - **不在支持范围**：上游模型能力与内容策略问题、用户自身集成错误、超出上游限制的用法、提示词效果调优。
@@ -56,7 +56,7 @@
 
 ## 8. 联系方式
 
-- 邮箱：**support@nowhub.org**
+- 邮箱：[support@nowhub.org](mailto:support@nowhub.org)
 - 工单：控制台 → 工单支持
 - 状态与公告：站点公告栏
 
