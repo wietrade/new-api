@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { getSortLabels, type SortOption } from '../constants'
@@ -57,6 +58,27 @@ function Field(props: {
   )
 }
 
+/**
+ * GitHub 风格的下拉壳：原生 select 去掉系统箭头，右侧单独一段 caret（带左侧分隔线），
+ * 观感上就是一个「标签 + ▾」的复合按钮，同时保留原生 select 的无障碍与键盘行为。
+ */
+function SelectShell(props: {
+  width?: string
+  children: React.ReactNode
+}) {
+  return (
+    <span
+      className='pf-select-shell'
+      style={props.width ? { width: props.width } : undefined}
+    >
+      {props.children}
+      <span className='pf-select-caret' aria-hidden='true'>
+        <ChevronDown className='size-3.5' strokeWidth={2} />
+      </span>
+    </span>
+  )
+}
+
 function NativeSelect(props: {
   value: string[]
   onChange: (value: string) => void
@@ -67,22 +89,23 @@ function NativeSelect(props: {
   counts?: Record<string, number>
 }) {
   return (
-    <select
-      className='pf-select'
-      style={props.width ? { width: props.width } : undefined}
-      value={props.value[0] ?? ''}
-      onChange={(e) => props.onChange(e.target.value)}
-    >
-      <option value=''>{props.placeholder}</option>
-      {Object.entries(props.options).map(([value, label]) => {
-        const count = props.counts?.[value]
-        return (
-          <option key={value} value={value} disabled={count === 0}>
-            {count === undefined ? label : `${label} (${count})`}
-          </option>
-        )
-      })}
-    </select>
+    <SelectShell width={props.width}>
+      <select
+        className='pf-select'
+        value={props.value[0] ?? ''}
+        onChange={(e) => props.onChange(e.target.value)}
+      >
+        <option value=''>{props.placeholder}</option>
+        {Object.entries(props.options).map(([value, label]) => {
+          const count = props.counts?.[value]
+          return (
+            <option key={value} value={value} disabled={count === 0}>
+              {count === undefined ? label : `${label} (${count})`}
+            </option>
+          )
+        })}
+      </select>
+    </SelectShell>
   )
 }
 
@@ -171,7 +194,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(vendorOptions, vendorCounts)}
           counts={vendorCounts}
           placeholder='全部供应商'
-          width='132px'
+          width='144px'
         />
       </Field>
 
@@ -182,7 +205,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(MODEL_TYPE_LABELS, modelTypeCounts)}
           counts={modelTypeCounts}
           placeholder='全部类型'
-          width='110px'
+          width='120px'
         />
       </Field>
 
@@ -193,7 +216,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(INPUT_TYPE_LABELS, inputTypeCounts)}
           counts={inputTypeCounts}
           placeholder='全部输入'
-          width='110px'
+          width='120px'
         />
       </Field>
 
@@ -204,7 +227,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(CONTEXT_LABELS, contextCounts)}
           counts={contextCounts}
           placeholder='不限'
-          width='124px'
+          width='134px'
         />
       </Field>
 
@@ -215,23 +238,24 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           options={keepHit(PRICE_TIER_LABELS, priceCounts)}
           counts={priceCounts}
           placeholder='不限'
-          width='96px'
+          width='108px'
         />
       </Field>
 
       <Field label={t('Sort')}>
-        <select
-          className='pf-select'
-          style={{ width: '112px' }}
-          value={props.sortBy}
-          onChange={(e) => props.onSortChange(e.target.value)}
-        >
-          {Object.entries(sortLabels).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label as string}
-            </option>
-          ))}
-        </select>
+        <SelectShell width='128px'>
+          <select
+            className='pf-select'
+            value={props.sortBy}
+            onChange={(e) => props.onSortChange(e.target.value)}
+          >
+            {Object.entries(sortLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label as string}
+              </option>
+            ))}
+          </select>
+        </SelectShell>
       </Field>
     </div>
   )

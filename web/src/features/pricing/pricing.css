@@ -45,6 +45,49 @@
   outline: none;
 }
 
+/* ── GitHub 风格下拉：标签区 + 右侧独立 caret 段 ───────── */
+.pricing-page .pf-select-shell {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.pricing-page .pf-select-shell > .pf-select {
+  width: 100%;
+  /* 去掉系统箭头，给右侧 caret 段留位置 */
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+  cursor: pointer;
+}
+
+.pricing-page .pf-select-caret {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  display: flex;
+  width: 28px;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid var(--border);
+  border-radius: 0 7px 7px 0;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.pricing-page .pf-select-shell:hover .pf-select-caret {
+  background-color: color-mix(in oklab, var(--foreground) 6%, transparent);
+  color: var(--foreground);
+}
+
+.pricing-page .pf-select-shell:focus-within .pf-select-caret {
+  color: var(--foreground);
+}
+
 .pricing-page .pf-select:hover {
   border-color: color-mix(in oklab, var(--ring) 45%, var(--border));
 }
