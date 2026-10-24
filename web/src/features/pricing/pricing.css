@@ -35,14 +35,19 @@
 }
 
 .pricing-page .pf-select {
-  height: 36px;
-  padding: 0 10px;
-  border-radius: 8px;
+  /* 对齐 GitHub 的按钮/选择器尺寸：32px 高、6px 圆角、500 字重、浅灰底 */
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
   border: 1px solid var(--border);
-  background-color: var(--card);
+  background-color: color-mix(in oklab, var(--foreground) 4%, var(--card));
   color: var(--foreground);
   font-size: 13px;
+  font-weight: 500;
   outline: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 /* ── GitHub 风格下拉：标签区 + 右侧独立 caret 段 ───────── */
@@ -57,7 +62,7 @@
   /* 去掉系统箭头，给右侧 caret 段留位置 */
   appearance: none;
   -webkit-appearance: none;
-  padding-right: 34px;
+  padding-right: 32px;
   cursor: pointer;
 }
 
@@ -67,11 +72,11 @@
   right: 1px;
   bottom: 1px;
   display: flex;
-  width: 28px;
+  width: 26px;
   align-items: center;
   justify-content: center;
-  border-left: 1px solid var(--border);
-  border-radius: 0 7px 7px 0;
+  border-left: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+  border-radius: 0 5px 5px 0;
   color: var(--muted-foreground);
   pointer-events: none;
   transition:
@@ -79,8 +84,12 @@
     color 0.15s ease;
 }
 
+.pricing-page .pf-select-shell:hover > .pf-select {
+  background-color: color-mix(in oklab, var(--foreground) 7%, var(--card));
+}
+
 .pricing-page .pf-select-shell:hover .pf-select-caret {
-  background-color: color-mix(in oklab, var(--foreground) 6%, transparent);
+  background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
   color: var(--foreground);
 }
 
@@ -99,7 +108,7 @@
 
 .pricing-page .pf-count {
   margin-left: auto;
-  padding-bottom: 9px;
+  padding-bottom: 7px;
   font-size: 12px;
   color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
