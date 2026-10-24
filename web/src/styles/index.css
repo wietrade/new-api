@@ -128,6 +128,13 @@ For commercial licensing, please contact support@quantumnous.com
     cursor: pointer;
   }
 
+  /* Edge/IE 浏览器自带的「显示密码」按钮会和 PasswordInput 里的眼睛重复，
+     统一隐藏，只保留组件自己的那一个开关。 */
+  input[type='password']::-ms-reveal,
+  input[type='password']::-ms-clear {
+    display: none;
+  }
+
   /* Prevent focus zoom on mobile devices */
   @media screen and (max-width: 767px) {
     input,

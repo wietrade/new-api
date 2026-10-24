@@ -41,12 +41,16 @@ export function PasswordInput({
   className,
   inputClassName,
   buttonClassName,
-  visibilityIcon = 'state',
+  visibilityIcon = 'action',
   disabled,
   ref,
   ...props
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = React.useState(false)
+  // action 模式：隐藏时显示 Eye（点一下就看）；state 模式：直接反映当前可见状态。
+  const openEye =
+    visibilityIcon === 'action' ? !showPassword : showPassword
+  const toggleLabel = showPassword ? 'Hide password' : 'Show password'
 
   return (
     <div className={cn('relative rounded-md', className)}>
@@ -63,22 +67,20 @@ export function PasswordInput({
         variant='ghost'
         disabled={disabled}
         className={cn(
-          'text-muted-foreground absolute end-1 top-1/2 h-6 w-6 -translate-y-1/2 rounded-md',
+          'text-muted-foreground hover:text-foreground absolute end-1 top-1/2 h-7 w-7 -translate-y-1/2 rounded-md',
           buttonClassName
         )}
+        aria-label={toggleLabel}
+        aria-pressed={showPassword}
+        title={toggleLabel}
+        // 阻止默认行为，避免点击时输入框失焦、光标跳到开头
+        onMouseDown={(event) => event.preventDefault()}
         onClick={() => setShowPassword((prev) => !prev)}
-        aria-label='Toggle password visibility'
       >
-        {visibilityIcon === 'action' ? (
-          showPassword ? (
-            <EyeOff size={18} aria-hidden='true' />
-          ) : (
-            <Eye size={18} aria-hidden='true' />
-          )
-        ) : showPassword ? (
-          <Eye size={18} aria-hidden='true' />
+        {openEye ? (
+          <Eye size={16} aria-hidden='true' />
         ) : (
-          <EyeOff size={18} aria-hidden='true' />
+          <EyeOff size={16} aria-hidden='true' />
         )}
       </Button>
     </div>
