@@ -11,20 +11,6 @@
   ],
   "data": [
     {
-      "model_name": "free",
-      "vendor_name": "",
-      "price_kind": "free",
-      "source_kind": "catalog",
-      "source": "metadata:is_free",
-      "currency": "USD",
-      "unit": "per_1m_tokens",
-      "input": 0.0,
-      "output": 0.0,
-      "cache_read": 0.0,
-      "billing_mode": "tiered_expr",
-      "billing_expr": "tier(\"free\", p * 0 + c * 0)"
-    },
-    {
       "model_name": "claude-fable-5",
       "vendor_name": "Anthropic",
       "price_kind": "vendor_official",
@@ -1379,6 +1365,20 @@
       "cache_read": 0.5,
       "billing_mode": "tiered_expr",
       "billing_expr": "tier(\"standard\", p * 2 + c * 6 + cr * 0.5)"
+    },
+    {
+      "model_name": "free",
+      "vendor_name": "自建渠道",
+      "price_kind": "free",
+      "source_kind": "catalog",
+      "source": "metadata:is_free",
+      "currency": "USD",
+      "unit": "per_1m_tokens",
+      "input": 0.0,
+      "output": 0.0,
+      "cache_read": 0.0,
+      "billing_mode": "tiered_expr",
+      "billing_expr": "tier(\"free\", p * 0 + c * 0)"
     }
   ]
 }
