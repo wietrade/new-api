@@ -50,3 +50,21 @@ func TestComputeTieredQuota_NoClampInRange(t *testing.T) {
 	require.NoError(t, err)
 	assert.Nil(t, result.Clamp, "in-range settlement must not report a clamp")
 }
+
+// TestComputeTieredQuota_RejectsNegativeCost guards the billing-safety
+// invariant that an expression producing a negative cost can never reach
+// settlement: a negative quota is treated as a refund and would credit the
+// user's wallet.
+func TestComputeTieredQuota_RejectsNegativeCost(t *testing.T) {
+	exprStr := `tier("base", p * 2 - 1000000)`
+	snap := &billingexpr.BillingSnapshot{
+		BillingMode:  "tiered_expr",
+		ExprString:   exprStr,
+		ExprHash:     billingexpr.ExprHashString(exprStr),
+		GroupRatio:   1.0,
+		QuotaPerUnit: 500_000,
+	}
+
+	_, err := billingexpr.ComputeTieredQuota(snap, billingexpr.TokenParams{P: 1})
+	require.Error(t, err, "negative cost must be rejected instead of settling a credit")
+}
