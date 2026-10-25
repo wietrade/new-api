@@ -828,6 +828,11 @@ func UpdateChannelStatus(channelId int, usingKey string, status int, reason stri
 			return false
 		}
 	}
+	// 重新启用后必须把渠道加回内存路由表。增量回填容易与并发排序/权重重排冲突，
+	// 这里直接复用全量重建（与 SYNC_FREQUENCY 周期任务同一条路径）。
+	if common.MemoryCacheEnabled && status == common.ChannelStatusEnabled {
+		InitChannelCache()
+	}
 	return true
 }
 
@@ -837,6 +842,10 @@ func EnableChannelByTag(tag string) error {
 		return err
 	}
 	err = UpdateAbilityStatusByTag(tag, true)
+	if err == nil && common.MemoryCacheEnabled {
+		// 批量启用同样需要重建路由表，否则要等下一次周期同步。
+		InitChannelCache()
+	}
 	return err
 }
 

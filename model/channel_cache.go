@@ -58,6 +58,11 @@ func InitChannelCache() {
 		}
 		groups := strings.SplitSeq(channel.Group, ",")
 		for group := range groups {
+			// abilities 与 channels.group 可能短暂不一致（例如刚建渠道、尚未生成 ability）。
+			// 这里兜底建 map，避免重建缓存时对 nil map 赋值直接 panic。
+			if newGroup2model2channels[group] == nil {
+				newGroup2model2channels[group] = make(map[string][]int)
+			}
 			models := channel.GetModels()
 			for _, model := range models {
 				if _, ok := newGroup2model2channels[group][model]; !ok {

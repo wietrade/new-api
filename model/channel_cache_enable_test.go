@@ -42,6 +42,12 @@ func TestReEnableChannelRestoresMemoryRouting(t *testing.T) {
 		Models: "recover-model",
 	}
 	require.NoError(t, DB.Create(&channel).Error)
+	require.NoError(t, DB.Create(&Ability{
+		Group:     "default",
+		Model:     "recover-model",
+		ChannelId: channel.Id,
+		Enabled:   true,
+	}).Error)
 	InitChannelCache()
 
 	require.NotNil(t, pickRoutingChannel(t, "default", "recover-model"), "启用状态下应能路由到该渠道")

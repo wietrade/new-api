@@ -244,7 +244,7 @@ func Register(c *gin.Context) {
 			common.ApiErrorT(c, "Email verification is enabled, please enter email address and verification code")
 			return
 		}
-		if !common.VerifyCodeWithKey(user.Email, user.VerificationCode, common.EmailVerificationPurpose) {
+		if !common.VerifyAndConsumeCode(user.Email, user.VerificationCode, common.EmailVerificationPurpose) {
 			common.ApiErrorT(c, "Verification code is incorrect or has expired")
 			return
 		}

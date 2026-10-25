@@ -225,8 +225,14 @@ func SendEmailVerification(c *gin.Context) {
 		return
 	}
 
+	// 已注册地址不能返回错误：那会让本接口变成账号枚举器。
+	// 保持与未注册完全相同的响应，只是不发送注册验证码（用户直接去登录即可）。
 	if model.IsEmailAlreadyTaken(email) {
-		common.ApiErrorT(c, "Email address is already in use")
+		common.SysLog(common.LogText("registration code requested for an existing email; responded without sending"))
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"message": "",
+		})
 		return
 	}
 	code := common.GenerateVerificationCode(6)
@@ -311,7 +317,7 @@ func ResetPassword(c *gin.Context) {
 		common.ApiErrorT(c, "Invalid parameters")
 		return
 	}
-	if !common.VerifyCodeWithKey(req.Email, req.Token, common.PasswordResetPurpose) {
+	if !common.VerifyAndConsumeCode(req.Email, req.Token, common.PasswordResetPurpose) {
 		common.ApiErrorT(c, "Password reset link is invalid or has expired")
 		return
 	}
