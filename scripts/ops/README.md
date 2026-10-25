@@ -1,8 +1,8 @@
 # 运维脚本（线上数据库）
 
-价格和模型的**事实源**在 `metadata/`，但线上生效要落进 new-api 的 SQLite。
-本目录的脚本负责这一步，让「线上最终状态」可以从 git 完全复现，而不是靠记忆
-手工点后台。
+价格和模型的**事实源**已拆到独立仓库 `model-data`（`api/newapi/*.json`），
+但线上生效要落进 new-api 的 SQLite。本目录只保留**落库侧**脚本，让「线上最终状态」
+可以从两个仓库的 git 完全复现，而不是靠记忆手工点后台。
 
 所有脚本默认操作 `/www/wwwroot/new-api/data/one-api.db`，写入前自动备份为
 `one-api.db.bak-<时间戳>`。写完都要重启进程，`options` 只在启动时读入内存。
@@ -10,11 +10,9 @@
 ## 改价的完整链路
 
 ```bash
-# 1. 改数据源（metadata/api/newapi/pricing.official.json），重新生成
-python scripts/model_sync/sync_models.py --only pricing
-
-# 2. 导出计费配置
-python -m scripts.model_sync.export_billing -o /tmp/billing.json
+# 1-2. 在 model-data 仓库里改价并导出（见该仓库 README）
+#      python -m tools.model_sync.validate
+#      python -m tools.model_sync.export_billing -o /tmp/billing.json
 
 # 3. 确认将要发生的变更
 python scripts/ops/apply_billing.py -i /tmp/billing.json --dry-run

@@ -1,12 +1,13 @@
 """把导出的计费表达式写进 new-api 的 options 表。
 
-``metadata/api/newapi/pricing.json`` 是计费的事实源，但只有落到
+计费事实源在独立的 model-data 仓库（``api/newapi/pricing.json``），只有落到
 ``billing_setting.billing_mode`` / ``billing_setting.billing_expr`` 才对线上生效。
 本脚本负责这一步，并在写入前备份数据库。
 
 用法（在服务器上跑，DB 默认取运行时目录）::
 
-    python scripts/model_sync/export_billing.py -o /tmp/billing.json
+    # 在 model-data 仓库里导出（需先 checkout）：
+    python -m tools.model_sync.export_billing -o /tmp/billing.json
     python scripts/ops/apply_billing.py -i /tmp/billing.json
     systemctl restart new-api          # 进程只在启动时读 options
 

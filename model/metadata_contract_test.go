@@ -12,20 +12,35 @@ import (
 
 // This file pins the metadata pipeline end to end:
 //
-//	scripts/model_sync (python)  ->  metadata/*.json  ->  backend vocabularies
-//	                                             \->  web constants -> i18n catalog
+//	model-data repo (python)  ->  api/*.json  ->  backend vocabularies
+//	                                        \->  web constants -> i18n catalog
 //
 // Any drift used to surface as blank UI columns or silently dropped values.
+//
+// 模型元数据与价格资料库已于 2026-10-26 拆成独立仓库，默认与本仓库同级
+// （../model-data）。设置 MODEL_DATA_DIR 指向该仓库根目录即可继续校验；
+// 仓库不在本机时相关断言自动跳过，不影响其余测试。
 
 const (
 	webConstantsPath = "../web/src/features/pricing/constants.ts"
 	webTypesPath     = "../web/src/features/pricing/types.ts"
 	webModelTypes    = "../web/src/features/models/types.ts"
 	webDialogPath    = "../web/src/features/models/components/dialogs/sync-wizard-dialog.tsx"
-	pythonNormalize  = "../scripts/model_sync/normalize.py"
-	metadataDir      = "../metadata/api/newapi"
-	metadataI18nDir  = "../metadata/api/i18n"
 )
+
+var (
+	modelDataDir    = resolveModelDataDir()
+	pythonNormalize = filepath.Join(modelDataDir, "tools", "model_sync", "normalize.py")
+	metadataDir     = filepath.Join(modelDataDir, "api", "newapi")
+	metadataI18nDir = filepath.Join(modelDataDir, "api", "i18n")
+)
+
+func resolveModelDataDir() string {
+	if dir := strings.TrimSpace(os.Getenv("MODEL_DATA_DIR")); dir != "" {
+		return dir
+	}
+	return filepath.Join("..", "model-data")
+}
 
 func readOrSkip(t *testing.T, path string) string {
 	t.Helper()

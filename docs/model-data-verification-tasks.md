@@ -1,7 +1,7 @@
 # 模型数据「官方核实」任务单
 
 > 用途：把 NowHub 模型元数据/价格数据中**尚未与厂商官方文档对齐**的项，交给外部调研方（豆包）逐条核实。
-> 核实结果由仓库维护者写入 `metadata/api/newapi/pricing.official.json` 与 `metadata/api/newapi/overrides.json`，
+> 核实结果由仓库维护者写入 model-data 仓库的 `api/newapi/pricing.official.json` 与 `api/newapi/overrides.json`，
 > 再经 `python -m scripts.model_sync.validate` 校验后发布。
 > 数据口径：价格单位一律 **USD / 每 1M tokens**；token 上限指**输入**上限。
 
@@ -26,7 +26,7 @@
 
 ## 2. 待核实任务
 
-> 「当前值」取自 `metadata/api/newapi/{models.json,pricing.json}`，核实后请给出建议值。
+> 「当前值」取自 model-data 仓库的 `api/newapi/{models.json,pricing.json}`，核实后请给出建议值。
 
 ### T1 `chatgpt-image-latest` 关键字段全空 + 计费分项待校对
 
@@ -154,17 +154,19 @@
 
 ## 4. 核实完成后的落地流程（维护者执行）
 
+> 以下命令在独立的 **model-data** 仓库根目录执行（2026-10-26 起元数据与价格已拆出本仓库）。
+
 ```bash
 # 1. 把结论写入官方抄录/覆盖文件
 #    pricing.official.json  <- 官方价格（含 quote/retrieved_at/confidence）
 #    overrides.json         <- 官方事实字段（context_length / max_output_tokens / capabilities 等）
 # 2. 校验
-python -m scripts.model_sync.validate
+python -m tools.model_sync.validate
 # 3. 生成 + 发布（会开 PR）
-python scripts/model_sync/sync_models.py --only pricing
-python scripts/model_sync/sync_models.py --only metadata --official
+python -m tools.model_sync.sync_models --only pricing
+python -m tools.model_sync.sync_models --only metadata --official
 # 4. 部署后核对线上是否与 catalog 一致
-python -m scripts.model_sync.validate --live /tmp/expr.json
+python -m tools.model_sync.validate --live /tmp/expr.json
 ```
 
-> 任何改价都必须先改 catalog 再走 `scripts/ops/apply_billing.py`，**不要直接调用后台接口改库**，否则 `--live` 校验会报漂移。
+> 任何改价都必须先在 model-data 里改 catalog，再按该仓库 README 导出并走 new-api 的 `scripts/ops/apply_billing.py`，**不要直接调用后台接口改库**，否则 `--live` 校验会报漂移。
