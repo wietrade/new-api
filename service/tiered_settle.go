@@ -36,6 +36,12 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 	if usage.UsageSemantic == "anthropic" {
 		cc1h = max(float64(usage.ClaudeCacheCreation1hTokens), 0)
 		cc5m = max(float64(usage.ClaudeCacheCreation5mTokens), 0)
+		// 上游只给聚合的 cache_creation_input_tokens、未给 5m/1h 分档时，
+		// 上面的赋值会把聚合值清零，导致这部分用量在 anthropic 语义下整块免费。
+		// 与 cacheCreationTokensForOpenAIUsage 保持一致：无分档则按 5m 档计。
+		if cc5m == 0 && cc1h == 0 {
+			cc5m = max(float64(usage.PromptTokensDetails.CacheCreationTokensTotal()), 0)
+		}
 	}
 
 	img := max(float64(usage.PromptTokensDetails.ImageTokens), 0)

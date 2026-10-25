@@ -78,6 +78,17 @@ znbcode 的 Claude 分组本身是 Anthropic 原生，全部改为渠道类型 1
 
 结论：Anthropic 原生 + 分档齐全时，5m 按 `cc`、1h 按 `cc1h` 计费，与上游口径一致。
 
-### 遗留风险
+### 聚合值兜底（已修复）
 
-`BuildTieredTokenParams` 在 anthropic 语义下用分档值覆盖聚合值（`tiered_settle.go:37-38`），而 `GetCacheCreation5mTokens()` 在上游未返回 `cache_creation` 分档对象时返回 0。实测非流式路径因此把一整块缓存写入丢弃（应 7150，实收 2150），且日志里 `cache_creation_tokens` 仍正常记录，属于**静默漏收**。当前 znbcode 会返回分档，未触发；一旦上游改为只回聚合值即生效。修复方式：分档全为 0 时用 `CacheCreationTokensTotal()` 按 5m 档兜底。
+`BuildTieredTokenParams` 在 anthropic 语义下用分档值覆盖聚合值（`tiered_settle.go:37-38`），而 `GetCacheCreation5mTokens()` 在上游未返回 `cache_creation` 分档对象时返回 0。实测非流式路径因此把一整块缓存写入丢弃（应 7150，实收 2150），且日志里 `cache_creation_tokens` 仍正常记录，属于**静默漏收**。
+
+修复：分档 5m / 1h 全为 0 时用 `CacheCreationTokensTotal()` 按 5m 档兜底，与 `cacheCreationTokensForOpenAIUsage` 的语义一致。
+
+回归测试 `TestCacheWriteTokensAreBilledPerChannelProtocol` 覆盖四个场景：
+
+| 用例 | 期望 quota | 说明 |
+|:---|:---:|:---|
+| `anthropic_aggregate_only` | 7150 | 修复前 2150，聚合值被丢弃 |
+| `anthropic_with_cache_creation_split` | 7900 | 5m=1500@5 + 1h=500@8 |
+| `anthropic_aggregate_only_stream` | 7150 | 流式路径本来就走规范化，保持正确 |
+| `openai_compatible` | 6150 | OpenAI 协议无缓存写字段，只能按输入价计 |
