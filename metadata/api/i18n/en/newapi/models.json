@@ -455,6 +455,34 @@
       "knowledge_cutoff": ""
     },
     {
+      "model_name": "deepseek-v4.1-flash",
+      "vendor_name": "DeepSeek",
+      "description": "deepseek-v4.1-flash (provided via znbcode)",
+      "icon": "DeepSeek.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 384000,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "2026-10-17",
+      "knowledge_cutoff": ""
+    },
+    {
       "model_name": "deepseek-v4.1-flash-1017",
       "vendor_name": "DeepSeek",
       "description": "DeepSeek V4.1 Flash 1017 is the October 17, 2026 snapshot of DeepSeek V4.1 Flash, served by DeepSeek under the `deepseek-flash` API model name. V4.1 Flash is a sparse mixture-of-experts model...",
@@ -630,6 +658,74 @@
       "endpoints": null,
       "lifecycle": "",
       "release_date": "2026-02-26",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gemini-3.8-flash",
+      "vendor_name": "Google",
+      "description": "gemini-3.8-flash (provided via znbcode)",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit",
+        "cache_explicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file",
+        "audio",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 943718,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "2026-10-13",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gemini-3.8-flash-tiered",
+      "vendor_name": "Google",
+      "description": "gemini-3.8-flash-tiered (provided via znbcode)",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit",
+        "cache_explicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file",
+        "audio",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 943718,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "2026-10-13",
       "knowledge_cutoff": ""
     },
     {
@@ -817,6 +913,36 @@
       "model_name": "kimi-k3",
       "vendor_name": "Moonshot AI",
       "description": "Kimi K3 多模态模型，1M 上下文，可切换推理强度",
+      "icon": "Moonshot",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 943718,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "2026-07-16",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "kimi-k3.1-pro",
+      "vendor_name": "Moonshot AI",
+      "description": "kimi-k3.1-pro (provided via znbcode)",
       "icon": "Moonshot",
       "name_rule": 0,
       "status": 1,
@@ -1521,6 +1647,62 @@
       "knowledge_cutoff": ""
     },
     {
+      "model_name": "glm-5.3",
+      "vendor_name": "Z.AI",
+      "description": "glm-5.3 (provided via znbcode)",
+      "icon": "ZAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,平台命名",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 131072,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "",
+      "release_date": "2026-09-23",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "glm-5.3-flash",
+      "vendor_name": "Z.AI",
+      "description": "glm-5.3-flash (provided via znbcode)",
+      "icon": "ZAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,平台命名",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 131072,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "",
+      "release_date": "2026-09-23",
+      "knowledge_cutoff": ""
+    },
+    {
       "model_name": "glm-5.3-prime",
       "vendor_name": "Z.AI",
       "description": "GLM-5.3-Prime is the high-speed variant of Z.ai's GLM-5.3, inheriting its full capabilities while delivering 1.5–2× the output throughput through inference acceleration. It supports text input and out",
@@ -1547,6 +1729,68 @@
       "lifecycle": "",
       "release_date": "2026-09-23",
       "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "grok-4.5",
+      "vendor_name": "xAI",
+      "description": "grok-4.5 (provided via znbcode)",
+      "icon": "Grok",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 500000,
+      "max_output_tokens": 500000,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": "2026-05"
+    },
+    {
+      "model_name": "grok-4.6",
+      "vendor_name": "xAI",
+      "description": "grok-4.6 (provided via znbcode)",
+      "icon": "Grok",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 500000,
+      "max_output_tokens": 500000,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": "2026-05"
     },
     {
       "model_name": "grok-4.7",
