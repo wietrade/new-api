@@ -49,7 +49,6 @@ import { formatPrice, formatRequestPrice } from '../lib/price'
 import { taskPriceLabel, taskUsageUnitLabel } from '../lib/task-price-display'
 import type { PricingModel, PriceType, TokenUnit } from '../types'
 import { ModelBillingModeBadge } from './model-billing-mode-badge'
-import { ModelLifecycleBadge } from './model-lifecycle-badge'
 import { ModelPerfBadge, type ModelPerfBadgeData } from './model-perf-badge'
 
 export interface ModelCardProps {
@@ -387,10 +386,6 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
               {t('Free of charge')}
             </span>
           )}
-          <ModelLifecycleBadge
-            lifecycle={props.model.lifecycle}
-            className='w-fit rounded-md font-medium'
-          />
           {dynamicSummary?.providerCount && (
             <span className='text-muted-foreground text-xs break-words'>
               {t('{{count}} providers', {

@@ -621,14 +621,6 @@ function ModelHeader(props: { model: PricingModel }) {
           className:
             'border-amber-500/30 bg-amber-500/8 text-amber-700 dark:text-amber-400',
         }
-      case 'legacy':
-        return {
-          text: t(
-            'Still available, but listed as a previous-generation model by the vendor.'
-          ),
-          className:
-            'border-border bg-muted/40 text-muted-foreground',
-        }
       default:
         return null
     }

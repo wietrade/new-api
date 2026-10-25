@@ -7445,6 +7445,9 @@
     "Undocumented": "Undocumented",
     "This model has been retired by the vendor; calls may fail.": "This model has been retired by the vendor; calls may fail.",
     "The vendor has marked this model as deprecated. Consider migrating to a current model.": "The vendor has marked this model as deprecated. Consider migrating to a current model.",
-    "Still available, but listed as a previous-generation model by the vendor.": "Still available, but listed as a previous-generation model by the vendor."
+    "Still available, but listed as a previous-generation model by the vendor.": "Still available, but listed as a previous-generation model by the vendor.",
+    "Lifecycle": "Lifecycle",
+    "Vendor lifecycle": "Vendor lifecycle",
+    "Not announced": "Not announced"
   }
 }

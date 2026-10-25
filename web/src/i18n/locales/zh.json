@@ -7445,6 +7445,9 @@
     "Undocumented": "未标注",
     "This model has been retired by the vendor; calls may fail.": "该模型已被厂商关停，调用可能失败。",
     "The vendor has marked this model as deprecated. Consider migrating to a current model.": "厂商标记该模型为已弃用，建议迁移到当前在售型号。",
-    "Still available, but listed as a previous-generation model by the vendor.": "仍可调用，但已被厂商列为上一代旧款。"
+    "Still available, but listed as a previous-generation model by the vendor.": "仍可调用，但已被厂商列为上一代旧款。",
+    "Lifecycle": "生命周期",
+    "Vendor lifecycle": "厂商生命周期",
+    "Not announced": "官方未公布"
   }
 }

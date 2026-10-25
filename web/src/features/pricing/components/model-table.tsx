@@ -22,7 +22,6 @@ import { memo, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { getPerfMetricsSummary } from '@/features/performance-metrics/api'
-import { ModelLifecycleBadge } from '@/features/pricing/components/model-lifecycle-badge'
 import type { ModelPerfBadgeData } from '@/features/pricing/components/model-perf-badge'
 import { getSuccessRateDotClass } from '@/features/performance-metrics/lib/format'
 import type { SuccessRatePoint } from '@/features/performance-metrics/types'
@@ -379,23 +378,15 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
             return (
               <tr
                 key={model.model_name}
-                className={cn(
-                  'cursor-pointer',
-                  (model.lifecycle === 'retired' ||
-                    model.lifecycle === 'deprecated') &&
-                    'text-muted-foreground'
-                )}
+                className='cursor-pointer'
                 onClick={() => props.onModelClick(model.model_name)}
               >
                 <td>
                   <div className='flex min-w-0 items-center gap-2.5'>
                     {icon}
                     <div className='min-w-0'>
-                      <div className='flex min-w-0 items-center gap-1.5'>
-                        <span className='truncate text-[13.5px] leading-5 font-medium'>
-                          {model.model_name}
-                        </span>
-                        <ModelLifecycleBadge lifecycle={model.lifecycle} />
+                      <div className='truncate text-[13.5px] leading-5 font-medium'>
+                        {model.model_name}
                       </div>
                       {model.vendor_name && (
                         <div className='text-muted-foreground truncate text-[11.5px] leading-4'>

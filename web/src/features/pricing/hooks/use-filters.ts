@@ -38,7 +38,6 @@ type FilterState = {
   inputType?: string[]
   context?: string[]
   priceTier?: string[]
-  lifecycle?: string[]
   tokenUnit?: TokenUnit
   rechargePrice?: boolean
 }
@@ -76,7 +75,6 @@ export function useFilters(models: PricingModel[]) {
     inputType: parseList(search.inputType),
     context: parseList(search.context),
     priceTier: parseList(search.priceTier),
-    lifecycle: parseList(search.lifecycle),
     tokenUnit: search.tokenUnit,
     rechargePrice: search.rechargePrice,
   }))
@@ -91,7 +89,6 @@ export function useFilters(models: PricingModel[]) {
   const inputTypeFilter = filterState.inputType ?? []
   const contextFilter = filterState.context ?? []
   const priceTierFilter = filterState.priceTier ?? []
-  const lifecycleFilter = filterState.lifecycle ?? []
   const tokenUnit: TokenUnit =
     filterState.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
   const showRechargePrice = filterState.rechargePrice === true
@@ -201,10 +198,6 @@ export function useFilters(models: PricingModel[]) {
     (v: string) => updateFilters({ priceTier: v ? [v] : [] }),
     [updateFilters]
   )
-  const selectLifecycleFilter = useCallback(
-    (v: string) => updateFilters({ lifecycle: v ? [v] : [] }),
-    [updateFilters]
-  )
 
   const filteredModels = useMemo(() => {
     if (!models || models.length === 0) return []
@@ -218,7 +211,6 @@ export function useFilters(models: PricingModel[]) {
       inputType: inputTypeFilter,
       context: contextFilter,
       priceTier: priceTierFilter,
-      lifecycle: lifecycleFilter,
       sortBy,
     })
   }, [
@@ -231,7 +223,6 @@ export function useFilters(models: PricingModel[]) {
     inputTypeFilter,
     contextFilter,
     priceTierFilter,
-    lifecycleFilter,
     sortBy,
   ])
 
@@ -244,7 +235,6 @@ export function useFilters(models: PricingModel[]) {
       inputTypeFilter.length > 0,
       contextFilter.length > 0,
       priceTierFilter.length > 0,
-      lifecycleFilter.length > 0,
     ],
     [
       vendorFilter,
@@ -254,7 +244,6 @@ export function useFilters(models: PricingModel[]) {
       inputTypeFilter,
       contextFilter,
       priceTierFilter,
-      lifecycleFilter,
     ]
   )
 
@@ -276,7 +265,6 @@ export function useFilters(models: PricingModel[]) {
       inputType: [],
       context: [],
       priceTier: [],
-      lifecycle: [],
     })
   }, [updateFilters])
 
@@ -294,7 +282,6 @@ export function useFilters(models: PricingModel[]) {
     inputTypeFilter,
     contextFilter,
     priceTierFilter,
-    lifecycleFilter,
     tokenUnit,
     showRechargePrice,
     setSearchInput,
@@ -311,7 +298,6 @@ export function useFilters(models: PricingModel[]) {
     selectInputTypeFilter,
     selectContextFilter,
     selectPriceTierFilter,
-    selectLifecycleFilter,
     setTokenUnit,
     setShowRechargePrice,
     filteredModels,

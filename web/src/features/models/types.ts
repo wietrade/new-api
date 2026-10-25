@@ -49,6 +49,10 @@ export interface Model {
   output_modalities?: string
   context_length?: number
   max_output_tokens?: number
+  /** 厂商生命周期：ga / preview / legacy / deprecated / retired；空串=官方未声明 */
+  lifecycle?: string
+  release_date?: string
+  knowledge_cutoff?: string
   is_free?: number
   vendor_id?: number
   endpoints?: string

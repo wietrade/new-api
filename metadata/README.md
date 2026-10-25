@@ -107,9 +107,9 @@ jsDelivr 备选 `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`，�
 |:---|:---|:---|
 | 数据源 | `models.json` / `overrides.json` | `lifecycle` 空串表示官方未声明；人工核对值必须在 `overrides.json` 写 `note` |
 | 校验 | `scripts/model_sync/validate.py` | 词表校验、`tags` 与 lifecycle 矛盾、`retired` 但仍在售、overrides 是否真的生效、语言包事实字段是否与基准一致 |
-| 后端 | `GET /api/pricing?lifecycle=ga,legacy` | 逗号分隔；支持 `unknown`（表示未声明）。不传 = 不过滤 |
-| 前端 | 模型广场「生命周期」筛选 | 与 URL 参数 `lifecycle` 同步，可分享带筛选的链接 |
-| 前端 | 徽标 / 详情页 | 非 `ga` 才显示徽标；`deprecated`/`retired`/`legacy` 在详情页给出迁移提示 |
+| 后端 | `GET /api/pricing?lifecycle=ga,legacy` | 逗号分隔；支持 `unknown`（表示未声明）。不传 = 不过滤；供脚本/后台使用 |
+| 后台 | 模型管理列表 + 元数据详情 | 显示生命周期徽标、发布日、知识截止；**由管理员据此决定 `status`（是否上架广场）**，系统不自动下架 |
+| 前台 | 模型详情页 | 仅在详情页显示生命周期徽标；`deprecated`/`retired` 额外给出迁移提示；列表页不展示、不筛选 |
 
 > `lifecycle` 不参与计费与路由限流，只用于展示、筛选与运营提示。是否允许调用仍由 `status` 与渠道决定。
 

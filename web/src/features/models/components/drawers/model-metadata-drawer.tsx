@@ -36,6 +36,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { ModelLifecycleBadge } from '@/features/pricing/components/model-lifecycle-badge'
+import type { ModelLifecycle } from '@/features/pricing/types'
 import { requireServerSuccess } from '@/lib/server-error-message'
 
 import { getModel, getVendors } from '../../api'
@@ -196,6 +198,37 @@ export function ModelMetadataDrawer(props: ModelMetadataDrawerProps) {
                   </DetailRow>
                   <DetailRow label={t('Free model')}>
                     {detail.is_free ? t('Yes') : t('No')}
+                  </DetailRow>
+                </div>
+              </SideDrawerSection>
+
+              <SideDrawerSection>
+                <h3 className='text-sm font-semibold'>
+                  {t('Vendor lifecycle')}
+                </h3>
+                <div className='flex flex-col'>
+                  <DetailRow label={t('Lifecycle')}>
+                    {detail.lifecycle ? (
+                      <ModelLifecycleBadge lifecycle={detail.lifecycle as ModelLifecycle} />
+                    ) : (
+                      <span className='text-muted-foreground'>
+                        {t('Not announced')}
+                      </span>
+                    )}
+                  </DetailRow>
+                  <DetailRow label={t('Released')}>
+                    {detail.release_date || (
+                      <span className='text-muted-foreground'>
+                        {t('Not announced')}
+                      </span>
+                    )}
+                  </DetailRow>
+                  <DetailRow label={t('Knowledge cutoff')}>
+                    {detail.knowledge_cutoff || (
+                      <span className='text-muted-foreground'>
+                        {t('Not announced')}
+                      </span>
+                    )}
                   </DetailRow>
                 </div>
               </SideDrawerSection>

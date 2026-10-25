@@ -65,7 +65,6 @@ export function Pricing() {
     inputTypeFilter,
     contextFilter,
     priceTierFilter,
-    lifecycleFilter,
     tokenUnit,
     showRechargePrice,
     setSearchInput,
@@ -75,7 +74,6 @@ export function Pricing() {
     selectInputTypeFilter,
     selectContextFilter,
     selectPriceTierFilter,
-    selectLifecycleFilter,
     filteredModels,
     hasActiveFilters,
     clearFilters,
@@ -212,8 +210,6 @@ export function Pricing() {
             onContextChange={selectContextFilter}
             priceTierFilter={priceTierFilter}
             onPriceTierChange={selectPriceTierFilter}
-            lifecycleFilter={lifecycleFilter}
-            onLifecycleChange={selectLifecycleFilter}
             filteredCount={filteredModels.length}
             totalCount={models?.length}
             models={models || []}

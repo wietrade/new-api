@@ -35,7 +35,9 @@ import {
   type ModelPricingConfig,
 } from '@/features/model-pricing/api'
 import { modelPricingDisplay } from '@/features/model-pricing/pricing'
+import { ModelLifecycleBadge } from '@/features/pricing/components/model-lifecycle-badge'
 import { ModelPriceCell } from '@/features/pricing/components/model-price-cell'
+import type { ModelLifecycle } from '@/features/pricing/types'
 import { formatTimestampToDate } from '@/lib/format'
 import { getLobeIcon } from '@/lib/lobe-icon'
 
@@ -126,6 +128,7 @@ export function useModelsColumns(
                     value={model.model_name}
                     className='size-6 shrink-0'
                   />
+                  <ModelLifecycleBadge lifecycle={model.lifecycle as ModelLifecycle} />
                 </div>
                 <div className='text-muted-foreground mt-1 flex min-w-0 items-center gap-2 text-xs'>
                   <span className='truncate' title={vendor?.name}>
