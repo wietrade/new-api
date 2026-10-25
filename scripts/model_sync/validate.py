@@ -150,6 +150,27 @@ def check_i18n(base_models, report: Report):
             report.error(
                 f"{locale} 语言包模型与基准不一致: 多 {sorted(set(rows) - set(base))[:5]} / 少 {sorted(set(base) - set(rows))[:5]}"
             )
+        # 事实字段必须与基准逐字一致：语言包只允许翻译描述类文本，
+        # 出现过回归（zh 包 context_length 仍是旧值）所以在这里硬校验。
+        factual = (
+            "lifecycle",
+            "release_date",
+            "knowledge_cutoff",
+            "context_length",
+            "max_output_tokens",
+        )
+        drifted = [
+            f"{name}.{field}"
+            for name in rows
+            if name in base
+            for field in factual
+            if rows[name].get(field) != base[name].get(field)
+        ]
+        if drifted:
+            report.error(
+                f"{locale} 语言包事实字段与基准不一致（{len(drifted)} 处）: {drifted[:6]}"
+                "（由 sync_models.py 统一生成，不要手改语言包）"
+            )
         same = [
             name
             for name in rows
@@ -160,6 +181,59 @@ def check_i18n(base_models, report: Report):
             report.info(
                 f"{locale} 语言包有 {len(same)} 条描述与基准相同（未翻译），例如 {same[:3]}"
             )
+
+
+def check_overrides(models, report: Report):
+    """确认 overrides.json 里人工核对的权威值真的落到了 models.json。
+
+    每日同步会重写 models.json；如果 overrides 没生效（字段名拼错、
+    merge 逻辑回退），数据会静默回到聚合源的旧值——这里做兜底断言。
+    """
+    path = META / "newapi" / "overrides.json"
+    if not path.exists():
+        report.warn("缺少 overrides.json，人工核对值无法固化")
+        return
+    overrides = json.loads(path.read_text(encoding="utf-8"))
+    by_name = {m.get("model_name"): m for m in models}
+    for item in overrides.get("models") or []:
+        name = str(item.get("model_name") or "")
+        record = by_name.get(name)
+        if record is None:
+            report.error(f"overrides 指定了不存在的模型: {name}")
+            continue
+        if not (item.get("note") or "").strip():
+            report.warn(f"{name}: overrides 缺少 note（依据与复核日期）")
+        for field, expected in (item.get("fields") or {}).items():
+            if field == "lifecycle":
+                value = str(expected or "").strip().lower()
+                if value not in LIFECYCLES:
+                    report.error(f"{name}: overrides 的 lifecycle「{value}」非法")
+            if record.get(field) != expected:
+                report.error(
+                    f"{name}.{field}: overrides 期望 {expected!r}，models.json 实际 {record.get(field)!r}"
+                    "（覆盖未生效或被同步回滚）"
+                )
+
+
+def check_lifecycle_coverage(models, report: Report):
+    total = len(models)
+    if not total:
+        return
+    known = [m for m in models if (m.get("lifecycle") or "").strip()]
+    counts: dict[str, int] = {}
+    for item in models:
+        key = (item.get("lifecycle") or "").strip().lower() or "unknown"
+        counts[key] = counts.get(key, 0) + 1
+    report.info(
+        f"lifecycle 覆盖 {len(known)}/{total}（{counts}），其余为官方未声明"
+    )
+    retired_on_sale = [
+        m.get("model_name")
+        for m in models
+        if (m.get("lifecycle") or "").strip().lower() == "retired" and m.get("status", 1) == 1
+    ]
+    if retired_on_sale:
+        report.warn(f"lifecycle=retired 但仍在售（status=1）: {retired_on_sale[:6]}")
 
 
 def check_pricing(models, pricing, official, context_by_name, report: Report):
@@ -249,6 +323,8 @@ def main(argv=None) -> int:
 
     report = Report()
     check_metadata(models, vendors, report)
+    check_overrides(models, report)
+    check_lifecycle_coverage(models, report)
     check_i18n(models, report)
 
     context = {m["model_name"]: m.get("context_length") or 0 for m in models}

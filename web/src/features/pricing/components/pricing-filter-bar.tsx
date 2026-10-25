@@ -2,7 +2,7 @@ import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { getSortLabels, type SortOption } from '../constants'
-import { getContextRangeOf, getModelTypes } from '../lib/filters'
+import { getContextRangeOf, getLifecycleOf, getModelTypes } from '../lib/filters'
 import type { PricingModel, PricingVendor } from '../types'
 import { SearchBar } from './search-bar'
 
@@ -32,6 +32,16 @@ const CONTEXT_LABELS: Record<string, string> = {
 const PRICE_TIER_LABELS: Record<string, string> = {
   free: '免费',
   paid: '付费',
+}
+
+/** 生命周期筛选标签；unknown = 官方未声明（数据留空，不当作现役） */
+const LIFECYCLE_LABELS: Record<string, string> = {
+  ga: '现役',
+  preview: '预览',
+  legacy: '旧款',
+  deprecated: '已弃用',
+  retired: '已关停',
+  unknown: '未标注',
 }
 
 /** 排序下拉用语：短文案，避免整行筛选栏被撑到换行 */
@@ -129,6 +139,8 @@ export interface PricingFilterBarProps {
   onContextChange: (value: string) => void
   priceTierFilter: string[]
   onPriceTierChange: (value: string) => void
+  lifecycleFilter: string[]
+  onLifecycleChange: (value: string) => void
   filteredCount: number
   totalCount?: number
   models?: PricingModel[]
@@ -154,6 +166,7 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
   const inputTypeCounts: Record<string, number> = {}
   const contextCounts: Record<string, number> = {}
   const priceCounts: Record<string, number> = { free: 0, paid: 0 }
+  const lifecycleCounts: Record<string, number> = {}
   for (const model of allModels) {
     if (model.vendor_name) {
       vendorCounts[model.vendor_name] =
@@ -170,6 +183,8 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
     const range = getContextRangeOf(model)
     if (range) contextCounts[range] = (contextCounts[range] ?? 0) + 1
     priceCounts[model.is_free === true ? 'free' : 'paid'] += 1
+    const lifecycle = getLifecycleOf(model)
+    lifecycleCounts[lifecycle] = (lifecycleCounts[lifecycle] ?? 0) + 1
   }
 
   // 只保留真的有模型命中的选项，避免选完必然空结果
@@ -247,6 +262,18 @@ export function PricingFilterBar(props: PricingFilterBarProps) {
           placeholder='不限'
           label={t('Price')}
           width='108px'
+        />
+      </Field>
+
+      <Field label='生命周期'>
+        <NativeSelect
+          value={props.lifecycleFilter}
+          onChange={props.onLifecycleChange}
+          options={keepHit(LIFECYCLE_LABELS, lifecycleCounts)}
+          counts={lifecycleCounts}
+          placeholder='全部状态'
+          label='生命周期'
+          width='124px'
         />
       </Field>
 

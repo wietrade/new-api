@@ -36,6 +36,7 @@ const modelDetailsSearchSchema = z.object({
   modelType: z.string().optional(),
   inputType: z.string().optional(),
   priceTier: z.string().optional(),
+  lifecycle: z.string().optional(),
   tokenUnit: z.enum(['M', 'K']).optional(),
   view: z.enum(['card', 'table']).optional().catch(undefined),
   rechargePrice: z.boolean().optional(),

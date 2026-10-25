@@ -379,7 +379,12 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
             return (
               <tr
                 key={model.model_name}
-                className='cursor-pointer'
+                className={cn(
+                  'cursor-pointer',
+                  (model.lifecycle === 'retired' ||
+                    model.lifecycle === 'deprecated') &&
+                    'text-muted-foreground'
+                )}
                 onClick={() => props.onModelClick(model.model_name)}
               >
                 <td>

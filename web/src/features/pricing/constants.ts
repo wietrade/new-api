@@ -328,6 +328,36 @@ export function getPriceTierLabels(t: TFunction): Record<PriceTierOption, string
   }
 }
 
+/**
+ * 厂商生命周期筛选。值必须与元数据 lifecycle 字段完全一致；
+ * 空串表示“官方未声明”，单独作为 unknown 一档，避免与 GA 混淆。
+ */
+export const LIFECYCLE_FILTERS = {
+  ALL: 'all',
+  GA: 'ga',
+  PREVIEW: 'preview',
+  LEGACY: 'legacy',
+  DEPRECATED: 'deprecated',
+  RETIRED: 'retired',
+  UNKNOWN: 'unknown',
+} as const
+
+export type LifecycleFilterOption =
+  (typeof LIFECYCLE_FILTERS)[keyof typeof LIFECYCLE_FILTERS]
+
+export function getLifecycleLabels(
+  t: TFunction
+): Record<Exclude<LifecycleFilterOption, 'all'>, string> {
+  return {
+    [LIFECYCLE_FILTERS.GA]: t('Current'),
+    [LIFECYCLE_FILTERS.PREVIEW]: t('Preview'),
+    [LIFECYCLE_FILTERS.LEGACY]: t('Legacy'),
+    [LIFECYCLE_FILTERS.DEPRECATED]: t('Deprecated'),
+    [LIFECYCLE_FILTERS.RETIRED]: t('Retired'),
+    [LIFECYCLE_FILTERS.UNKNOWN]: t('Undocumented'),
+  }
+}
+
 /** Human-readable API protocol names for endpoint type keys. */
 const PROTOCOL_LABEL_KEYS: Record<string, string> = {
   openai: 'OpenAI Chat',

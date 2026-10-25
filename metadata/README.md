@@ -101,6 +101,18 @@ jsDelivr 备选 `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`，�
 
 > 一个模型可以同时命中多项（例如 Claude 同时属于「对话 / 图像理解 / 文件」），这是预期行为。
 
+### 生命周期（lifecycle）在链路上的消费方式
+
+| 层 | 位置 | 行为 |
+|:---|:---|:---|
+| 数据源 | `models.json` / `overrides.json` | `lifecycle` 空串表示官方未声明；人工核对值必须在 `overrides.json` 写 `note` |
+| 校验 | `scripts/model_sync/validate.py` | 词表校验、`tags` 与 lifecycle 矛盾、`retired` 但仍在售、overrides 是否真的生效、语言包事实字段是否与基准一致 |
+| 后端 | `GET /api/pricing?lifecycle=ga,legacy` | 逗号分隔；支持 `unknown`（表示未声明）。不传 = 不过滤 |
+| 前端 | 模型广场「生命周期」筛选 | 与 URL 参数 `lifecycle` 同步，可分享带筛选的链接 |
+| 前端 | 徽标 / 详情页 | 非 `ga` 才显示徽标；`deprecated`/`retired`/`legacy` 在详情页给出迁移提示 |
+
+> `lifecycle` 不参与计费与路由限流，只用于展示、筛选与运营提示。是否允许调用仍由 `status` 与渠道决定。
+
 ## 注意
 
 - 同步只覆盖 `sync_official=1` 的模型；手工改过的（`sync_official=0`）不会被覆盖

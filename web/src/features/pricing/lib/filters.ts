@@ -26,6 +26,7 @@ import {
   CONTEXT_RANGE_BOUNDS,
   MODEL_TYPES,
   PRICE_TIERS,
+  LIFECYCLE_FILTERS,
   type ContextRange,
   type SortOption,
 } from '../constants'
@@ -182,6 +183,20 @@ export function filterByPriceTier(
   )
 }
 
+/** Bucket a model by lifecycle; empty metadata value maps to `unknown`. */
+export function getLifecycleOf(model: PricingModel): string {
+  return model.lifecycle ?? LIFECYCLE_FILTERS.UNKNOWN
+}
+
+/** Filter models by vendor lifecycle state. */
+export function filterByLifecycle(
+  models: PricingModel[],
+  lifecycles: string[]
+): PricingModel[] {
+  if (lifecycles.length === 0) return models
+  return models.filter((m) => lifecycles.includes(getLifecycleOf(m)))
+}
+
 /** Bucket a model by its declared context window; undefined when unknown. */
 export function getContextRangeOf(
   model: PricingModel
@@ -320,6 +335,7 @@ export function filterAndSortModels(
     inputType: string[]
     context: string[]
     priceTier: string[]
+    lifecycle: string[]
     sortBy: string
   }
 ): PricingModel[] {
@@ -331,6 +347,7 @@ export function filterAndSortModels(
   result = filterByInputType(result, filters.inputType)
   result = filterByContextRange(result, filters.context)
   result = filterByPriceTier(result, filters.priceTier)
+  result = filterByLifecycle(result, filters.lifecycle)
   result = sortModels(result, filters.sortBy, filters.group[0])
 
   return result

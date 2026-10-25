@@ -2,6 +2,7 @@ package controller
 
 import (
 	"maps"
+	"strings"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
@@ -35,6 +36,54 @@ func filterPricingByUsableGroups(pricing []model.Pricing, usableGroup map[string
 	return filtered
 }
 
+// lifecycleFilterStates 是 /api/pricing?lifecycle= 允许的取值。
+// unknown 代表元数据里 lifecycle 为空（官方未声明），与 ga 区分开。
+var lifecycleFilterStates = map[string]bool{
+	"ga":          true,
+	"preview":     true,
+	"legacy":      true,
+	"deprecated":  true,
+	"retired":     true,
+	"unknown":     true,
+}
+
+// parseLifecycleFilter 解析逗号分隔的 lifecycle 查询参数。
+// 空值、all 或全部非法时返回 nil，表示不过滤。
+func parseLifecycleFilter(raw string) map[string]bool {
+	out := make(map[string]bool)
+	for _, part := range strings.Split(raw, ",") {
+		key := strings.ToLower(strings.TrimSpace(part))
+		if key == "" || key == "all" {
+			continue
+		}
+		if lifecycleFilterStates[key] {
+			out[key] = true
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
+}
+
+// filterPricingByLifecycle 只保留 lifecycle 命中请求状态的模型。
+func filterPricingByLifecycle(pricing []model.Pricing, states map[string]bool) []model.Pricing {
+	if len(states) == 0 {
+		return pricing
+	}
+	filtered := make([]model.Pricing, 0, len(pricing))
+	for _, item := range pricing {
+		state := item.Lifecycle
+		if state == "" {
+			state = "unknown"
+		}
+		if states[state] {
+			filtered = append(filtered, item)
+		}
+	}
+	return filtered
+}
+
 func GetPricing(c *gin.Context) {
 	pricing := model.GetPricing()
 	userId, exists := c.Get("id")
@@ -57,6 +106,7 @@ func GetPricing(c *gin.Context) {
 
 	usableGroup = service.GetUserUsableGroups(group)
 	pricing = filterPricingByUsableGroups(pricing, usableGroup)
+	pricing = filterPricingByLifecycle(pricing, parseLifecycleFilter(c.Query("lifecycle")))
 	// check groupRatio contains usableGroup
 	for group := range ratio_setting.GetGroupRatioCopy() {
 		if _, ok := usableGroup[group]; !ok {

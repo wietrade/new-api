@@ -48,6 +48,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getPerfMetrics } from '@/features/performance-metrics/api'
+import { ModelLifecycleBadge } from './model-lifecycle-badge'
 import {
   formatLatency,
   formatThroughput,
@@ -603,14 +604,44 @@ function ModelHeader(props: { model: PricingModel }) {
   const modelIconKey = model.icon || model.vendor_icon
   const modelIcon = modelIconKey ? getLobeIcon(modelIconKey, 20) : null
   const description = model.description || model.vendor_description || null
+  // 生命周期提示：只有官方明确声明时才提示，未标注不提示
+  const lifecycleNotice = (() => {
+    switch (model.lifecycle) {
+      case 'retired':
+        return {
+          text: t('This model has been retired by the vendor; calls may fail.'),
+          className:
+            'border-red-500/30 bg-red-500/8 text-red-700 dark:text-red-400',
+        }
+      case 'deprecated':
+        return {
+          text: t(
+            'The vendor has marked this model as deprecated. Consider migrating to a current model.'
+          ),
+          className:
+            'border-amber-500/30 bg-amber-500/8 text-amber-700 dark:text-amber-400',
+        }
+      case 'legacy':
+        return {
+          text: t(
+            'Still available, but listed as a previous-generation model by the vendor.'
+          ),
+          className:
+            'border-border bg-muted/40 text-muted-foreground',
+        }
+      default:
+        return null
+    }
+  })()
 
   return (
     <header className='pb-4'>
-      <div className='flex items-center gap-2.5'>
+      <div className='flex flex-wrap items-center gap-2.5'>
         {modelIcon}
         <h1 className='font-mono text-xl font-bold tracking-tight sm:text-2xl'>
           {model.model_name}
         </h1>
+        <ModelLifecycleBadge lifecycle={model.lifecycle} />
         <CopyButton
           value={model.model_name || ''}
           className='size-6'
@@ -623,6 +654,16 @@ function ModelHeader(props: { model: PricingModel }) {
       {description && (
         <p className='text-muted-foreground mt-2 text-sm leading-relaxed'>
           {description}
+        </p>
+      )}
+      {lifecycleNotice && (
+        <p
+          className={cn(
+            'mt-3 rounded-md border px-3 py-2 text-[12.5px] leading-relaxed',
+            lifecycleNotice.className
+          )}
+        >
+          {lifecycleNotice.text}
         </p>
       )}
     </header>
