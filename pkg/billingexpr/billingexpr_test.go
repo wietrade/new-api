@@ -4,6 +4,7 @@ import (
 	"math"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/pkg/billingexpr"
@@ -1195,4 +1196,15 @@ func TestFrontendSimulationContract(t *testing.T) {
 			}
 		})
 	}
+}
+
+// 表达式求值必须支持注入"当前时间"，否则时间相关分支无法被确定性地测试与预检。
+func TestRunExprWithRequestHonorsInjectedClock(t *testing.T) {
+	fixed := time.Date(2026, 3, 2, 3, 15, 0, 0, time.UTC) // 周一 03:15 UTC
+	result, _, err := billingexpr.RunExprWithRequest(`hour("UTC") * 100 + weekday("UTC")`,
+		billingexpr.TokenParams{P: 1},
+		billingexpr.RequestInput{Now: &fixed})
+	require.NoError(t, err)
+	// hour=3, weekday=1 (Monday) → 301
+	require.Equal(t, float64(301), result)
 }

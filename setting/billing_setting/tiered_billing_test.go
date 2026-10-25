@@ -109,3 +109,17 @@ func TestSmokeTestExprRejectsTaskUsageWithoutSchema(t *testing.T) {
 
 	require.NoError(t, SmokeTestExpr(`tier("base", p * 2 + c * 8)`))
 }
+
+// 时间三元表达式的另一条分支只有在对应时段才会被求值。smoke test 必须
+// 用多个固定时刻扫过两条分支，否则"夜间价写错"这类问题会带病上线。
+func TestSmokeTestExprCoversTimeBranchOtherwiseUnreachable(t *testing.T) {
+	// 白天分支结果为负；若只按当前时刻求值，凌晨保存时不会发现。
+	err := SmokeTestExpr(`hour("UTC") < 6 ? tier("night", p * 1) : tier("day", p * -2)`)
+	require.ErrorContains(t, err, "must be finite and non-negative")
+}
+
+func TestSmokeTestExprCoversWeekendBranch(t *testing.T) {
+	// 周末分支为负；工作日跑测试时不应漏检。
+	err := SmokeTestExpr(`weekday("UTC") == 0 ? tier("sunday", p * -1) : tier("weekday", p * 2)`)
+	require.ErrorContains(t, err, "must be finite and non-negative")
+}
