@@ -384,6 +384,7 @@ function TokenBreakdown(props: { log: UsageLog; other: LogOtherData }) {
   const cacheWrite5m = other.cache_creation_tokens_5m || 0
   const cacheWrite1h = other.cache_creation_tokens_1h || 0
   const reasoningTokens = other.reasoning_tokens || 0
+  const billedInput = Math.max(promptTokens - cacheRead, 0)
   const hasTokens = promptTokens > 0 || completionTokens > 0
 
   if (!hasTokens) return null
@@ -391,6 +392,20 @@ function TokenBreakdown(props: { log: UsageLog; other: LogOtherData }) {
   const rows: Array<{ label: string; value: string }> = []
 
   rows.push({ label: t('Input Tokens'), value: promptTokens.toLocaleString() })
+
+  if (cacheRead > 0) {
+    rows.push({
+      label: t('Cache Read'),
+      value: cacheRead.toLocaleString(),
+    })
+    // Input Tokens is the total (cache included); show the part billed at the
+    // full input rate so the input side mirrors the output side.
+    rows.push({
+      label: t('Billed Input'),
+      value: billedInput.toLocaleString(),
+    })
+  }
+
   rows.push({
     label: t('Output Tokens'),
     value: completionTokens.toLocaleString(),
@@ -409,13 +424,6 @@ function TokenBreakdown(props: { log: UsageLog; other: LogOtherData }) {
         value: (completionTokens + reasoningTokens).toLocaleString(),
       })
     }
-  }
-
-  if (cacheRead > 0) {
-    rows.push({
-      label: t('Cache Read'),
-      value: cacheRead.toLocaleString(),
-    })
   }
 
   if (other.image_cache_tokens !== undefined) {
