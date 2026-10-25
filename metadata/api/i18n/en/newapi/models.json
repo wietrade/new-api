@@ -418,12 +418,12 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1048576,
-      "max_output_tokens": 393216,
+      "context_length": 1000000,
+      "max_output_tokens": 384000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "",
+      "lifecycle": "ga",
+      "release_date": "2026-09-10",
       "knowledge_cutoff": ""
     },
     {
@@ -446,12 +446,12 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1048576,
+      "context_length": 1000000,
       "max_output_tokens": 384000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "2026-04-24",
+      "lifecycle": "ga",
+      "release_date": "2026-08-13",
       "knowledge_cutoff": ""
     },
     {
@@ -474,11 +474,11 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 1048576,
-      "max_output_tokens": 393216,
+      "context_length": 1000000,
+      "max_output_tokens": 384000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-10-17",
       "knowledge_cutoff": ""
     },
@@ -599,7 +599,7 @@
       "max_output_tokens": 32768,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-06-18",
       "knowledge_cutoff": ""
     },
@@ -662,7 +662,7 @@
       "max_output_tokens": 943718,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-10-13",
       "knowledge_cutoff": ""
     },
@@ -778,8 +778,8 @@
       "max_output_tokens": 524288,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "",
+      "lifecycle": "ga",
+      "release_date": "2026-06-01",
       "knowledge_cutoff": ""
     },
     {
@@ -809,8 +809,8 @@
       "max_output_tokens": 524288,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "",
+      "lifecycle": "ga",
+      "release_date": "2026-10-19",
       "knowledge_cutoff": ""
     },
     {
@@ -839,7 +839,7 @@
       "max_output_tokens": 943718,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-07-16",
       "knowledge_cutoff": ""
     },
@@ -982,9 +982,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-03-05",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2025-08"
     },
     {
       "model_name": "gpt-5.5",
@@ -1013,9 +1013,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "2026-04-24",
-      "knowledge_cutoff": ""
+      "lifecycle": "ga",
+      "release_date": "2026-04-23",
+      "knowledge_cutoff": "2025-12"
     },
     {
       "model_name": "gpt-5.6-luna",
@@ -1045,9 +1045,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-07-09",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-02"
     },
     {
       "model_name": "gpt-5.6-sol",
@@ -1077,9 +1077,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-07-09",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-02"
     },
     {
       "model_name": "gpt-5.6-terra",
@@ -1109,9 +1109,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-07-09",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-02"
     },
     {
       "model_name": "gpt-6-astra",
@@ -1141,9 +1141,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-09-04",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-04"
     },
     {
       "model_name": "gpt-6-luna",
@@ -1173,9 +1173,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-09-22",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-05"
     },
     {
       "model_name": "gpt-6-sol",
@@ -1205,9 +1205,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-09-22",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-04"
     },
     {
       "model_name": "gpt-6.1-sol",
@@ -1237,9 +1237,9 @@
       "max_output_tokens": 128000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "2026-09-29",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-04"
     },
     {
       "model_name": "gpt-image-2.5-sunburst",
@@ -1263,8 +1263,8 @@
       "max_output_tokens": 0,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "",
+      "lifecycle": "ga",
+      "release_date": "2026-09-08",
       "knowledge_cutoff": ""
     },
     {
@@ -1289,8 +1289,8 @@
       "max_output_tokens": 0,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "",
+      "lifecycle": "ga",
+      "release_date": "2026-09-08",
       "knowledge_cutoff": ""
     },
     {
@@ -1314,12 +1314,12 @@
         "text"
       ],
       "context_length": 131072,
-      "max_output_tokens": 65536,
+      "max_output_tokens": 131072,
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
       "release_date": "2025-08-05",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2024-06"
     },
     {
       "model_name": "laguna-s-2.1:free",
@@ -1402,8 +1402,8 @@
       "max_output_tokens": 131072,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
-      "release_date": "",
+      "lifecycle": "ga",
+      "release_date": "2026-08-26",
       "knowledge_cutoff": ""
     },
     {
@@ -1517,7 +1517,7 @@
       "is_free": false,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "2026-02-11",
+      "release_date": "2026-02-12",
       "knowledge_cutoff": ""
     },
     {
@@ -1577,7 +1577,7 @@
       "endpoints": null,
       "lifecycle": "",
       "release_date": "",
-      "knowledge_cutoff": ""
+      "knowledge_cutoff": "2026-05"
     }
   ]
 }
