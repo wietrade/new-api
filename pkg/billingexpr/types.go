@@ -3,6 +3,7 @@ package billingexpr
 import (
 	"crypto/sha256"
 	"fmt"
+	"time"
 
 	"github.com/QuantumNous/new-api/common"
 )
@@ -14,6 +15,9 @@ type RequestInput struct {
 	// ImageCount is a validated billing quantity, separate from the frozen
 	// request's n. Settlement can replace it with the actual returned count.
 	ImageCount *int
+	// Now 覆盖表达式里 hour()/weekday() 等时间函数读取的"当前时间"，
+	// 让时间三元表达式在保存前能被确定性地扫过所有分支（smoke test 用）。
+	Now *time.Time
 }
 
 // TokenParams holds all token dimensions passed into an Expr evaluation.

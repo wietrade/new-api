@@ -6,6 +6,7 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/pkg/billingexpr"
@@ -216,12 +217,19 @@ func smokeTestExpr(exprStr string) error {
 
 	for _, v := range vectors {
 		for _, request := range billingExprSmokeRequests() {
-			result, _, err := billingexpr.RunExprWithRequest(exprStr, v, request)
-			if err != nil {
-				return fmt.Errorf("vector {p=%g, c=%g}: run failed: %w", v.P, v.C, err)
-			}
-			if math.IsNaN(result) || math.IsInf(result, 0) || result < 0 {
-				return fmt.Errorf("vector {p=%g, c=%g}: result must be finite and non-negative, got %f", v.P, v.C, result)
+			for _, clock := range billingExprSmokeClocks() {
+				if clock != nil {
+					request.Now = clock
+				} else {
+					request.Now = nil // 保留按真实时钟求值的探针
+				}
+				result, _, err := billingexpr.RunExprWithRequest(exprStr, v, request)
+				if err != nil {
+					return fmt.Errorf("vector {p=%g, c=%g}: run failed: %w", v.P, v.C, err)
+				}
+				if math.IsNaN(result) || math.IsInf(result, 0) || result < 0 {
+					return fmt.Errorf("vector {p=%g, c=%g}: result must be finite and non-negative, got %f", v.P, v.C, result)
+				}
 			}
 		}
 	}
@@ -364,4 +372,19 @@ func billingExprSmokeRequests() []billingexpr.RequestInput {
 			Body: []byte(`{"service_tier":"fast","stream_options":{"include_usage":true},"messages":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]}`),
 		},
 	}
+}
+
+// billingExprSmokeClocks 提供一组固定时刻用于扫过时间三元表达式的两条分支：
+// nil 保留按真实时钟求值；其余覆盖周日 0/6/12/18/23 点与周一 0 点，
+// 确保 hour() 的白天/夜间分支、weekday() 的周日分支在保存时都被求值。
+func billingExprSmokeClocks() []*time.Time {
+	sunday := time.Date(2026, 1, 4, 0, 0, 0, 0, time.UTC) // 周日
+	monday := time.Date(2026, 1, 5, 0, 0, 0, 0, time.UTC)  // 周一
+	clocks := []*time.Time{nil}
+	for _, hour := range []int{0, 6, 12, 18, 23} {
+		t := sunday.Add(time.Duration(hour) * time.Hour)
+		clocks = append(clocks, &t)
+	}
+	clocks = append(clocks, &monday)
+	return clocks
 }
