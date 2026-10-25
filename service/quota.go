@@ -138,19 +138,19 @@ func PreWssConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, usag
 	quota, clamp := calculateAudioQuota(quotaInfo)
 	noteQuotaClamp(relayInfo, clamp)
 
-	if userQuota < quota {
-		return fmt.Errorf("user quota is not enough, user quota: %s, need quota: %s", logger.FormatQuota(userQuota), logger.FormatQuota(quota))
+	// B-M4：流中只做余额校验不扣款；扣款统一由 PostWssConsumeQuota → SettleBilling 结算一次，
+	// 否则会话预扣 E + 流中 Σ + 结算 (A−E) ≈ 2A。余额与令牌已扣掉预扣 E，故只比较超出预扣的部分。
+	relayInfo.RealtimeAccruedQuota += quota
+	beyondReserved := relayInfo.RealtimeAccruedQuota - relayInfo.FinalPreConsumedQuota
+	if beyondReserved > userQuota {
+		return fmt.Errorf("user quota is not enough, user quota: %s, need quota: %s", logger.FormatQuota(userQuota), logger.FormatQuota(beyondReserved))
 	}
 
-	if !token.UnlimitedQuota && token.RemainQuota < quota {
-		return fmt.Errorf("token quota is not enough, token remain quota: %s, need quota: %s", logger.FormatQuota(token.RemainQuota), logger.FormatQuota(quota))
+	if !token.UnlimitedQuota && beyondReserved > token.RemainQuota {
+		return fmt.Errorf("token quota is not enough, token remain quota: %s, need quota: %s", logger.FormatQuota(token.RemainQuota), logger.FormatQuota(beyondReserved))
 	}
 
-	err = PostConsumeQuota(relayInfo, quota, 0, false)
-	if err != nil {
-		return err
-	}
-	logger.LogInfo(ctx, common.LogText("realtime streaming consume quota success, quota: %d", quota))
+	logger.LogInfo(ctx, common.LogText("realtime streaming quota accrued: %d, total accrued: %d", quota, relayInfo.RealtimeAccruedQuota))
 	return nil
 }
 
