@@ -2829,7 +2829,7 @@
     "footer.columns.related.title": "相關項目",
     "footer.defaultCopyright": "版權所有。",
     "footer.brandDescription": "統一的模型 API 接入層，聚合主流大模型，按實際用量計費。",
-    "footer.new\u0061pi.projectAttributionSuffix": "版權所有，由項目貢獻者設計與開發。",
+    "footer.newapi.projectAttributionSuffix": "版權所有，由項目貢獻者設計與開發。",
     "For advanced custom channels this applies only to /v1/responses routes without protocol conversion.": "進階自訂渠道僅對 /v1/responses 且不做協定轉換的路由生效。",
     "GitHub ID is empty!": "GitHub ID 為空！",
     "For channels added after May 10, 2025, no need to remove \".\" from model names during deployment": "對於 2025 年 5 月 10 日之後新增的渠道，在部署時無需從模型名稱中移除 \".\"",
@@ -7048,7 +7048,6 @@
     "Vendor name is required": "供應商名稱不得為空",
     "Vendor updated successfully": "供應商已更新",
     "Vendor:": "供應商：",
-    "Vendors": "供應商",
     "Vendors ranked by aggregated token volume": "廠商按聚合 Token 用量排序",
     "Vendors source": "供應商來源",
     "Vendors still have {{count}} linked model records. Transfer or clear their assignments first.": "供應商仍有 {{count}} 筆關聯模型記錄，請先轉移或清除歸屬。",
@@ -7364,6 +7363,12 @@
     "Zhipu": "智譜",
     "Zhipu GLM": "智譜GLM",
     "Zhipu V4": "智譜 V4",
-    "Zoom": "縮放"
+    "Zoom": "縮放",
+    "Lifecycle": "生命週期",
+    "Vendor lifecycle": "廠商生命週期",
+    "Not announced": "官方未公布",
+    "Undocumented": "未標註",
+    "Legacy": "舊款",
+    "Retired": "已關停"
   }
 }
