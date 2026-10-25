@@ -151,10 +151,11 @@
     },
     {
       "model_name": "grok-4.7",
-      "note": "第二轮官方核实（https://docs.x.ai/developers/grok-4-7，2026-10-25 复核）。",
+      "note": "第二轮官方核实（https://docs.x.ai/developers/grok-4-7，2026-10-25 复核）。 第三轮核实：docs.x.ai/developers/models/grok-4.7 列为 frontier/Latest 现役模型。",
       "fields": {
         "context_length": 500000,
-        "knowledge_cutoff": "2026-05"
+        "knowledge_cutoff": "2026-05",
+        "lifecycle": "ga"
       }
     },
     {
@@ -342,6 +343,48 @@
         "lifecycle": "ga",
         "release_date": "2026-09-08"
       }
+    },
+    {
+      "model_name": "lfm-2.5-2.6b:free",
+      "note": "第三轮核实：docs.liquid.ai 规格 131K 上下文；发布日期 2026-08-04。",
+      "fields": {
+        "context_length": 131072,
+        "release_date": "2026-08-04"
+      }
+    },
+    {
+      "model_name": "dots-3-note-preview:free",
+      "note": "第三轮核实：HF dots-studio/dots3-note-prev，集合更新日 2026-08-14；官方写 512K 上下文（SGLang 配置 524288），保留 524288 不做改动。",
+      "fields": {
+        "release_date": "2026-08-14"
+      }
+    },
+    {
+      "model_name": "nemotron-3.5-content-safety:free",
+      "note": "第三轮核实：NVIDIA 发布公告日期。",
+      "fields": {
+        "release_date": "2026-06-02"
+      }
+    },
+    {
+      "model_name": "inkling:free",
+      "note": "第三轮核实：Thinking Machines Lab 发布日。",
+      "fields": {
+        "release_date": "2026-07-15"
+      }
+    },
+    {
+      "model_name": "xing4.0-29b-a4b:free",
+      "note": "第三轮核实：中国电信星辰发布日。",
+      "fields": {
+        "release_date": "2026-09-17"
+      }
+    },
+    {
+      "model_name": "glm-5.3-prime",
+      "note": "第三轮核实：智谱官方模型概览无 glm-5.3-prime（官方加速变体为 GLM-5.3-FlashX）→ 判定为平台/转售命名，lifecycle 等字段永久留空，不再进入核实队列。",
+      "fields": {},
+      "platform_only": true
     }
   ],
   "excluded": [

@@ -113,6 +113,14 @@ jsDelivr 备选 `https://cdn.jsdelivr.net/gh/wietrade/new-api@main/metadata`，�
 
 > `lifecycle` 不参与计费与路由限流，只用于展示、筛选与运营提示。是否允许调用仍由 `status` 与渠道决定。
 
+### 两个约定 tag（纯展示，不参与同步/计费）
+
+| tag | 含义 | 对 lifecycle 的影响 |
+|:---|:---|:---|
+| `开源权重` | 厂商以开放权重方式发布，可自托管 | 官方通常没有 API 生命周期口径，`lifecycle` 保持空 |
+| `平台命名` | 聚合/转售平台自造 ID，官方无该模型 | 永久留空，并在 `overrides.json` 标 `platform_only: true`，不再进入核实队列 |
+
+
 ## 注意
 
 - 同步只覆盖 `sync_official=1` 的模型；手工改过的（`sync_official=0`）不会被覆盖

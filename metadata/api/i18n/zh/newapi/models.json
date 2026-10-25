@@ -508,7 +508,7 @@
       "is_free": true,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-08-14",
       "knowledge_cutoff": ""
     },
     {
@@ -673,7 +673,7 @@
       "icon": "Gemini.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,多模态,免费",
+      "tags": "推理,工具,多模态,免费,开源权重",
       "capabilities": [
         "reasoning",
         "tools",
@@ -703,7 +703,7 @@
       "icon": "Gemini.Color",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,多模态,免费",
+      "tags": "推理,工具,多模态,免费,开源权重",
       "capabilities": [
         "reasoning",
         "tools",
@@ -743,12 +743,12 @@
       "output_modalities": [
         "text"
       ],
-      "context_length": 65536,
+      "context_length": 131072,
       "max_output_tokens": 8192,
       "is_free": true,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-08-04",
       "knowledge_cutoff": ""
     },
     {
@@ -866,7 +866,7 @@
       "is_free": true,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-06-02",
       "knowledge_cutoff": ""
     },
     {
@@ -1300,7 +1300,7 @@
       "icon": "OpenAI",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具",
+      "tags": "推理,工具,开源权重",
       "capabilities": [
         "reasoning",
         "tools",
@@ -1413,7 +1413,7 @@
       "icon": "ThinkingMachines",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,多模态,免费",
+      "tags": "推理,工具,多模态,免费,开源权重",
       "capabilities": [
         "reasoning",
         "tools",
@@ -1443,7 +1443,7 @@
       "icon": "ThinkingMachines",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具,多模态,免费",
+      "tags": "推理,工具,多模态,免费,开源权重",
       "capabilities": [
         "reasoning",
         "tools",
@@ -1463,7 +1463,7 @@
       "is_free": true,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-07-15",
       "knowledge_cutoff": ""
     },
     {
@@ -1489,7 +1489,7 @@
       "is_free": true,
       "endpoints": null,
       "lifecycle": "",
-      "release_date": "",
+      "release_date": "2026-09-17",
       "knowledge_cutoff": ""
     },
     {
@@ -1527,7 +1527,7 @@
       "icon": "ZAI",
       "name_rule": 0,
       "status": 1,
-      "tags": "推理,工具",
+      "tags": "推理,工具,平台命名",
       "capabilities": [
         "reasoning",
         "tools",
@@ -1575,7 +1575,7 @@
       "max_output_tokens": 500000,
       "is_free": false,
       "endpoints": null,
-      "lifecycle": "",
+      "lifecycle": "ga",
       "release_date": "",
       "knowledge_cutoff": "2026-05"
     }
