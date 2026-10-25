@@ -7448,6 +7448,8 @@
     "Still available, but listed as a previous-generation model by the vendor.": "Still available, but listed as a previous-generation model by the vendor.",
     "Lifecycle": "Lifecycle",
     "Vendor lifecycle": "Vendor lifecycle",
-    "Not announced": "Not announced"
+    "Not announced": "Not announced",
+    "Reasoning Tokens": "Reasoning Tokens",
+    "Billed Output": "Billed Output"
   }
 }

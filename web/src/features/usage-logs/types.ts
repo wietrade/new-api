@@ -191,6 +191,11 @@ export interface LogOtherData {
   cache_creation_tokens?: number
   cache_creation_tokens_5m?: number
   cache_creation_tokens_1h?: number
+  // Upstream-reported thinking tokens. Some gateways keep them outside
+  // completion_tokens while still billing for them; the flag below marks a
+  // request where the expression charged completion + reasoning together.
+  reasoning_tokens?: number
+  reasoning_billed_with_completion?: boolean
   claude?: boolean
   model_ratio?: number
   completion_ratio?: number

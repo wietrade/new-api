@@ -383,6 +383,7 @@ function TokenBreakdown(props: { log: UsageLog; other: LogOtherData }) {
   const cacheWrite = other.cache_creation_tokens || 0
   const cacheWrite5m = other.cache_creation_tokens_5m || 0
   const cacheWrite1h = other.cache_creation_tokens_1h || 0
+  const reasoningTokens = other.reasoning_tokens || 0
   const hasTokens = promptTokens > 0 || completionTokens > 0
 
   if (!hasTokens) return null
@@ -394,6 +395,21 @@ function TokenBreakdown(props: { log: UsageLog; other: LogOtherData }) {
     label: t('Output Tokens'),
     value: completionTokens.toLocaleString(),
   })
+
+  if (reasoningTokens > 0) {
+    rows.push({
+      label: t('Reasoning Tokens'),
+      value: reasoningTokens.toLocaleString(),
+    })
+    if (other.reasoning_billed_with_completion) {
+      // The expression charged completion + reasoning as the output side, so
+      // show the amount the bill was calculated from.
+      rows.push({
+        label: t('Billed Output'),
+        value: (completionTokens + reasoningTokens).toLocaleString(),
+      })
+    }
+  }
 
   if (cacheRead > 0) {
     rows.push({

@@ -7448,6 +7448,8 @@
     "Still available, but listed as a previous-generation model by the vendor.": "仍可调用，但已被厂商列为上一代旧款。",
     "Lifecycle": "生命周期",
     "Vendor lifecycle": "厂商生命周期",
-    "Not announced": "官方未公布"
+    "Not announced": "官方未公布",
+    "Reasoning Tokens": "思考 Token",
+    "Billed Output": "计费输出"
   }
 }
