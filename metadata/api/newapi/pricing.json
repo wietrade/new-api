@@ -276,11 +276,11 @@
       "confidence": "high",
       "input": 2.0,
       "output": 10.0,
-      "cache_read": 0.1,
+      "cache_read": 0.2,
       "cache_write": 2.5,
       "cache_write_1h": 4.0,
       "billing_mode": "tiered_expr",
-      "billing_expr": "tier(\"standard\", p * 2 + c * 10 + cr * 0.1 + cc * 2.5 + cc1h * 4)"
+      "billing_expr": "tier(\"standard\", p * 2 + c * 10 + cr * 0.2 + cc * 2.5 + cc1h * 4)"
     },
     {
       "model_name": "deepseek-flash",

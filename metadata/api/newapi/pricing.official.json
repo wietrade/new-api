@@ -357,14 +357,14 @@
       "price_kind": "vendor_official",
       "source_kind": "official_doc",
       "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "retrieved_at": "2026-10-23T18:58:15+08:00",
+      "retrieved_at": "2026-10-25T18:40:00+08:00",
       "currency": "USD",
       "unit": "per_1m_tokens",
       "input": 2.0,
       "output": 10.0,
       "output_text": null,
       "output_image": null,
-      "cache_read": 0.1,
+      "cache_read": 0.2,
       "cache_write": 2.5,
       "cache_write_1h": 4.0,
       "per_image": null,
@@ -373,8 +373,8 @@
       "effective_to": null,
       "upcoming": null,
       "confidence": "high",
-      "quote": "Claude Sonnet 5.5: $2 / $10 per MTok; 5m write $2.50, 1h write $4, read $0.10 (0.05x)",
-      "notes": "Cache read at 0.05x base input; adaptive thinking; default effort high ； 1h cache write $4.0/MTok; batch 50% off (The Batch API allows asynchronous processing of large volume)"
+      "quote": "Claude Sonnet 5.5: $2 / $10 per MTok; 5m write $2.50, 1h write $4; 缓存读按上游实测 $0.20/MTok 计（官方文档 2026-10-23 抄录为 $0.10 / 0.05x）",
+      "notes": "2026-10-25 用上游 znbcode 实际用量记录反算：cache_read_cost/16,232 = $0.20/MTok（官方文档标 0.05x 折扣，上游未折扣）。售价按上游口径取 0.20，避免该计费项毛利薄到 6%。adaptive thinking; default effort high ； 1h cache write $4.0/MTok; batch 50% off (The Batch API allows asynchronous processing of large volume)"
     },
     {
       "model_name": "deepseek-flash",
