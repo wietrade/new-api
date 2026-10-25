@@ -2,6 +2,7 @@ package billingexpr
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/QuantumNous/new-api/common"
 )
@@ -32,6 +33,15 @@ func ComputeTieredQuotaWithRequest(snap *BillingSnapshot, params TokenParams, re
 	cost, trace, err := RunExprByHashWithRequest(snap.ExprString, snap.ExprHash, params, request)
 	if err != nil {
 		return TieredResult{}, err
+	}
+	// 负成本在结算链路上等同退款：BillingSession.Settle 会用「实际 - 预扣」
+	// 的负差值调用 IncreaseUserQuota。表达式产出负值永远不是合法计费结果，
+	// 直接报错让上层回退到保守的「保留预扣」分支。
+	if math.IsNaN(cost) || math.IsInf(cost, 0) {
+		return TieredResult{}, fmt.Errorf("billing expression produced non-finite cost")
+	}
+	if cost < 0 {
+		return TieredResult{}, fmt.Errorf("billing expression produced negative cost")
 	}
 
 	quotaBeforeGroup := quotaConversion(cost, snap)

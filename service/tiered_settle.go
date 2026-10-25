@@ -24,18 +24,21 @@ type TieredResultWrapper = billingexpr.TieredResult
 // report them as text-only. This function normalizes to text-only when
 // sub-categories are separately priced.
 func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVars map[string]bool) billingexpr.TokenParams {
-	p := float64(usage.PromptTokens)
-	c := float64(usage.CompletionTokens)
-	cr := float64(usage.PromptTokensDetails.CachedTokens)
-	cc5m := float64(usage.PromptTokensDetails.CacheCreationTokensTotal())
+	// 上游（尤其二次转发渠道）可能上报负数 token。任何负值进入表达式都会
+	// 压低成本，甚至把成本算成负数，而负成本在结算侧等同于退款（净贷记用户），
+	// 所以这里在进入表达式之前统一钳制到非负。
+	p := max(float64(usage.PromptTokens), 0)
+	c := max(float64(usage.CompletionTokens), 0)
+	cr := max(float64(usage.PromptTokensDetails.CachedTokens), 0)
+	cc5m := max(float64(usage.PromptTokensDetails.CacheCreationTokensTotal()), 0)
 	cc1h := float64(0)
 
 	if usage.UsageSemantic == "anthropic" {
-		cc1h = float64(usage.ClaudeCacheCreation1hTokens)
-		cc5m = float64(usage.ClaudeCacheCreation5mTokens)
+		cc1h = max(float64(usage.ClaudeCacheCreation1hTokens), 0)
+		cc5m = max(float64(usage.ClaudeCacheCreation5mTokens), 0)
 	}
 
-	img := float64(usage.PromptTokensDetails.ImageTokens)
+	img := max(float64(usage.PromptTokensDetails.ImageTokens), 0)
 	imgCR := float64(0)
 	if usedVars["img_cr"] && !isClaudeUsageSemantic {
 		details := usage.PromptTokensDetails.CachedTokensDetails
@@ -67,9 +70,9 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 			}
 		}
 	}
-	ai := float64(usage.PromptTokensDetails.AudioTokens)
-	imgO := float64(usage.CompletionTokenDetails.ImageTokens)
-	ao := float64(usage.CompletionTokenDetails.AudioTokens)
+	ai := max(float64(usage.PromptTokensDetails.AudioTokens), 0)
+	imgO := max(float64(usage.CompletionTokenDetails.ImageTokens), 0)
+	ao := max(float64(usage.CompletionTokenDetails.AudioTokens), 0)
 
 	// len = total input context length for tier condition evaluation.
 	// Non-Claude: prompt_tokens already includes everything.
@@ -80,10 +83,17 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 	}
 
 	if isClaudeUsageSemantic {
-		// Anthropic input excludes cache reads. When cr has no separate
-		// price, merge those tokens into the input category instead.
+		// Anthropic 的 input_tokens 既不包含缓存读、也不包含缓存写。
+		// 某个子类目没有被表达式单独定价时，必须并回输入 p 按输入价计费，
+		// 否则这部分用量会完全免费（GPT 语义的分支也是这个契约）。
 		if !usedVars["cr"] {
 			p += cr
+		}
+		if !usedVars["cc"] {
+			p += cc5m
+		}
+		if !usedVars["cc1h"] {
+			p += cc1h
 		}
 	} else {
 		if usedVars["cr"] {
@@ -119,6 +129,9 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 	}
 	if c < 0 {
 		c = 0
+	}
+	if inputLen < 0 {
+		inputLen = 0
 	}
 
 	return billingexpr.TokenParams{
