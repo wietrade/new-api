@@ -21,8 +21,9 @@
 
 ### 回归范围
 
-`go test ./model/ ./B-M4 另跑 `./service/... ./relay/... ./model/... ./pkg/... ./controller/... ./setting/...`，除第三节列出的 6 个基线控制器失败外全绿；common/ ./service/ ./pkg/billingexpr/ ./relay/channel/...` 全绿；
-`go build ./...` 通过；部署后 `/`、`/pricing`、`/pricing/<model>`、`/docs/`、`/api/status` 均 200。
+`go test ./model/ ./common/ ./service/ ./pkg/billingexpr/ ./relay/channel/...` 全绿；
+`go build ./...` 通过；B-M4 另跑 `./service/... ./relay/... ./model/... ./pkg/... ./controller/... ./setting/...`，除第三节列出的 6 个基线控制器失败外全绿；
+部署后 `/`、`/pricing`、`/pricing/<model>`、`/docs/`、`/api/status` 均 200。
 
 ## 二、经核实**不成立 / 分级过高**的审计结论
 
@@ -41,3 +42,42 @@
 | C2 `prefill_groups` 部分唯一索引在 MySQL 退化 | 同上，需要 MySQL 实测 |
 | B-M5 图片空 usage | 空 usage 被强填 1 token；**且预扣端 `EstimatedCompletionTokens` 恒为 0，`img_o` 不参与预扣**，所以「保留预扣」也无法止血 | 先加告警（零计费变化）拿触发率，再定 fail-closed / 估算口径 |
 | 审计基线已有的 6 个控制器测试失败 | 在 `0490d19` 上同样失败，与本次修复无关；其中 `PasswordPolicy/short` 是密码下限 8→6 后测试未同步（对应 S-M3 产品决策待定） |
+
+## 四、渠道协议与缓存写入计费（2026-10-25）
+
+### 现象
+
+`claude-opus-5-5` 两小时内 77 次成功调用，我们记录 9.19M token（输入 9,125,389 + 输出 63,186），上游报表 9.34M / ¥10.60，差额约 151K —— 正是缓存写入。
+
+用表达式反算即可确认我方 `cc` 为 0：`p*4 + c*20 + cr*0.2` 的结果与记录 quota 1,581,662 分毫不差，说明缓存写入完全没有进入计费。
+
+### 根因
+
+渠道类型 59（sub2api）继承 newapi 适配器，转发地址直接取入站路径（`relay_info.go:639` → `newapi/adaptor.go:36`）。客户端用 OpenAI 协议时上游也收到 OpenAI 请求，而 **OpenAI 协议没有 cache_write 字段**，上游在转换时把 `cache_creation_input_tokens` 丢掉了，我方无从计费。
+
+### 处置
+
+znbcode 的 Claude 分组本身是 Anthropic 原生，全部改为渠道类型 14（`/v1/messages` 固定出站），与客户端协议无关：
+
+| 渠道 | 上游分组 | 上游倍率 | 我方分组 | 我方倍率 | 覆盖倍数 |
+|:---|:---|:---:|:---|:---:|---:|
+| `znb-cc-稳定` | znb-cc-稳定 | 0.8 | Claude稳定 | 0.25 | 2.1× |
+| `znb-cc-特惠` | znb-cc-特惠 | 0.3 | Claude特惠 | 0.12 | 2.7× |
+| `znb-cc-max-满血` | znb-cc-max-满血 | 1.5 | Claude满血 | 0.40 | 1.8× |
+| `znb-cc-max-正价20` | znb-cc-max-正价20 | 2.0 | Claude正价 | 0.60 | 2.0× |
+
+> 上游计价单位是人民币（充值 ¥1 = 1 个计价单位），我方按美元计费。按 1 USD = 6.8 CNY，保本倍率 = 上游倍率 ÷ 6.8，故各分组均有 1.8~2.7 倍覆盖。
+
+### 实测验证
+
+| 场景 | 上游返回 | 入账 | quota | 手算 |
+|:---|:---|:---|:---:|:---|
+| 稳定组 5m 写入 | `cw=17,519` | `cc=17519`、`cc5m=17519` | 10,955 | $(6×4+1×20+17519×5)/10^6×5×10^5×0.25$ ✅ |
+| 稳定组缓存命中 | `cr=17,519` | `cr=17519` | 443 | ✅ |
+| 正价组 1h 写入 | `ephemeral_1h=12,631` | `cc=12631`、`cc1h=12631` | 30,348 | $(8×4+4×20+12631×8)/10^6×5×10^5×0.6$ ✅ |
+
+结论：Anthropic 原生 + 分档齐全时，5m 按 `cc`、1h 按 `cc1h` 计费，与上游口径一致。
+
+### 遗留风险
+
+`BuildTieredTokenParams` 在 anthropic 语义下用分档值覆盖聚合值（`tiered_settle.go:37-38`），而 `GetCacheCreation5mTokens()` 在上游未返回 `cache_creation` 分档对象时返回 0。实测非流式路径因此把一整块缓存写入丢弃（应 7150，实收 2150），且日志里 `cache_creation_tokens` 仍正常记录，属于**静默漏收**。当前 znbcode 会返回分档，未触发；一旦上游改为只回聚合值即生效。修复方式：分档全为 0 时用 `CacheCreationTokensTotal()` 按 5m 档兜底。
