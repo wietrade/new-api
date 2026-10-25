@@ -272,7 +272,7 @@
       "currency": "USD",
       "unit": "per_1m_tokens",
       "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "retrieved_at": "2026-10-23T18:58:15+08:00",
+      "retrieved_at": "2026-10-25T18:40:00+08:00",
       "confidence": "high",
       "input": 2.0,
       "output": 10.0,
@@ -980,8 +980,6 @@
           "cache_write_12h": 1.0
         }
       ],
-      "billing_mode": "tiered_expr",
-      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.367647 + c * 2.205882 + cr * 0.036765 + cc * 0.459559) : tier(\"long_context\", p * 0.735294 + c * 3.308824 + cr * 0.073529 + cc * 0.919118)",
       "billing_basis": {
         "input_cny": 2.5,
         "output_cny": 15,
@@ -1002,7 +1000,9 @@
             "cache_write_12h": 1.838235
           }
         ]
-      }
+      },
+      "billing_mode": "tiered_expr",
+      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.367647 + c * 2.205882 + cr * 0.036765 + cc * 0.459559) : tier(\"long_context\", p * 0.735294 + c * 3.308824 + cr * 0.073529 + cc * 0.919118)"
     },
     {
       "model_name": "gpt-5.6-sol",
@@ -1034,8 +1034,6 @@
           "cache_write_12h": 20.0
         }
       ],
-      "billing_mode": "tiered_expr",
-      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.735294 + c * 4.411765 + cr * 0.073529 + cc * 0.919118) : tier(\"long_context\", p * 1.470588 + c * 6.617647 + cr * 0.147059 + cc * 1.838235)",
       "billing_basis": {
         "input_cny": 5,
         "output_cny": 30,
@@ -1056,7 +1054,9 @@
             "cache_write_12h": 3.676471
           }
         ]
-      }
+      },
+      "billing_mode": "tiered_expr",
+      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.735294 + c * 4.411765 + cr * 0.073529 + cc * 0.919118) : tier(\"long_context\", p * 1.470588 + c * 6.617647 + cr * 0.147059 + cc * 1.838235)"
     },
     {
       "model_name": "gpt-5.6-terra",
@@ -1088,8 +1088,6 @@
           "cache_write_12h": 10.0
         }
       ],
-      "billing_mode": "tiered_expr",
-      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.294118 + c * 1.764706 + cr * 0.029412 + cc * 0.367647) : tier(\"long_context\", p * 0.588235 + c * 2.647059 + cr * 0.058824 + cc * 0.735294)",
       "billing_basis": {
         "input_cny": 2,
         "output_cny": 12,
@@ -1110,7 +1108,9 @@
             "cache_write_12h": 1.470588
           }
         ]
-      }
+      },
+      "billing_mode": "tiered_expr",
+      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.294118 + c * 1.764706 + cr * 0.029412 + cc * 0.367647) : tier(\"long_context\", p * 0.588235 + c * 2.647059 + cr * 0.058824 + cc * 0.735294)"
     },
     {
       "model_name": "gpt-6-astra",
@@ -1142,8 +1142,6 @@
           "cache_write_12h": 50.0
         }
       ],
-      "billing_mode": "tiered_expr",
-      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 1.470588 + c * 7.352941 + cr * 0.147059 + cc * 1.838235) : tier(\"long_context\", p * 2.941176 + c * 11.029412 + cr * 0.294118 + cc * 3.676471)",
       "billing_basis": {
         "input_cny": 10,
         "output_cny": 50,
@@ -1164,7 +1162,9 @@
             "cache_write_12h": 7.352941
           }
         ]
-      }
+      },
+      "billing_mode": "tiered_expr",
+      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 1.470588 + c * 7.352941 + cr * 0.147059 + cc * 1.838235) : tier(\"long_context\", p * 2.941176 + c * 11.029412 + cr * 0.294118 + cc * 3.676471)"
     },
     {
       "model_name": "gpt-6-luna",
@@ -1229,8 +1229,6 @@
           "cache_write_12h": 10.0
         }
       ],
-      "billing_mode": "tiered_expr",
-      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.294118 + c * 1.470588 + cr * 0.029412 + cc * 0.367647) : tier(\"long_context\", p * 0.588235 + c * 2.205882 + cr * 0.058824 + cc * 0.735294)",
       "billing_basis": {
         "input_cny": 2,
         "output_cny": 10,
@@ -1251,7 +1249,9 @@
             "cache_write_12h": 1.470588
           }
         ]
-      }
+      },
+      "billing_mode": "tiered_expr",
+      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.294118 + c * 1.470588 + cr * 0.029412 + cc * 0.367647) : tier(\"long_context\", p * 0.588235 + c * 2.205882 + cr * 0.058824 + cc * 0.735294)"
     },
     {
       "model_name": "gpt-6.1-sol",
@@ -1283,8 +1283,6 @@
           "cache_write_12h": 10.0
         }
       ],
-      "billing_mode": "tiered_expr",
-      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.294118 + c * 1.470588 + cr * 0.014706 + cc * 0.367647) : tier(\"long_context\", p * 0.588235 + c * 2.205882 + cr * 0.029412 + cc * 0.735294)",
       "billing_basis": {
         "input_cny": 2,
         "output_cny": 10,
@@ -1305,7 +1303,9 @@
             "cache_write_12h": 1.470588
           }
         ]
-      }
+      },
+      "billing_mode": "tiered_expr",
+      "billing_expr": "len <= 272000 ? tier(\"standard\", p * 0.294118 + c * 1.470588 + cr * 0.014706 + cc * 0.367647) : tier(\"long_context\", p * 0.588235 + c * 2.205882 + cr * 0.029412 + cc * 0.735294)"
     },
     {
       "model_name": "gpt-image-2.5-sunburst",
