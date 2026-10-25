@@ -191,6 +191,9 @@ export type MetadataSyncField =
   | 'context_length'
   | 'max_output_tokens'
   | 'is_free'
+  | 'lifecycle'
+  | 'release_date'
+  | 'knowledge_cutoff'
 export type MetadataSyncValues = {
   description: string
   icon: string
@@ -205,6 +208,9 @@ export type MetadataSyncValues = {
   context_length: number
   max_output_tokens: number
   is_free: boolean
+  lifecycle: string
+  release_date: string
+  knowledge_cutoff: string
 }
 export type MetadataSyncCandidate = {
   model_name: string

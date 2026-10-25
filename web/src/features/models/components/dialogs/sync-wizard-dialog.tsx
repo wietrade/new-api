@@ -64,6 +64,9 @@ const FIELD_LABELS: Record<MetadataSyncField, string> = {
   context_length: 'Context Length',
   max_output_tokens: 'Max output tokens',
   is_free: 'Free of charge',
+  lifecycle: 'Lifecycle',
+  release_date: 'Released',
+  knowledge_cutoff: 'Knowledge cutoff',
 }
 const REASON_LABELS = {
   create: 'New metadata',
