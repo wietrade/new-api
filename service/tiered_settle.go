@@ -29,6 +29,14 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 	// 所以这里在进入表达式之前统一钳制到非负。
 	p := max(float64(usage.PromptTokens), 0)
 	c := max(float64(usage.CompletionTokens), 0)
+	// Some gateways report reasoning tokens outside completion_tokens and bill
+	// for both (znbcode's Grok does: total = prompt + completion + reasoning).
+	// OpenAI's own contract folds reasoning into completion_tokens, so only add
+	// it when total_tokens proves it was not already counted.
+	if reasoning := max(float64(usage.CompletionTokenDetails.ReasoningTokens), 0); reasoning > 0 &&
+		float64(usage.TotalTokens) >= float64(usage.PromptTokens)+c+reasoning {
+		c += reasoning
+	}
 	cr := max(float64(usage.PromptTokensDetails.CachedTokens), 0)
 	cc5m := max(float64(usage.PromptTokensDetails.CacheCreationTokensTotal()), 0)
 	cc1h := float64(0)

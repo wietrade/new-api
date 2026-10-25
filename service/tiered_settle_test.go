@@ -1092,3 +1092,54 @@ func TestSamePriceCacheReadsRemainInInput(t *testing.T) {
 		})
 	}
 }
+
+// TestBuildTieredTokenParamsCountsSeparatelyReportedReasoning guards the Grok
+// case: some gateways keep reasoning out of completion_tokens while billing for
+// it, so the expression must see the full output. OpenAI's own contract folds
+// reasoning into completion_tokens and must not be double counted.
+func TestBuildTieredTokenParamsCountsSeparatelyReportedReasoning(t *testing.T) {
+	cases := []struct {
+		name string
+		usg  dto.Usage
+		want float64
+	}{
+		{
+			// znbcode grok-4.5: 504 + 46 + 732 = 1282, reasoning billed separately.
+			name: "reasoning reported outside completion",
+			usg: dto.Usage{
+				PromptTokens: 504, CompletionTokens: 46, TotalTokens: 1282,
+				CompletionTokenDetails: dto.OutputTokenDetails{ReasoningTokens: 732},
+			},
+			want: 778,
+		},
+		{
+			// OpenAI style: reasoning already inside completion_tokens.
+			name: "reasoning already inside completion",
+			usg: dto.Usage{
+				PromptTokens: 8174, CompletionTokens: 22, TotalTokens: 8196,
+				CompletionTokenDetails: dto.OutputTokenDetails{ReasoningTokens: 15},
+			},
+			want: 22,
+		},
+		{
+			name: "no reasoning",
+			usg:  dto.Usage{PromptTokens: 100, CompletionTokens: 10, TotalTokens: 110},
+			want: 10,
+		},
+		{
+			// Missing total_tokens: stay conservative and keep completion only.
+			name: "total tokens missing",
+			usg: dto.Usage{
+				PromptTokens: 100, CompletionTokens: 10,
+				CompletionTokenDetails: dto.OutputTokenDetails{ReasoningTokens: 500},
+			},
+			want: 10,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			params := BuildTieredTokenParams(&tc.usg, false, billingexpr.UsedVars(`tier("b", p * 1 + c * 2)`))
+			assert.Equal(t, tc.want, params.C)
+		})
+	}
+}
