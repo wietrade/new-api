@@ -470,7 +470,7 @@ def attach_expression(row):
     return row
 
 
-def official_price_row(record, official):
+def official_price_row(record, official, basis=None):
     """Turn one ``pricing.official.json`` row into a ``pricing.json`` row."""
     name = str(record.get("model_name", ""))
     row = {
@@ -491,6 +491,11 @@ def official_price_row(record, official):
         value = official.get(field)
         if value is not None:
             row[field] = value
+    # The vendor list price is a global baseline. What we actually pay depends on
+    # the upstream channel, so the settlement basis arrives from a separate
+    # document instead of being written into the official price file.
+    if basis:
+        row["billing_basis"] = basis
     return attach_expression(row)
 
 
@@ -508,13 +513,44 @@ def has_usable_price(official):
     return any(official.get(key) is not None for key in ("input", "output", "per_image"))
 
 
-def price_records(existing, index, official=None):
+def basis_for(name, basis):
+    """Look up the settlement basis for one published model name."""
+    if not basis:
+        return None
+    return basis.get(normalize_key(str(name)))
+
+
+def load_billing_basis(path):
+    """Load per-model upstream cost numbers from the settlement document.
+
+    Keys are normalized so aliases resolve to the same entry. A missing file is
+    not an error: it only means every row bills straight from its list price.
+    """
+    try:
+        with open(path, encoding="utf-8") as handle:
+            doc = json.load(handle)
+    except FileNotFoundError:
+        return {}
+    data = doc.get("data") if isinstance(doc, dict) else None
+    if not isinstance(data, dict):
+        return {}
+    return {
+        normalize_key(name): value
+        for name, value in data.items()
+        if isinstance(value, dict)
+    }
+
+
+def price_records(existing, index, official=None, basis=None):
     """Build the pricing.json rows for models we actually publish.
 
     Vendor official list prices win over aggregator rows: a reseller price must
     never silently replace the published list price. Models without an official
     entry keep the aggregator reference price, so coverage stays complete and
     every row still says where its number came from (``price_kind``).
+
+    ``basis`` carries per-model upstream cost numbers from a separate document.
+    It only feeds ``billing_expr``; the list price fields stay vendor-official.
 
     One row per **published model name**: aliases (``claude-haiku-5.5`` vs
     ``claude-haiku-5-5``) each get their own row, because price lookup is by
@@ -531,7 +567,7 @@ def price_records(existing, index, official=None):
         listed = official.get(key)
         if listed is not None and has_usable_price(listed):
             seen.add(name)
-            rows.append(official_price_row(record, listed))
+            rows.append(official_price_row(record, listed, basis_for(name, basis)))
             continue
         candidates = index.get(key) or []
         model = pick_incoming(candidates, name)
@@ -555,6 +591,9 @@ def price_records(existing, index, official=None):
             value = model.price.get(component)
             if value is not None:
                 row[component] = value
+        entry = basis_for(name, basis)
+        if entry:
+            row["billing_basis"] = entry
         rows.append(attach_expression(row))
 
     rows.sort(key=lambda item: (item["vendor_name"], item["model_name"]))

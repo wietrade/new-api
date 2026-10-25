@@ -219,6 +219,42 @@ def image_meter_expr(row):
     return f'tier("image", fixed({number(default["price"])})) * image_count', skipped
 
 
+# Fields ``billing_basis`` may override. A reseller buys below (or above) the
+# vendor list price, so the engine must bill the settlement numbers while the
+# vendor list price stays in the row for audit and margin comparison.
+BASIS_FIELDS = (
+    "input",
+    "output",
+    "output_text",
+    "output_image",
+    "cache_read",
+    "cache_read_image",
+    "cache_write",
+    "cache_write_1h",
+    "cache_write_12h",
+    "input_image",
+    "tiers",
+    "meters",
+    "per_image",
+)
+
+
+def apply_billing_basis(row):
+    """Overlay ``billing_basis`` onto the price fields the engine bills with.
+
+    Rows without a basis are returned unchanged, so vendor-official pricing keeps
+    its existing behaviour.
+    """
+    basis = row.get("billing_basis")
+    if not isinstance(basis, dict):
+        return row
+    merged = dict(row)
+    for field in BASIS_FIELDS:
+        if basis.get(field) is not None:
+            merged[field] = basis[field]
+    return merged
+
+
 def build(row):
     """Return ``(expression, unexpressible_items)`` for one price row.
 
@@ -228,6 +264,7 @@ def build(row):
     needed. ``meters`` only describes quantities the engine cannot bill, and is
     reported rather than turned into a wrong expression.
     """
+    row = apply_billing_basis(row)
     if row.get("price_kind") == "free":
         return 'tier("free", p * 0 + c * 0)', []
 

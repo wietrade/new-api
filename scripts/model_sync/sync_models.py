@@ -146,6 +146,7 @@ def main(argv=None):
     vendors_path = os.path.join(api_dir, "newapi", "vendors.json")
     pricing_path = os.path.join(api_dir, "newapi", "pricing.json")
     official_pricing_path = os.path.join(api_dir, "newapi", "pricing.official.json")
+    billing_basis_path = os.path.join(api_dir, "newapi", "billing_basis.json")
 
     if not os.path.exists(models_path):
         print("error: %s not found (wrong --root?)" % models_path, file=sys.stderr)
@@ -286,7 +287,8 @@ def main(argv=None):
 
     if args.only in ("pricing", "all"):
         official_prices = merge.load_official_prices(official_pricing_path)
-        rows = merge.price_records(models, index, official_prices)
+        billing_basis = merge.load_billing_basis(billing_basis_path)
+        rows = merge.price_records(models, index, official_prices, billing_basis)
         pricing_envelope = {
             "success": True,
             "message": "ok",
