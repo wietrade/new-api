@@ -7451,6 +7451,8 @@
     "Not announced": "官方未公布",
     "Reasoning Tokens": "思考 Token",
     "Billed Output": "计费输出",
-    "Billed Input": "计费输入"
+    "Billed Input": "计费输入",
+    "Force Upstream Stream": "强流式上游",
+    "Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE": "客户端要单次响应时也向上游发送 stream=true，再把流式分片合并成一个 JSON 返回。适用于只返回 SSE 的上游"
   }
 }

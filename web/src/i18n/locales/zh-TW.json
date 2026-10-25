@@ -7372,6 +7372,8 @@
     "Retired": "已關停",
     "Reasoning Tokens": "思考 Token",
     "Billed Output": "計費輸出",
-    "Billed Input": "計費輸入"
+    "Billed Input": "計費輸入",
+    "Force Upstream Stream": "強流式上游",
+    "Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE": "客戶端要單次回應時也向上游發送 stream=true，再把串流分片合并成一個 JSON 返回。適用於只返回 SSE 的上游"
   }
 }

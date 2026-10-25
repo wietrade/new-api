@@ -7451,6 +7451,8 @@
     "Not announced": "Not announced",
     "Reasoning Tokens": "Reasoning Tokens",
     "Billed Output": "Billed Output",
-    "Billed Input": "Billed Input"
+    "Billed Input": "Billed Input",
+    "Force Upstream Stream": "Force Upstream Stream",
+    "Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE": "Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE"
   }
 }

@@ -303,6 +303,7 @@ const SENSITIVE_FORM_FIELDS = [
   'http2_connection_shards',
   'tls_insecure_skip_verify',
   'pass_through_body_enabled',
+  'force_stream_upstream',
   'responses_websocket_enabled',
   'system_prompt',
   'system_prompt_override',
@@ -1911,6 +1912,32 @@ export function ChannelMutateDrawer({
             <FormLabel>{t('Thinking to Content')}</FormLabel>
             <FormDescription>
               {t('Convert reasoning_content to <think> tag in content')}
+            </FormDescription>
+          </div>
+          <FormControl>
+            <Switch
+              disabled={sensitiveLocked}
+              checked={field.value}
+              onCheckedChange={field.onChange}
+            />
+          </FormControl>
+        </FormItem>
+      )}
+    />
+  )
+
+  const forceStreamFields = (
+    <FormField
+      control={form.control}
+      name='force_stream_upstream'
+      render={({ field }) => (
+        <FormItem className='flex items-center justify-between px-4 py-3'>
+          <div className='space-y-0.5'>
+            <FormLabel>{t('Force Upstream Stream')}</FormLabel>
+            <FormDescription>
+              {t(
+                'Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE'
+              )}
             </FormDescription>
           </div>
           <FormControl>
@@ -4758,6 +4785,7 @@ export function ChannelMutateDrawer({
                 {formatFields}
                 {ollamaOpenAIChatFields}
                 {thinkingFields}
+                {forceStreamFields}
                 {currentType !== CHANNEL_TYPE_ADVANCED_CUSTOM &&
                   passthroughFields}
                 {systemPromptFields}
