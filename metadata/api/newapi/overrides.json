@@ -133,6 +133,215 @@
         "lifecycle": "ga",
         "knowledge_cutoff": "2026-06"
       }
+    },
+    {
+      "model_name": "gemini-4-argon",
+      "note": "第二轮官方核实（https://ai.google.dev/gemini-api/docs/models，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "context_length": 1048576
+      }
+    },
+    {
+      "model_name": "gemini-3.1-flash-image",
+      "note": "第二轮官方核实（https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-image，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga"
+      }
+    },
+    {
+      "model_name": "grok-4.7",
+      "note": "第二轮官方核实（https://docs.x.ai/developers/grok-4-7，2026-10-25 复核）。",
+      "fields": {
+        "context_length": 500000,
+        "knowledge_cutoff": "2026-05"
+      }
+    },
+    {
+      "model_name": "deepseek-flash",
+      "note": "第二轮官方核实（https://api-docs.deepseek.com/zh-cn/quick_start/pricing，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-09-10",
+        "context_length": 1000000,
+        "max_output_tokens": 384000
+      }
+    },
+    {
+      "model_name": "deepseek-v4-pro",
+      "note": "第二轮官方核实（https://api-docs.deepseek.com/zh-cn/updates，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-08-13",
+        "context_length": 1000000,
+        "max_output_tokens": 384000
+      }
+    },
+    {
+      "model_name": "deepseek-v4.1-flash-1017",
+      "note": "第二轮官方核实（https://api-docs.deepseek.com/zh-cn/updates，2026-10-25 复核）。 与 deepseek-flash 同为 DeepSeek-V4.1-Flash-1017 的规格：上下文 1M、最大输出 384K（api-docs.deepseek.com/quick_start/pricing）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-10-17",
+        "context_length": 1000000,
+        "max_output_tokens": 384000
+      }
+    },
+    {
+      "model_name": "kimi-k3",
+      "note": "第二轮官方核实（https://platform.kimi.com/docs/changelog/index.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "context_length": 1048576
+      }
+    },
+    {
+      "model_name": "glm-5",
+      "note": "第二轮官方核实（https://docs.bigmodel.cn/cn/update/new-releases.md，2026-10-25 复核）。",
+      "fields": {
+        "release_date": "2026-02-12"
+      }
+    },
+    {
+      "model_name": "MiniMax-M3",
+      "note": "第二轮官方核实（https://platform.minimaxi.com/docs/faq/models.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-06-01"
+      }
+    },
+    {
+      "model_name": "minimax-m3.1-flash",
+      "note": "第二轮官方核实（https://platform.minimaxi.com/docs/faq/models.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-10-19"
+      }
+    },
+    {
+      "model_name": "qwen3.8-flash",
+      "note": "第二轮官方核实（https://help.aliyun.com/zh/model-studio/newly-released-models，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-08-26"
+      }
+    },
+    {
+      "model_name": "gpt-oss-120b",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-oss-120b，2026-10-25 复核）。",
+      "fields": {
+        "context_length": 131072,
+        "max_output_tokens": 131072,
+        "knowledge_cutoff": "2024-06"
+      }
+    },
+    {
+      "model_name": "gpt-5.4",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-5.4.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-03-05",
+        "knowledge_cutoff": "2025-08",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-5.5",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-5.5.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-04-23",
+        "knowledge_cutoff": "2025-12",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-5.6-luna",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-5.6-luna.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-02",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-5.6-sol",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-5.6-sol.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-02",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-5.6-terra",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-5.6-terra.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-02",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-6-luna",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-6-luna.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-05",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-6-sol",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-6-sol.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-04",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-6-astra",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-6-astra.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-04",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-6.1-sol",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-6.1-sol.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "knowledge_cutoff": "2026-04",
+        "context_length": 1050000,
+        "max_output_tokens": 128000
+      }
+    },
+    {
+      "model_name": "gpt-image-2.5-sunburst",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-09-08"
+      }
+    },
+    {
+      "model_name": "gpt-image-2.5-sunburst-2026-09-08",
+      "note": "第二轮官方核实（https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst.md，2026-10-25 复核）。",
+      "fields": {
+        "lifecycle": "ga",
+        "release_date": "2026-09-08"
+      }
     }
   ],
   "excluded": [
