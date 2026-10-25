@@ -763,6 +763,108 @@
       "knowledge_cutoff": ""
     },
     {
+      "model_name": "gemini-4-argon-high",
+      "vendor_name": "Google",
+      "description": "Gemini 4 Argon（high 推理档）",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit",
+        "cache_explicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file",
+        "audio",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 943718,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "2026-10-13",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gemini-4-argon-low",
+      "vendor_name": "Google",
+      "description": "Gemini 4 Argon（low 推理档）",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit",
+        "cache_explicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file",
+        "audio",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 943718,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "2026-10-13",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gemini-4-argon-medium",
+      "vendor_name": "Google",
+      "description": "Gemini 4 Argon（medium 推理档）",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,文件,多模态",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "web_search",
+        "cache_implicit",
+        "cache_explicit"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "file",
+        "audio",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 943718,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "2026-10-13",
+      "knowledge_cutoff": ""
+    },
+    {
       "model_name": "gemma-4-26b-a4b-it:free",
       "vendor_name": "Google",
       "description": "Gemma 4 26B A4B IT is an instruction-tuned Mixture-of-Experts (MoE) model from Google DeepMind. Despite 25.2B total parameters, only 3.8B activate per token during inference — delivering near-31B qual",
@@ -910,9 +1012,9 @@
       "knowledge_cutoff": ""
     },
     {
-      "model_name": "kimi-k3.1-pro",
+      "model_name": "kimi-k3",
       "vendor_name": "Moonshot AI",
-      "description": "kimi-k3.1-pro（经 znbcode 渠道接入）",
+      "description": "Kimi K3 多模态模型，1M 上下文，可切换推理强度",
       "icon": "Moonshot",
       "name_rule": 0,
       "status": 1,
@@ -940,9 +1042,9 @@
       "knowledge_cutoff": ""
     },
     {
-      "model_name": "kimi-k3",
+      "model_name": "kimi-k3.1-pro",
       "vendor_name": "Moonshot AI",
-      "description": "Kimi K3 多模态模型，1M 上下文，可切换推理强度",
+      "description": "kimi-k3.1-pro（经 znbcode 渠道接入）",
       "icon": "Moonshot",
       "name_rule": 0,
       "status": 1,
@@ -1647,6 +1749,62 @@
       "knowledge_cutoff": ""
     },
     {
+      "model_name": "glm-5.3",
+      "vendor_name": "Z.AI",
+      "description": "glm-5.3（经 znbcode 渠道接入）",
+      "icon": "ZAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,平台命名",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 131072,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "",
+      "release_date": "2026-09-23",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "glm-5.3-flash",
+      "vendor_name": "Z.AI",
+      "description": "glm-5.3-flash（经 znbcode 渠道接入）",
+      "icon": "ZAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "推理,工具,平台命名",
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "structured_output",
+        "cache_implicit"
+      ],
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "context_length": 1000000,
+      "max_output_tokens": 131072,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "",
+      "release_date": "2026-09-23",
+      "knowledge_cutoff": ""
+    },
+    {
       "model_name": "glm-5.3-prime",
       "vendor_name": "Z.AI",
       "description": "GLM-5.3-Prime is the high-speed variant of Z.ai's GLM-5.3, inheriting its full capabilities while delivering 1.5–2× the output throughput through inference acceleration. It supports text input and out",
@@ -1766,62 +1924,6 @@
       "lifecycle": "ga",
       "release_date": "",
       "knowledge_cutoff": "2026-05"
-    },
-    {
-      "model_name": "glm-5.3",
-      "vendor_name": "Z.AI",
-      "description": "glm-5.3（经 znbcode 渠道接入）",
-      "icon": "ZAI",
-      "name_rule": 0,
-      "status": 1,
-      "tags": "推理,工具,平台命名",
-      "capabilities": [
-        "reasoning",
-        "tools",
-        "structured_output",
-        "cache_implicit"
-      ],
-      "input_modalities": [
-        "text"
-      ],
-      "output_modalities": [
-        "text"
-      ],
-      "context_length": 1000000,
-      "max_output_tokens": 131072,
-      "is_free": false,
-      "endpoints": null,
-      "lifecycle": "",
-      "release_date": "2026-09-23",
-      "knowledge_cutoff": ""
-    },
-    {
-      "model_name": "glm-5.3-flash",
-      "vendor_name": "Z.AI",
-      "description": "glm-5.3-flash（经 znbcode 渠道接入）",
-      "icon": "ZAI",
-      "name_rule": 0,
-      "status": 1,
-      "tags": "推理,工具,平台命名",
-      "capabilities": [
-        "reasoning",
-        "tools",
-        "structured_output",
-        "cache_implicit"
-      ],
-      "input_modalities": [
-        "text"
-      ],
-      "output_modalities": [
-        "text"
-      ],
-      "context_length": 1000000,
-      "max_output_tokens": 131072,
-      "is_free": false,
-      "endpoints": null,
-      "lifecycle": "",
-      "release_date": "2026-09-23",
-      "knowledge_cutoff": ""
     }
   ]
 }
