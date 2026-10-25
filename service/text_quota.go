@@ -527,6 +527,18 @@ func PostTextConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, us
 
 	}
 
+	// reasoning_tokens: some gateways (znbcode's Grok) report thinking tokens in
+	// completion_tokens_details without folding them into completion_tokens, yet
+	// bill for both. Record the raw count so a log reader can reconcile the
+	// charged amount with the upstream invoice; the flag marks the case where the
+	// expression charged completion_tokens + reasoning_tokens together.
+	if originUsage != nil && originUsage.CompletionTokenDetails.ReasoningTokens > 0 {
+		other.SetPublic("reasoning_tokens", originUsage.CompletionTokenDetails.ReasoningTokens)
+		if originUsage.TotalTokens >= originUsage.PromptTokens+originUsage.CompletionTokens+originUsage.CompletionTokenDetails.ReasoningTokens {
+			other.SetPublic("reasoning_billed_with_completion", true)
+		}
+	}
+
 	attachQuotaSaturation(ctx, relayInfo, other)
 
 	model.RecordConsumeLog(ctx, relayInfo.UserId, model.RecordConsumeLogParams{
