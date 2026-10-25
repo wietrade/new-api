@@ -39,12 +39,12 @@ func filterPricingByUsableGroups(pricing []model.Pricing, usableGroup map[string
 // lifecycleFilterStates 是 /api/pricing?lifecycle= 允许的取值。
 // unknown 代表元数据里 lifecycle 为空（官方未声明），与 ga 区分开。
 var lifecycleFilterStates = map[string]bool{
-	"ga":          true,
-	"preview":     true,
-	"legacy":      true,
-	"deprecated":  true,
-	"retired":     true,
-	"unknown":     true,
+	"ga":         true,
+	"preview":    true,
+	"legacy":     true,
+	"deprecated": true,
+	"retired":    true,
+	"unknown":    true,
 }
 
 // parseLifecycleFilter 解析逗号分隔的 lifecycle 查询参数。
