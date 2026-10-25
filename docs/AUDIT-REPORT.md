@@ -1,5 +1,9 @@
 # new-api (NowHub) 代码审计报告
 
+> **2026-10-26 变更**：模型元数据与价格资料库已拆到独立仓库 `wietrade/model-data`，
+> 本仓库只剩落库侧（`scripts/ops/apply_billing.py`）。本文中 `metadata/`、`scripts/model_sync/`
+> 的描述保留的是**审计当时（2026-10-25）的状态**，仅供参考。
+>
 > 审计日期：2026-10-25
 > 审计基线：`J:\hubapi\new-api` 工作区当前 HEAD（`0490d19 chore(ops): 修正 cron 脚本可执行位`）
 > 审计方法：5 路并行深审（数据库 schema / 计费额度 / 渠道中继 / 安全认证 / git 历史+元数据脚本），全部基于真实源码逐行核实；git 提交段按 doubao-coding-review-code 方法学执行，只报"新引入、可触发、证据闭合"的缺陷。

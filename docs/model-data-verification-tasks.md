@@ -2,7 +2,7 @@
 
 > 用途：把 NowHub 模型元数据/价格数据中**尚未与厂商官方文档对齐**的项，交给外部调研方（豆包）逐条核实。
 > 核实结果由仓库维护者写入 model-data 仓库的 `api/newapi/pricing.official.json` 与 `api/newapi/overrides.json`，
-> 再经 `python -m scripts.model_sync.validate` 校验后发布。
+> 再经 `python -m tools.model_sync.validate` 校验后发布。
 > 数据口径：价格单位一律 **USD / 每 1M tokens**；token 上限指**输入**上限。
 
 ## 0. 通用规则（必须遵守）
