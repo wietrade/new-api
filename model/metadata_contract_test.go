@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -237,14 +238,74 @@ func stringList(value any) []string {
 	return out
 }
 
+// 语言包允许翻译展示文本（description / tags），但事实字段必须与基准一致。
+// 早期这里要求整文件逐字节相同，与「语言包是翻译产物」的设计冲突，必然为红。
 func TestMetadataI18nCopiesMatchCanonical(t *testing.T) {
-	for _, file := range []string{"models.json", "vendors.json"} {
-		canonical := readOrSkip(t, filepath.Join(metadataDir, file))
-		for _, locale := range []string{"zh", "en"} {
-			path := filepath.Join(metadataI18nDir, locale, "newapi", file)
-			copy := readOrSkip(t, path)
-			if canonical != copy {
-				t.Errorf("%s is out of sync with %s", path, filepath.Join(metadataDir, file))
+	factual := []string{"lifecycle", "release_date", "knowledge_cutoff", "context_length", "max_output_tokens"}
+	models := loadMetadata(t, filepath.Join(metadataDir, "models.json"))
+	canonical := make(map[string]map[string]any, len(models.Data))
+	for _, row := range models.Data {
+		if name, ok := row["model_name"].(string); ok {
+			canonical[name] = row
+		}
+	}
+	if len(canonical) == 0 {
+		t.Skip("canonical metadata is empty")
+	}
+
+	for _, locale := range []string{"zh", "en"} {
+		path := filepath.Join(metadataI18nDir, locale, "newapi", "models.json")
+		local := loadMetadata(t, path)
+		seen := map[string]bool{}
+		for _, row := range local.Data {
+			name, _ := row["model_name"].(string)
+			seen[name] = true
+			source, ok := canonical[name]
+			if !ok {
+				t.Errorf("%s: 多出模型 %q", path, name)
+				continue
+			}
+			for _, field := range factual {
+				if fmt.Sprint(row[field]) != fmt.Sprint(source[field]) {
+					t.Errorf("%s: %s.%s = %v，基准是 %v", path, name, field, row[field], source[field])
+				}
+			}
+		}
+		for name := range canonical {
+			if !seen[name] {
+				t.Errorf("%s: 缺少模型 %q", path, name)
+			}
+		}
+	}
+
+	// 供应商语言包只校验名称集合，其余字段允许本地化。
+	vendors := loadMetadata(t, filepath.Join(metadataDir, "vendors.json"))
+	wantVendors := map[string]bool{}
+	for _, row := range vendors.Data {
+		if name, ok := row["name"].(string); ok {
+			wantVendors[name] = true
+		}
+	}
+	if len(wantVendors) == 0 {
+		return
+	}
+	for _, locale := range []string{"zh", "en"} {
+		path := filepath.Join(metadataI18nDir, locale, "newapi", "vendors.json")
+		local := loadMetadata(t, path)
+		got := map[string]bool{}
+		for _, row := range local.Data {
+			if name, ok := row["name"].(string); ok {
+				got[name] = true
+			}
+		}
+		for name := range wantVendors {
+			if !got[name] {
+				t.Errorf("%s: 缺少供应商 %q", path, name)
+			}
+		}
+		for name := range got {
+			if !wantVendors[name] {
+				t.Errorf("%s: 多出供应商 %q", path, name)
 			}
 		}
 	}
