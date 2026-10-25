@@ -1822,6 +1822,219 @@
       "lifecycle": "ga",
       "release_date": "",
       "knowledge_cutoff": "2026-05"
+    },
+    {
+      "model_name": "gpt-image-2",
+      "vendor_name": "OpenAI",
+      "description": "gpt-image-2 image generation model (served through znbcode, billed per image)",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation",
+        "vision"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gpt-image-2.5",
+      "vendor_name": "OpenAI",
+      "description": "gpt-image-2.5 image generation model (served through znbcode, billed per image)",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation",
+        "vision"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gpt-image-2.5-flare",
+      "vendor_name": "OpenAI",
+      "description": "gpt-image-2.5-flare image generation model (served through znbcode, billed per image)",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation",
+        "vision"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gpt-image-medium",
+      "vendor_name": "OpenAI",
+      "description": "gpt-image-medium image generation model (served through znbcode, billed per image)",
+      "icon": "OpenAI",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation",
+        "vision"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "grok-imagine-image",
+      "vendor_name": "xAI",
+      "description": "grok-imagine-image image generation model (served through znbcode, billed per image)",
+      "icon": "Grok",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "grok-imagine-image-2.0",
+      "vendor_name": "xAI",
+      "description": "grok-imagine-image-2.0 image generation model (served through znbcode, billed per image)",
+      "icon": "Grok",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "grok-imagine-image-quality",
+      "vendor_name": "xAI",
+      "description": "grok-imagine-image-quality image generation model (served through znbcode, billed per image)",
+      "icon": "Grok",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
+    },
+    {
+      "model_name": "gemini-nano-banana-2.1",
+      "vendor_name": "Google",
+      "description": "Gemini Nano Banana 2.1 image generation model (served through znbcode, native Gemini protocol)",
+      "icon": "Gemini.Color",
+      "name_rule": 0,
+      "status": 1,
+      "tags": "图像生成",
+      "capabilities": [
+        "image_generation",
+        "vision"
+      ],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "image"
+      ],
+      "context_length": 0,
+      "max_output_tokens": 0,
+      "is_free": false,
+      "endpoints": null,
+      "lifecycle": "ga",
+      "release_date": "",
+      "knowledge_cutoff": ""
     }
   ]
 }
