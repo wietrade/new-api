@@ -10,6 +10,7 @@ import (
 	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
+	"github.com/QuantumNous/new-api/relay/channel/openai"
 	relayconstant "github.com/QuantumNous/new-api/relay/constant"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/relaykit/dto"
@@ -51,6 +52,15 @@ func TextHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types
 	// 判断用户是否需要返回使用情况
 	if request.StreamOptions != nil {
 		includeUsage = request.StreamOptions.IncludeUsage
+	}
+
+	// 部分上游（如 znbcode 的 kimi-k3.1-pro）无论客户端要不要流式都只回 SSE。
+	// 这类渠道开启 force_stream_upstream 后，上游按流式请求，响应在下方聚合回
+	// 单个 JSON 对象。客户端意图由 ClientWantsStream 保留，不能看 IsStream。
+	aggregateUpstreamStream := info.ChannelSetting.ForceStreamUpstream && !info.ClientWantsStream
+	if aggregateUpstreamStream {
+		request.Stream = common.GetPointer(true)
+		includeUsage = true
 	}
 
 	// 如果不支持StreamOptions，将StreamOptions设置为nil
@@ -157,22 +167,41 @@ func TextHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types
 
 	statusCodeMappingStr := c.GetString("status_code_mapping")
 
+	var usage any
+	aggregated := false
+
 	if resp != nil {
 		httpResp = resp.(*http.Response)
-		info.IsStream = info.IsStream || strings.HasPrefix(httpResp.Header.Get("Content-Type"), "text/event-stream")
-		if httpResp.StatusCode != http.StatusOK {
-			newApiErr := service.RelayErrorHandler(c.Request.Context(), httpResp, false)
+		// Opted-in channels answer a non-stream request from an upstream SSE body:
+		// rebuild the single JSON object here instead of forwarding frames, then fall
+		// through to the normal settlement path.
+		if aggregateUpstreamStream && strings.HasPrefix(strings.ToLower(httpResp.Header.Get("Content-Type")), "text/event-stream") {
+			aggregatedUsage, aggregateErr := openai.AggregateStreamToTextResponse(c, httpResp, info)
+			if aggregateErr != nil {
+				return aggregateErr
+			}
+			usage = aggregatedUsage
+			aggregated = true
+		}
+		if !aggregated {
+			info.IsStream = info.IsStream || strings.HasPrefix(httpResp.Header.Get("Content-Type"), "text/event-stream")
+			if httpResp.StatusCode != http.StatusOK {
+				newApiErr := service.RelayErrorHandler(c.Request.Context(), httpResp, false)
+				// reset status code 重置状态码
+				service.ResetStatusCode(newApiErr, statusCodeMappingStr)
+				return newApiErr
+			}
+		}
+	}
+
+	if !aggregated {
+		var newApiErr *types.NewAPIError
+		usage, newApiErr = adaptor.DoResponse(c, httpResp, info)
+		if newApiErr != nil {
 			// reset status code 重置状态码
 			service.ResetStatusCode(newApiErr, statusCodeMappingStr)
 			return newApiErr
 		}
-	}
-
-	usage, newApiErr := adaptor.DoResponse(c, httpResp, info)
-	if newApiErr != nil {
-		// reset status code 重置状态码
-		service.ResetStatusCode(newApiErr, statusCodeMappingStr)
-		return newApiErr
 	}
 
 	var containAudioTokens = usage.(*dto.Usage).CompletionTokenDetails.AudioTokens > 0 || usage.(*dto.Usage).PromptTokensDetails.AudioTokens > 0

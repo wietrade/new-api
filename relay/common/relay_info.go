@@ -93,6 +93,10 @@ type RelayInfo struct {
 	isFirstResponse   bool
 	//SendLastReasoningResponse bool
 	IsStream               bool
+	// ClientWantsStream keeps the caller's original intent. IsStream may later be
+	// flipped by an upstream response header or by a channel that forces streaming;
+	// response shaping must use this value instead.
+	ClientWantsStream      bool
 	IsGeminiBatchEmbedding bool
 	IsPlayground           bool
 	UsePrice               bool
@@ -639,6 +643,7 @@ func genBaseRelayInfo(c *gin.Context, request dto.Request) *RelayInfo {
 		RequestURLPath:  c.Request.URL.String(),
 		RequestHeaders:  cloneRequestHeaders(c),
 		IsStream:        isStream,
+		ClientWantsStream: isStream,
 
 		StartTime:         startTime,
 		FirstResponseTime: startTime.Add(-time.Second),

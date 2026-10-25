@@ -17,6 +17,10 @@ type ChannelSettings struct {
 	ThinkingToContent         bool   `json:"thinking_to_content,omitempty"`
 	Proxy                     string `json:"proxy"`
 	PassThroughBodyEnabled    bool   `json:"pass_through_body_enabled,omitempty"`
+	// ForceStreamUpstream sends stream=true upstream even when the client asked for a
+	// single JSON object, then aggregates the SSE frames back into that object. Needed
+	// by gateways that only ever answer with text/event-stream.
+	ForceStreamUpstream       bool   `json:"force_stream_upstream,omitempty"`
 	ResponsesWebSocketEnabled bool   `json:"responses_websocket_enabled,omitempty"`
 	SystemPrompt              string `json:"system_prompt,omitempty"`
 	SystemPromptOverride      bool   `json:"system_prompt_override,omitempty"`
