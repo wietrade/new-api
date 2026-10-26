@@ -293,6 +293,9 @@ export function evalExprLocally(
 ): EvalResult {
   if (!exprStr.trim()) return { cost: 0, matchedTier: '', error: null }
   const result = evaluateBillingExpression(exprStr, {
+    // 估算器没有真实请求：给一个空 body，`param()` / `header()` 取不到值时
+    // 按「未命中」分支估算，而不是直接抛 `missing_context: request body`。
+    request: { body: {} },
     ...context,
     tokens: {
       ...buildEstimatorTokens(

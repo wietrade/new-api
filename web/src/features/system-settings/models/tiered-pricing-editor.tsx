@@ -867,18 +867,27 @@ function CostEstimator({ effectiveExpr, fullExpr, currency }: EstimatorProps) {
             {t('Expression error')}: {result.error}
           </span>
         ) : (
-          <div className='flex items-center gap-2'>
-            <span className='font-medium'>
-              {t('Estimated cost')}:{' '}
-              {formatPricingAmount(result.cost / 1_000_000, currency)}
-              {result.billingUnit === 'request' && `/${t('request')}`}
-            </span>
-            {result.matchedTier && (
-              <Badge variant='outline' className='text-xs'>
-                {t('Hit tier')}: {result.matchedTier}
-              </Badge>
+          <>
+            <div className='flex items-center gap-2'>
+              <span className='font-medium'>
+                {t('Estimated cost')}:{' '}
+                {formatPricingAmount(result.cost / 1_000_000, currency)}
+                {result.billingUnit === 'request' && `/${t('request')}`}
+              </span>
+              {result.matchedTier && (
+                <Badge variant='outline' className='text-xs'>
+                  {t('Hit tier')}: {result.matchedTier}
+                </Badge>
+              )}
+            </div>
+            {/\b(param|header)\s*\(/.test(effectiveExpr) && (
+              <p className='text-muted-foreground mt-1 text-xs'>
+                {t(
+                  'The estimator sees no request parameters or headers, so those branches fall through. Use request simulation to test them.'
+                )}
+              </p>
             )}
-          </div>
+          </>
         )}
       </div>
       <RequestSimulation

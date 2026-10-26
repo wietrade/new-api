@@ -26,6 +26,7 @@
     "Price per text": "Price per text",
     "Price per video": "Price per video",
     "text": "text",
+    "The estimator sees no request parameters or headers, so those branches fall through. Use request simulation to test them.": "The estimator sees no request parameters or headers, so those branches fall through. Use request simulation to test them.",
     "video": "video",
     "，": ", ",
     ", and": ", и",

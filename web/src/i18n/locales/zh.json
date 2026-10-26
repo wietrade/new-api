@@ -26,6 +26,7 @@
     "Price per text": "每段文本价格",
     "Price per video": "每个视频价格",
     "text": "文本",
+    "The estimator sees no request parameters or headers, so those branches fall through. Use request simulation to test them.": "估算器没有请求参数和请求头，依赖它们的条件会走未命中分支；可用下方「请求模拟」验证。",
     "video": "视频",
     "，": "，",
     ", and": "，和",

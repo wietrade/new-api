@@ -95,6 +95,18 @@ test('estimates long-lived cache writes at their own price, at the cc price fall
     evalExprLocally(source, 1000, 100, { ...tokens, cacheCreate12hTokens: 950 })
   ).toMatchObject({ cost: 80700, matchedTier: 'long' })
 
+  // 估算器没有真实请求：param()/header() 不能抛 missing_context，按未命中分支算
+  const paramExpr =
+    'param("size") == "1024x1024" ? tier("image_2", fixed(0.073529)) * image_count : tier("image", fixed(0.101103)) * image_count'
+  expect(evalExprLocally(paramExpr, 0, 0, tokens)).toMatchObject({
+    error: null,
+    matchedTier: 'image',
+  })
+  expect(evalExprLocally('header("x-fast") == "1" ? tier("f", fixed(2)) : tier("s", fixed(1))', 0, 0, tokens)).toMatchObject({
+    error: null,
+    matchedTier: 's',
+  })
+
   const ccOnly = 'tier("base", p * 10 + c * 50 + cr * 1 + cc * 12.5)'
   const twelveHours = { ...tokens, cacheCreate12hTokens: 1000 }
   const oneHour = {
