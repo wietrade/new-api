@@ -47,9 +47,15 @@ import {
 } from '../lib/billing-expr'
 import { formatBillingCondition } from '../lib/billing-expression/condition-display'
 import { compileBillingExpression } from '../lib/billing-expression/parser'
+import {
+  billingBasisEntryLabels,
+  summarizeFixedUnitExpression,
+} from '../lib/billing-basis'
 import { isBreakdownTierMatched } from '../lib/breakdown-tier-match'
 import {
   formatTaskUsageUnitPrice,
+  getDynamicPriceUnitLabelKey,
+  type DynamicPriceEntry,
   type DynamicPriceLabelKind,
   type DynamicPriceOptions,
 } from '../lib/dynamic-price'
@@ -337,8 +343,58 @@ export function DynamicPricingBreakdown({
 
   const hasTiers = tiers.length > 0
   const hasRules = ruleGroups.length > 0
+  // 形如 `param("size") == ... ? tier(..., fixed(x)) * image_count : ...` 的
+  // 表达式展开不成档位表，但本质是「按单位固定价」，这里直接报单价。
+  const fixedUnitPricing = useMemo(
+    () => (hasTiers ? null : summarizeFixedUnitExpression(expr ?? '')),
+    [expr, hasTiers]
+  )
 
   if (!expr) return null
+
+  if (!hasTiers && fixedUnitPricing) {
+    const labels = billingBasisEntryLabels(fixedUnitPricing.basis)
+    const unitKey = getDynamicPriceUnitLabelKey({
+      unit: labels.unit,
+    } as DynamicPriceEntry)
+    const unitLabel = unitKey ? t(unitKey) : ''
+    const priceOptions: DynamicPriceOptions = {
+      tokenUnit: 'M',
+      showRechargePrice: taskPriceOptions?.showRechargePrice,
+      priceRate: taskPriceOptions?.priceRate,
+      usdExchangeRate: taskPriceOptions?.usdExchangeRate,
+    }
+    const minPrice = formatTaskUsageUnitPrice(
+      fixedUnitPricing.min,
+      priceOptions
+    )
+    const maxPrice = formatTaskUsageUnitPrice(
+      fixedUnitPricing.max,
+      priceOptions
+    )
+    return (
+      <section className={cn('min-w-0', !compact && 'py-4')}>
+        <div className='text-muted-foreground mb-1 text-[11px] font-medium'>
+          {t(labels.label)}
+        </div>
+        <div className='font-mono text-sm font-semibold tabular-nums'>
+          {fixedUnitPricing.min === fixedUnitPricing.max
+            ? minPrice
+            : `${minPrice} – ${maxPrice}`}
+          {unitLabel && (
+            <span className='text-muted-foreground ml-1 text-xs font-normal'>
+              / {unitLabel}
+            </span>
+          )}
+        </div>
+        {fixedUnitPricing.min !== fixedUnitPricing.max && (
+          <p className='text-muted-foreground mt-2 text-xs'>
+            {t('Price depends on request parameters')}
+          </p>
+        )}
+      </section>
+    )
+  }
 
   if (!hasTiers) {
     return (

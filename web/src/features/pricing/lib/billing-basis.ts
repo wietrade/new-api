@@ -302,9 +302,16 @@ export function summarizeFixedUnitPricing(
 ): FixedUnitPricing | null {
   if (model.billing_plugin_variants?.length) return null
   if (model.billing_mode !== 'tiered_expr') return null
-  const expression = (model.billing_expr || '').trim()
-  if (!expression) return null
-  const compiled = compileBillingExpression(expression)
+  return summarizeFixedUnitExpression(model.billing_expr || '')
+}
+
+/** 同上，但直接接收表达式（价格明细面板只有表达式，没有模型对象）。 */
+export function summarizeFixedUnitExpression(
+  expression: string
+): FixedUnitPricing | null {
+  const source = expression.trim()
+  if (!source) return null
+  const compiled = compileBillingExpression(source)
   if (compiled.status !== 'ready') return null
   for (const variable of compiled.variables) {
     if (TOKEN_VARIABLES.has(variable)) return null

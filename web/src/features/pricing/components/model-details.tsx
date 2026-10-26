@@ -67,6 +67,7 @@ import { usePricingData } from '../hooks/use-pricing-data'
 import type { ParsedTaskTier } from '../lib/billing-expr'
 import { isDirectionLabel } from '../lib/billing-direction'
 import { getBillingModeLabelKey } from '../lib/billing-mode'
+import { summarizeFixedUnitPricing } from '../lib/billing-basis'
 import { formatBillingCondition } from '../lib/billing-expression/condition-display'
 import {
   formatTaskUsageUnitPrice,
@@ -1371,33 +1372,42 @@ function ProviderGroupPricingSection(
     )
 
     if (dynamicTiers.length === 0) {
+      // 展开不成档位表时，先看是不是「按单位固定价」（如按 size 分支的图片价）。
+      const fixedUnit = summarizeFixedUnitPricing(props.model)
       return (
         <section>
           {!props.hideTitle && (
             <SectionTitle>{t('Pricing by Group')}</SectionTitle>
           )}
           <AutoGroupChain model={props.model} autoGroups={props.autoGroups} />
-          <div className='rounded-lg border border-amber-200/70 bg-amber-50/70 p-3 dark:border-amber-500/20 dark:bg-amber-500/10'>
-            <div className='text-sm font-medium text-amber-800 dark:text-amber-200'>
-              {t('Special billing expression')}
-            </div>
-            <p className='text-muted-foreground mt-1 text-xs'>
-              {t(
-                pricingDisplayFallbackKey(
-                  props.model.billing_expr || '',
-                  props.model.billing_usage_schema
-                )
-              )}
-            </p>
-            <div className='mt-3'>
-              <div className='text-muted-foreground mb-1 text-[11px] font-medium'>
-                {t('Raw expression')}
+          {fixedUnit ? (
+            <DynamicPricingBreakdown
+              billingExpr={props.model.billing_expr}
+              usageSchema={props.model.billing_usage_schema}
+            />
+          ) : (
+            <div className='rounded-lg border border-amber-200/70 bg-amber-50/70 p-3 dark:border-amber-500/20 dark:bg-amber-500/10'>
+              <div className='text-sm font-medium text-amber-800 dark:text-amber-200'>
+                {t('Special billing expression')}
               </div>
-              <code className='text-muted-foreground bg-background/80 block max-h-28 overflow-auto rounded-md border px-2 py-1.5 font-mono text-xs break-all'>
-                {props.model.billing_expr}
-              </code>
+              <p className='text-muted-foreground mt-1 text-xs'>
+                {t(
+                  pricingDisplayFallbackKey(
+                    props.model.billing_expr || '',
+                    props.model.billing_usage_schema
+                  )
+                )}
+              </p>
+              <div className='mt-3'>
+                <div className='text-muted-foreground mb-1 text-[11px] font-medium'>
+                  {t('Raw expression')}
+                </div>
+                <code className='text-muted-foreground bg-background/80 block max-h-28 overflow-auto rounded-md border px-2 py-1.5 font-mono text-xs break-all'>
+                  {props.model.billing_expr}
+                </code>
+              </div>
             </div>
-          </div>
+          )}
         </section>
       )
     }

@@ -155,14 +155,22 @@ it('shows nested task conditions and prices in detail and group tables without a
 })
 
 it('explains missing task metadata while retaining the original expression', () => {
-  const expression = 'tier("base", u("seconds") * 0.09)'
-  render(<DynamicPricingBreakdown billingExpr={expression} />)
+  // 用量字段名能推出单位（seconds），无需 schema 也能报每秒单价
+  const priced = 'tier("base", u("seconds") * 0.09)'
+  const { unmount } = render(<DynamicPricingBreakdown billingExpr={priced} />)
+  expect(screen.getByText(/0\.09/)).toBeVisible()
+  expect(screen.getByText(/\/\s*s/)).toBeVisible()
+  unmount()
+
+  // 未知的用量字段仍回退到「缺少用量元数据」提示 + 原始表达式
+  const unknown = 'tier("base", u("mystery_field") * 0.09)'
+  render(<DynamicPricingBreakdown billingExpr={unknown} />)
   expect(
     screen.getByText(
       'Task usage metadata is unavailable. Pricing details cannot be displayed.'
     )
   ).toBeVisible()
-  expect(screen.getByText(expression)).toBeVisible()
+  expect(screen.getByText(unknown)).toBeVisible()
 })
 
 it('falls back for omitted count labels and preserves canonical units for other quantities', () => {
