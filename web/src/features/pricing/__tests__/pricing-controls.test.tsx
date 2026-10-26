@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { PricingSidebar } from '../components/pricing-sidebar'
+import { filterByQuotaType } from '../lib/filters'
 import {
   PricingToolbar,
   type PricingToolbarProps,
@@ -252,5 +253,119 @@ describe('pricing controls', () => {
     expect(props.onClearFilters).toHaveBeenCalledOnce()
     await user.keyboard('{Escape}')
     expect(await screen.findByRole('button', { name: /Filter/ })).toHaveFocus()
+  })
+})
+
+
+describe('quota type classification (upstream #8010)', () => {
+  const classificationCases: Array<{
+    name: string
+    pricing: Partial<PricingModel>
+    matches: string[]
+  }> = [
+    { name: 'legacy token pricing', pricing: {}, matches: ['token'] },
+    {
+      name: 'legacy per-request pricing',
+      pricing: { quota_type: 1, model_price: 0.01 },
+      matches: ['request'],
+    },
+    {
+      name: 'dynamic fixed pricing with a legacy token quota type',
+      pricing: {
+        billing_mode: 'tiered_expr',
+        billing_expr: 'tier("request", fixed(0.01))',
+      },
+      matches: ['request'],
+    },
+    {
+      name: 'free dynamic per-request pricing',
+      pricing: {
+        billing_mode: 'tiered_expr',
+        billing_expr: 'v1:tier("free", fixed(0))',
+      },
+      matches: ['request'],
+    },
+    {
+      name: 'request-dependent fixed tiers with an extra multiplier',
+      pricing: {
+        billing_mode: 'tiered_expr',
+        billing_expr:
+          '(param("quality") == "hd" ? tier("hd", fixed(0.02)) : tier("base", fixed(0.01))) * (header("x-fast") == "true" ? 2 : 1)',
+      },
+      matches: ['request'],
+    },
+    {
+      name: 'mixed pricing across nested time tiers classified only as token-based',
+      pricing: {
+        billing_mode: 'tiered_expr',
+        billing_expr:
+          'hour("UTC") < 12 ? (len < 1000 ? tier("short", fixed(0.01)) : tier("long", p * 2 + c * 8)) : tier("night", fixed(0.02))',
+      },
+      matches: ['token'],
+    },
+    {
+      name: 'mixed pricing overriding a legacy request quota type',
+      pricing: {
+        quota_type: 1,
+        billing_mode: 'tiered_expr',
+        billing_expr:
+          'len < 1000 ? tier("short", fixed(0.01)) : tier("long", p * 2 + c * 8)',
+      },
+      matches: ['token'],
+    },
+    {
+      name: 'dynamic token pricing overriding a legacy request quota type',
+      pricing: {
+        quota_type: 1,
+        billing_mode: 'tiered_expr',
+        billing_expr: 'tier("base", p * 2 + c * 8)',
+      },
+      matches: ['token'],
+    },
+    {
+      name: 'token pricing with fixed syntax only in its tier label',
+      pricing: {
+        billing_mode: 'tiered_expr',
+        billing_expr: 'tier("fixed(0.01)", p * 2)',
+      },
+      matches: ['token'],
+    },
+    {
+      name: 'task usage retaining its separate category',
+      pricing: {
+        billing_mode: 'tiered_expr',
+        billing_expr: 'tier("base", u("seconds") * 0.4)',
+        billing_usage_schema: { seconds: { type: 'number', unit: 'second' } },
+      },
+      matches: ['task'],
+    },
+    {
+      name: 'unparseable dynamic pricing retaining its legacy category',
+      pricing: {
+        quota_type: 1,
+        billing_mode: 'tiered_expr',
+        billing_expr: 'tier("request", fixed(',
+      },
+      matches: ['request'],
+    },
+  ]
+
+  it.each(classificationCases)('classifies $name', ({ pricing, matches }) => {
+    const model: PricingModel = {
+      id: 1,
+      model_name: 'pricing-model',
+      quota_type: 0,
+      model_ratio: 1,
+      completion_ratio: 1,
+      enable_groups: ['default'],
+      ...pricing,
+    }
+    const models = [model]
+    expect(filterByQuotaType(models, ['all'])).toEqual([model])
+    for (const quotaType of ['token', 'request', 'task']) {
+      expect(filterByQuotaType(models, [quotaType])).toEqual(
+        matches.includes(quotaType) ? [model] : []
+      )
+    }
   })
 })

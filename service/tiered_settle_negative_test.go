@@ -79,6 +79,10 @@ func TestTryTieredSettle_NegativeUsageNeverProducesNegativeQuota(t *testing.T) {
 
 // Claude 的 input_tokens 不包含 cache_creation，因此当表达式没有引用
 // cc/cc1h 时，这部分 token 必须并回 p 按输入价计费，否则整段缓存写免费。
+// Claude 的 input_tokens 不包含 cache_creation，因此当表达式没有引用
+// cc/cc1h 时，这部分 token 必须并回 p，否则整段缓存写免费。
+// 1h 写没有单独定价时按 ClaudeCacheCreation1hMultiplier（6/3.75 = 1.6 倍
+// 5m 写价）折算后并入 cc，再整体并入 p——而不是按输入价并入（那样会少收）。
 func TestBuildTieredTokenParams_MergesUnreferencedClaudeCacheCreation(t *testing.T) {
 	usage := &dto.Usage{
 		PromptTokens:                    100,
@@ -90,9 +94,10 @@ func TestBuildTieredTokenParams_MergesUnreferencedClaudeCacheCreation(t *testing
 
 	params := BuildTieredTokenParams(usage, true, map[string]bool{"cr": true})
 
-	assert.Equal(t, float64(3100), params.P, "未引用的 cc/cc1h 应并回输入 p")
-	assert.Equal(t, float64(1000), params.CC)
-	assert.Equal(t, float64(2000), params.CC1h)
+	// 100 + (1000 + 2000*1.6) = 4300
+	assert.Equal(t, float64(4300), params.P, "未引用的 cc/cc1h 应折算后并回输入 p")
+	assert.Equal(t, float64(0), params.CC, "并回后不再单独计 cc")
+	assert.Equal(t, float64(0), params.CC1h, "1h 已折算进 cc")
 	assert.Equal(t, float64(3100), params.Len, "len 仍是完整输入上下文")
 }
 

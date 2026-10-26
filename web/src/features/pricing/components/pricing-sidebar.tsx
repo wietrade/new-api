@@ -42,8 +42,7 @@ import {
   getPriceTierLabels,
   getQuotaTypeLabels,
 } from '../constants'
-import { hasTaskUsageSchema } from '../lib/dynamic-price'
-import { getContextRangeOf, getModelTypes } from '../lib/filters'
+import { getContextRangeOf, getModelQuotaType, getModelTypes } from '../lib/filters'
 import type { PricingModel, PricingVendor } from '../types'
 
 type FilterOption = {
@@ -238,13 +237,8 @@ export const PricingSidebar = memo(function PricingSidebar(
       } else {
         priceTiers.paid++
       }
-      if (hasTaskUsageSchema(model)) {
-        quotas.task++
-      } else if (model.quota_type === 0) {
-        quotas.token++
-      } else if (model.quota_type === 1) {
-        quotas.request++
-      }
+      const quotaType = getModelQuotaType(model)
+      if (quotaType) quotas[quotaType]++
     }
     return { vendors, modelTypes, inputTypes, contexts, priceTiers, quotas }
   }, [props.models])
