@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 
 import { StaticDataTable } from '@/components/data-table'
 import { Badge } from '@/components/ui/badge'
+import { resolveLocalizedText } from '@/lib/localized-text'
 import { cn } from '@/lib/utils'
 import { useSystemConfigStore } from '@/stores/system-config-store'
 
@@ -346,8 +347,11 @@ export function DynamicPricingBreakdown({
   // 形如 `param("size") == ... ? tier(..., fixed(x)) * image_count : ...` 的
   // 表达式展开不成档位表，但本质是「按单位固定价」，这里直接报单价。
   const fixedUnitPricing = useMemo(
-    () => (hasTiers ? null : summarizeFixedUnitExpression(expr ?? '')),
-    [expr, hasTiers]
+    () =>
+      hasTiers
+        ? null
+        : summarizeFixedUnitExpression(expr ?? '', usageSchema),
+    [expr, hasTiers, usageSchema]
   )
 
   if (!expr) return null
@@ -357,7 +361,12 @@ export function DynamicPricingBreakdown({
     const unitKey = getDynamicPriceUnitLabelKey({
       unit: labels.unit,
     } as DynamicPriceEntry)
-    const unitLabel = unitKey ? t(unitKey) : ''
+    // 用量字段自带单位文案（schema.unitLabel）时优先用它
+    const unitLabel = fixedUnitPricing.unitLabel
+      ? resolveLocalizedText(fixedUnitPricing.unitLabel, i18n.language)
+      : unitKey
+        ? t(unitKey)
+        : ''
     const priceOptions: DynamicPriceOptions = {
       tokenUnit: 'M',
       showRechargePrice: taskPriceOptions?.showRechargePrice,

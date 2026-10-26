@@ -22,6 +22,7 @@ import type { PricingModel } from '../../types'
 import {
   getBillingBasisBadgeLabelKey,
   getModelBillingBasis,
+  summarizeFixedUnitExpression,
   summarizeFixedUnitPricing,
 } from '../billing-basis'
 import { getDynamicPricingSummary } from '../dynamic-price'
@@ -157,6 +158,24 @@ describe('summarizeFixedUnitPricing', () => {
         })
       )
     ).toEqual({ basis: 'image', min: 0.02, max: 0.04 })
+  })
+
+  test('treats any u(field) as a usage fact, not an unknown', () => {
+    expect(
+      summarizeFixedUnitExpression('tier("base", u("mystery_field") * 0.09)')
+    ).toEqual({ basis: 'count', min: 0.09, max: 0.09 })
+
+    expect(
+      summarizeFixedUnitExpression(
+        'tier("base", u("credits") * 2)',
+        { credits: { type: 'number', unit: 'credit', unitLabel: { zh: '积分' } } }
+      )
+    ).toEqual({
+      basis: 'credit',
+      min: 2,
+      max: 2,
+      unitLabel: { zh: '积分' },
+    })
   })
 
   test('plain fixed pricing is per request', () => {

@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import type { PricingModel } from '../types'
+import type { BillingUsageSchema, PricingModel } from '../types'
 import { compileBillingExpression } from './billing-expression/parser'
 import type { ExpressionNode } from './billing-expression/types'
 import { QUOTA_TYPE_VALUES } from '../constants'
@@ -83,6 +83,8 @@ const USAGE_FIELD_BASIS: Readonly<Record<string, BillingBasis>> = {
   count: 'count',
   counts: 'count',
   units: 'count',
+  token: 'token',
+  tokens: 'token',
   credit: 'credit',
   credits: 'credit',
 }
@@ -106,6 +108,17 @@ function firstSchemaUnit(model: PricingModel): BillingBasis | null {
     if (named) return named
   }
   return null
+}
+
+function basisFromSchemaUnit(
+  unit: string,
+  field: string
+): BillingBasis | null {
+  if (unit === 'second') return 'second'
+  if (unit === 'credit') return 'credit'
+  if (unit === 'token') return 'token'
+  if (unit === 'count') return normalizeUsageField(field) ?? 'count'
+  return normalizeUsageField(field)
 }
 
 function literalString(node: ExpressionNode): string | null {
@@ -141,8 +154,7 @@ export function getModelBillingBasis(model: PricingModel): BillingBasis {
       }
       if (compiled.variables.has('image_count')) return 'image'
       if (compiled.functions.has('u')) {
-        const basis = usageBasisFromExpression(compiled.ast)
-        if (basis) return basis
+        return usageBasisFromExpression(compiled.ast) ?? 'count'
       }
       if (compiled.functions.has('fixed')) return 'request'
       return 'token'
@@ -157,8 +169,8 @@ function usageBasisFromExpression(node: ExpressionNode): BillingBasis | null {
   if (node.kind === 'call') {
     if (node.name === 'u') {
       const field = literalString(node.args[0])
-      const basis = field ? normalizeUsageField(field) : null
-      if (basis) return basis
+      // 自定义用量字段：名字没有约定时按「个」计，而不是当作无法识别
+      if (field) return normalizeUsageField(field) ?? 'count'
     }
     for (const arg of node.args) {
       const nested = usageBasisFromExpression(arg)
@@ -187,6 +199,8 @@ export type FixedUnitPricing = {
   basis: Exclude<BillingBasis, 'token'>
   min: number
   max: number
+  /** 用量字段自带的自定义单位文案（来自 billing_usage_schema）。 */
+  unitLabel?: string | Record<string, string>
 }
 
 type PriceInterval = { min: number; max: number }
@@ -200,7 +214,11 @@ type PriceInterval = { min: number; max: number }
  */
 function evaluatePriceInterval(
   node: ExpressionNode,
-  ctx: { usageBasis?: BillingBasis }
+  ctx: {
+    usageBasis?: BillingBasis
+    unitLabel?: string | Record<string, string>
+    schema?: BillingUsageSchema
+  }
 ): PriceInterval | null {
   switch (node.kind) {
     case 'literal':
@@ -230,11 +248,19 @@ function evaluatePriceInterval(
           : null
       }
       if (node.name === 'u') {
+        // u("x") 是自定义用量字段：数量由结算上下文提供，单价按 1 个单位折算。
+        // 单位优先取 billing_usage_schema 声明，其次按字段名推断，都没有就按「个」。
         const field = literalString(node.args[0])
-        const basis = field ? normalizeUsageField(field) : null
-        if (!basis || basis === 'token') return null
+        if (!field) return null
+        const declared = ctx.schema?.[field]
+        const basis = declared?.unit
+          ? basisFromSchemaUnit(declared.unit, field)
+          : (normalizeUsageField(field) ?? 'count')
+        if (!basis) return null
+        if (basis === 'token') return null
         if (ctx.usageBasis && ctx.usageBasis !== basis) return null
         ctx.usageBasis = basis
+        if (declared?.unitLabel) ctx.unitLabel = declared.unitLabel
         return { min: 1, max: 1 }
       }
       if (node.name === 'min' || node.name === 'max') {
@@ -302,12 +328,16 @@ export function summarizeFixedUnitPricing(
 ): FixedUnitPricing | null {
   if (model.billing_plugin_variants?.length) return null
   if (model.billing_mode !== 'tiered_expr') return null
-  return summarizeFixedUnitExpression(model.billing_expr || '')
+  return summarizeFixedUnitExpression(
+    model.billing_expr || '',
+    model.billing_usage_schema
+  )
 }
 
 /** 同上，但直接接收表达式（价格明细面板只有表达式，没有模型对象）。 */
 export function summarizeFixedUnitExpression(
-  expression: string
+  expression: string,
+  schema?: BillingUsageSchema
 ): FixedUnitPricing | null {
   const source = expression.trim()
   if (!source) return null
@@ -317,7 +347,11 @@ export function summarizeFixedUnitExpression(
     if (TOKEN_VARIABLES.has(variable)) return null
   }
 
-  const ctx: { usageBasis?: BillingBasis } = {}
+  const ctx: {
+    usageBasis?: BillingBasis
+    unitLabel?: string | Record<string, string>
+    schema?: BillingUsageSchema
+  } = { schema }
   const interval = evaluatePriceInterval(compiled.ast, ctx)
   if (!interval || !Number.isFinite(interval.min) || interval.min < 0) {
     return null
@@ -329,7 +363,12 @@ export function summarizeFixedUnitExpression(
       : compiled.variables.has('image_count')
         ? 'image'
         : 'request'
-  return { basis, min: interval.min, max: interval.max }
+  return {
+    basis,
+    min: interval.min,
+    max: interval.max,
+    ...(ctx.unitLabel ? { unitLabel: ctx.unitLabel } : {}),
+  }
 }
 
 /** 单价后缀 / 条目标签，负责把口径翻译成 i18n key。 */

@@ -154,23 +154,34 @@ it('shows nested task conditions and prices in detail and group tables without a
   expect(screen.queryByText('Matched')).not.toBeInTheDocument()
 })
 
-it('explains missing task metadata while retaining the original expression', () => {
-  // 用量字段名能推出单位（seconds），无需 schema 也能报每秒单价
+it('treats u(field) as a usage fact instead of refusing the expression', () => {
+  // 字段名能推出单位（seconds）：每秒单价
   const priced = 'tier("base", u("seconds") * 0.09)'
   const { unmount } = render(<DynamicPricingBreakdown billingExpr={priced} />)
   expect(screen.getByText(/0\.09/)).toBeVisible()
   expect(screen.getByText(/\/\s*s/)).toBeVisible()
   unmount()
 
-  // 未知的用量字段仍回退到「缺少用量元数据」提示 + 原始表达式
-  const unknown = 'tier("base", u("mystery_field") * 0.09)'
-  render(<DynamicPricingBreakdown billingExpr={unknown} />)
+  // 自定义字段名（引擎里就是自定义用量事实）：按「个单位」报单价，不是未知
+  const custom = 'tier("base", u("mystery_field") * 0.09)'
+  render(<DynamicPricingBreakdown billingExpr={custom} />)
+  expect(screen.getByText(/0\.09/)).toBeVisible()
+  expect(screen.getByText('/ unit')).toBeVisible()
+  expect(
+    screen.queryByText('Special billing expression')
+  ).not.toBeInTheDocument()
+})
+
+it('explains missing task metadata while retaining the original expression', () => {
+  // 真正无法展开成单价的情况（两个用量字段相除）才回退到原始表达式
+  const expression = 'tier("base", u("seconds") / u("steps") * 0.09)'
+  render(<DynamicPricingBreakdown billingExpr={expression} />)
   expect(
     screen.getByText(
       'Task usage metadata is unavailable. Pricing details cannot be displayed.'
     )
   ).toBeVisible()
-  expect(screen.getByText(unknown)).toBeVisible()
+  expect(screen.getByText(expression)).toBeVisible()
 })
 
 it('summarizes a size-conditioned image expression as a per-image price', () => {
