@@ -219,6 +219,9 @@ func FetchUpstreamRatios(c *gin.Context) {
 	if req.Timeout <= 0 {
 		req.Timeout = defaultTimeoutSeconds
 	}
+	if len(req.Upstreams) > 0 {
+		rememberUpstreamEndpoints(req.Upstreams)
+	}
 
 	var upstreams []dto.UpstreamDTO
 
@@ -1601,6 +1604,55 @@ func convertModelsDevToRatioData(reader io.Reader) (map[string]any, error) {
 	return converted, nil
 }
 
+// upstreamEndpointsOptionKey 记住每个渠道上次用过的同步端点。
+// 端点本身不落渠道表：内置预设是虚拟渠道（负数 ID），custom 也可能是任意 URL。
+const upstreamEndpointsOptionKey = "UpstreamRatioSyncEndpoints"
+
+func loadUpstreamEndpoints() map[string]string {
+	endpoints := map[string]string{}
+	raw := strings.TrimSpace(common.OptionMap[upstreamEndpointsOptionKey])
+	if raw == "" {
+		return endpoints
+	}
+	if err := common.Unmarshal([]byte(raw), &endpoints); err != nil {
+		sysLogWarn("failed to parse %s: %s", upstreamEndpointsOptionKey, err.Error())
+		return map[string]string{}
+	}
+	return endpoints
+}
+
+// rememberUpstreamEndpoints 记录本次同步用到的端点，下次打开弹窗自动回填。
+func rememberUpstreamEndpoints(upstreams []dto.UpstreamDTO) {
+	endpoints := loadUpstreamEndpoints()
+	changed := false
+	for _, u := range upstreams {
+		if u.ID == 0 || strings.TrimSpace(u.Endpoint) == "" {
+			continue
+		}
+		key := strconv.Itoa(u.ID)
+		if endpoints[key] == u.Endpoint {
+			continue
+		}
+		endpoints[key] = u.Endpoint
+		changed = true
+	}
+	if !changed {
+		return
+	}
+	encoded, err := common.Marshal(endpoints)
+	if err != nil {
+		sysLogWarn("failed to marshal %s: %s", upstreamEndpointsOptionKey, err.Error())
+		return
+	}
+	if err := model.UpdateOption(upstreamEndpointsOptionKey, string(encoded)); err != nil {
+		sysLogWarn("failed to save %s: %s", upstreamEndpointsOptionKey, err.Error())
+	}
+}
+
+func sysLogWarn(format string, args ...any) {
+	logger.LogWarn(context.Background(), common.LogText(format, args...))
+}
+
 func GetSyncableChannels(c *gin.Context) {
 	channels, err := model.GetAllChannels(0, 0, true, false)
 	if err != nil {
@@ -1611,31 +1663,36 @@ func GetSyncableChannels(c *gin.Context) {
 		return
 	}
 
+	endpoints := loadUpstreamEndpoints()
+
 	var syncableChannels []dto.SyncableChannel
 	for _, channel := range channels {
 		if channel.GetBaseURL() != "" {
 			syncableChannels = append(syncableChannels, dto.SyncableChannel{
-				ID:      channel.Id,
-				Name:    channel.Name,
-				BaseURL: channel.GetBaseURL(),
-				Status:  channel.Status,
-				Type:    channel.Type,
+				ID:       channel.Id,
+				Endpoint: endpoints[strconv.Itoa(channel.Id)],
+				Name:     channel.Name,
+				BaseURL:  channel.GetBaseURL(),
+				Status:   channel.Status,
+				Type:     channel.Type,
 			})
 		}
 	}
 
 	syncableChannels = append(syncableChannels, dto.SyncableChannel{
-		ID:      officialRatioPresetID,
-		Name:    officialRatioPresetName,
-		BaseURL: officialRatioPresetBaseURL,
-		Status:  1,
+		ID:       officialRatioPresetID,
+		Endpoint: endpoints[strconv.Itoa(officialRatioPresetID)],
+		Name:     officialRatioPresetName,
+		BaseURL:  officialRatioPresetBaseURL,
+		Status:   1,
 	})
 
 	syncableChannels = append(syncableChannels, dto.SyncableChannel{
-		ID:      modelsDevPresetID,
-		Name:    modelsDevPresetName,
-		BaseURL: modelsDevPresetBaseURL,
-		Status:  1,
+		ID:       modelsDevPresetID,
+		Endpoint: endpoints[strconv.Itoa(modelsDevPresetID)],
+		Name:     modelsDevPresetName,
+		BaseURL:  modelsDevPresetBaseURL,
+		Status:   1,
 	})
 
 	c.JSON(http.StatusOK, gin.H{
