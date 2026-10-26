@@ -189,137 +189,113 @@ export type FixedUnitPricing = {
   max: number
 }
 
-/** 条件里只允许这些函数出现，它们不改变单价，只筛选用量。 */
-const CONDITION_FUNCTIONS = new Set([
-  'param',
-  'header',
-  'has',
-  'hour',
-  'minute',
-  'weekday',
-  'month',
-  'day',
-])
-
-const COMPARISON_OPERATORS = new Set([
-  '==',
-  '!=',
-  '<',
-  '<=',
-  '>',
-  '>=',
-  '&&',
-  '||',
-])
-
-function isImageCount(node: ExpressionNode): boolean {
-  return node.kind === 'variable' && node.name === 'image_count'
-}
-
-function numericLiteral(node: ExpressionNode): number | null {
-  return node.kind === 'literal' && typeof node.value === 'number'
-    ? node.value
-    : null
-}
-
-/** 条件子树：只允许比较、逻辑与筛选函数，不允许出现单价。 */
-function safeCondition(node: ExpressionNode): boolean {
-  switch (node.kind) {
-    case 'literal':
-      return true
-    case 'variable':
-      return node.name === 'len' || node.name === 'image_count'
-    case 'unary':
-      return safeCondition(node.operand)
-    case 'call':
-      return (
-        CONDITION_FUNCTIONS.has(node.name) &&
-        node.args.every((arg) => safeCondition(arg))
-      )
-    case 'binary':
-      return safeCondition(node.left) && safeCondition(node.right)
-    case 'conditional':
-      return (
-        safeCondition(node.condition) &&
-        safeCondition(node.yes) &&
-        safeCondition(node.no)
-      )
-  }
-}
+type PriceInterval = { min: number; max: number }
 
 /**
- * 收集「每单位固定价」的单价集合。
+ * 把表达式按「1 张图 / 1 个单位用量」求值，得到单价区间。
  *
- * 只接受形如 `tier(name, fixed(0.01))` 或 `tier(name, fixed(0.01)) * image_count`
- * 的结构：任何乘数都必须显式是 image_count，其余算术一律放弃，
- * 免得把 `fixed(0.02) * 2` 之类的表达式报成 0.02。
+ * `fixed(0.07) * image_count` 在语义上就是「每张 0.07」——把 image_count 取 1
+ * 即可得到单价；`* 2` 这种系数会自然乘进去，`u("seconds") * 0.4` 则是每秒 0.4。
+ * 条件（param/header/len/时段）不参与求值，各分支的单价取并集得到区间。
  */
-function collectUnitPrices(
+function evaluatePriceInterval(
   node: ExpressionNode,
-  inCondition: boolean,
-  out: number[]
-): boolean {
+  ctx: { usageBasis?: BillingBasis }
+): PriceInterval | null {
   switch (node.kind) {
     case 'literal':
-      return inCondition || numericLiteral(node) !== null
+      return typeof node.value === 'number'
+        ? { min: node.value, max: node.value }
+        : null
     case 'variable':
-      return node.name === 'image_count' || (inCondition && node.name === 'len')
-    case 'unary':
-      return !inCondition && collectUnitPrices(node.operand, false, out)
+      // image_count 就是「按张」的用量变量，按 1 张折算单价
+      if (node.name === 'image_count') return { min: 1, max: 1 }
+      return null
+    case 'unary': {
+      const value = evaluatePriceInterval(node.operand, ctx)
+      if (!value) return null
+      if (node.operator === '-') return { min: -value.max, max: -value.min }
+      if (node.operator === '+') return value
+      return null
+    }
     case 'call': {
-      if (inCondition) return safeCondition(node)
       if (node.name === 'tier') {
-        if (node.args.length !== 2) return false
-        const price = node.args[1]
-        if (price.kind !== 'call' || price.name !== 'fixed') return false
-        const value = numericLiteral(price.args[0])
-        if (value === null || value < 0) return false
-        out.push(value)
-        return true
+        return node.args.length === 2
+          ? evaluatePriceInterval(node.args[1], ctx)
+          : null
       }
       if (node.name === 'fixed') {
-        const value = numericLiteral(node.args[0])
-        if (value === null || value < 0) return false
-        out.push(value)
-        return true
+        return node.args.length === 1
+          ? evaluatePriceInterval(node.args[0], ctx)
+          : null
       }
-      return false
+      if (node.name === 'u') {
+        const field = literalString(node.args[0])
+        const basis = field ? normalizeUsageField(field) : null
+        if (!basis || basis === 'token') return null
+        if (ctx.usageBasis && ctx.usageBasis !== basis) return null
+        ctx.usageBasis = basis
+        return { min: 1, max: 1 }
+      }
+      if (node.name === 'min' || node.name === 'max') {
+        const values = node.args.map((arg) => evaluatePriceInterval(arg, ctx))
+        if (values.some((value) => value === null)) return null
+        const list = values as PriceInterval[]
+        if (node.name === 'min') {
+          return {
+            min: Math.min(...list.map((v) => v.min)),
+            max: Math.min(...list.map((v) => v.max)),
+          }
+        }
+        return {
+          min: Math.max(...list.map((v) => v.min)),
+          max: Math.max(...list.map((v) => v.max)),
+        }
+      }
+      if (node.name === 'abs') {
+        const value = evaluatePriceInterval(node.args[0], ctx)
+        if (!value) return null
+        const candidates = [Math.abs(value.min), Math.abs(value.max)]
+        return { min: Math.min(...candidates), max: Math.max(...candidates) }
+      }
+      // param/header/has/hour/... 只用于条件，不参与单价
+      return null
     }
     case 'binary': {
-      const op = node.operator
-      if (COMPARISON_OPERATORS.has(op)) {
-        return safeCondition(node.left) && safeCondition(node.right)
+      const left = evaluatePriceInterval(node.left, ctx)
+      const right = evaluatePriceInterval(node.right, ctx)
+      if (!left || !right) return null
+      if (node.operator === '+') {
+        return { min: left.min + right.min, max: left.max + right.max }
       }
-      if (op === '*') {
-        if (isImageCount(node.left)) {
-          return collectUnitPrices(node.right, false, out)
-        }
-        if (isImageCount(node.right)) {
-          return collectUnitPrices(node.left, false, out)
-        }
-        return false
+      if (node.operator === '-') {
+        return { min: left.min - right.max, max: left.max - right.min }
       }
-      if (op === '+' || op === '-') {
-        return (
-          collectUnitPrices(node.left, false, out) &&
-          collectUnitPrices(node.right, false, out)
-        )
+      if (node.operator === '*') {
+        const products = [
+          left.min * right.min,
+          left.min * right.max,
+          left.max * right.min,
+          left.max * right.max,
+        ]
+        return { min: Math.min(...products), max: Math.max(...products) }
       }
-      return false
+      return null
     }
-    case 'conditional':
-      return (
-        safeCondition(node.condition) &&
-        collectUnitPrices(node.yes, false, out) &&
-        collectUnitPrices(node.no, false, out)
-      )
+    case 'conditional': {
+      // 条件本身不能当单价求值；两个分支都必须能算出单价
+      if (evaluatePriceInterval(node.condition, {}) !== null) return null
+      const yes = evaluatePriceInterval(node.yes, ctx)
+      const no = evaluatePriceInterval(node.no, ctx)
+      if (!yes || !no) return null
+      return { min: Math.min(yes.min, no.min), max: Math.max(yes.max, no.max) }
+    }
   }
 }
 
 /**
- * 解析器认不出来的「按单位固定价」表达式（典型：按 size 分支的图片价），
- * 退化成「每单位多少钱」的区间展示。无法保证正确时返回 null，
- * 调用方继续展示原始表达式。
+ * 解析器认不出来的「按单位计价」表达式（典型：按 size 分支的图片价、
+ * 按秒计费的任务价），退化成「每单位多少钱」。算不出单价时返回 null。
  */
 export function summarizeFixedUnitPricing(
   model: PricingModel
@@ -333,21 +309,20 @@ export function summarizeFixedUnitPricing(
   for (const variable of compiled.variables) {
     if (TOKEN_VARIABLES.has(variable)) return null
   }
-  // u(...) 计价的用量字段靠 schema 描述，这里不猜。
-  if (compiled.functions.has('u')) return null
 
-  const prices: number[] = []
-  if (!collectUnitPrices(compiled.ast, false, prices)) return null
-  if (prices.length === 0) return null
-
-  const basis: FixedUnitPricing['basis'] = compiled.variables.has('image_count')
-    ? 'image'
-    : 'request'
-  return {
-    basis,
-    min: Math.min(...prices),
-    max: Math.max(...prices),
+  const ctx: { usageBasis?: BillingBasis } = {}
+  const interval = evaluatePriceInterval(compiled.ast, ctx)
+  if (!interval || !Number.isFinite(interval.min) || interval.min < 0) {
+    return null
   }
+
+  const basis: FixedUnitPricing['basis'] =
+    ctx.usageBasis && ctx.usageBasis !== 'token'
+      ? ctx.usageBasis
+      : compiled.variables.has('image_count')
+        ? 'image'
+        : 'request'
+  return { basis, min: interval.min, max: interval.max }
 }
 
 /** 单价后缀 / 条目标签，负责把口径翻译成 i18n key。 */

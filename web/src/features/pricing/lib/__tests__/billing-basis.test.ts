@@ -127,7 +127,7 @@ describe('summarizeFixedUnitPricing', () => {
     ).toBeNull()
   })
 
-  test('refuses usage-field pricing handled by the schema path', () => {
+  test('reads u(field) coefficients as per-unit prices', () => {
     expect(
       summarizeFixedUnitPricing(
         model({
@@ -135,18 +135,28 @@ describe('summarizeFixedUnitPricing', () => {
           billing_expr: 'tier("base", u("seconds") * 0.4)',
         })
       )
-    ).toBeNull()
-  })
-
-  test('refuses numeric multipliers it cannot prove', () => {
+    ).toEqual({ basis: 'second', min: 0.4, max: 0.4 })
     expect(
       summarizeFixedUnitPricing(
         model({
           billing_mode: 'tiered_expr',
-          billing_expr: 'tier("image", fixed(0.02)) * 2 * image_count',
+          billing_expr: 'tier("images", u("images") * 0.25)',
         })
       )
-    ).toBeNull()
+    ).toEqual({ basis: 'image', min: 0.25, max: 0.25 })
+  })
+
+  test('applies request multipliers to the per-image price', () => {
+    // 引擎只允许 tier(...) 乘以 image_count 或请求级倍率
+    expect(
+      summarizeFixedUnitPricing(
+        model({
+          billing_mode: 'tiered_expr',
+          billing_expr:
+            'tier("image", fixed(0.02)) * (header("x-fast") == "true" ? 2 : 1) * image_count',
+        })
+      )
+    ).toEqual({ basis: 'image', min: 0.02, max: 0.04 })
   })
 
   test('plain fixed pricing is per request', () => {
