@@ -419,8 +419,6 @@ export type UpstreamChannel = {
   base_url: string
   status: number
   type?: number
-  // 上次同步用过的端点，由后端记住并回填（否则每次打开弹窗都要重填）
-  endpoint?: string
 }
 
 export type RatioType =

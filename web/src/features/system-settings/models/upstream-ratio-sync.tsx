@@ -103,9 +103,7 @@ export function UpstreamRatioSync() {
     setChannelEndpoints((previous) => {
       const next = { ...previous }
       for (const channel of channels) {
-        // 后端记住的上次端点优先；没有才回落到默认值
-        next[channel.id] ??=
-          channel.endpoint || getDefaultEndpointForChannel(channel)
+        next[channel.id] ??= getDefaultEndpointForChannel(channel)
       }
       return next
     })

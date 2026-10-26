@@ -36,7 +36,4 @@ type SyncableChannel struct {
 	BaseURL string `json:"base_url"`
 	Status  int    `json:"status"`
 	Type    int    `json:"type"`
-	// Endpoint 是该渠道上次用过的同步端点（上一次 fetch 时记下的），
-	// 前端用它回填下拉框/输入框，避免每次重填。
-	Endpoint string `json:"endpoint,omitempty"`
 }
