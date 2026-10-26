@@ -229,10 +229,8 @@ export function ChannelSelectorDialog({
         minSize: 360,
         cell: ({ row }) => {
           const channel = row.original
-          // 必须用 ??：选 custom 时端点被置为空串，用 || 会回落到默认值，
-          // 导致下拉立刻弹回 pricing、输入框永远不出现（custom 不可选）。
           const currentEndpoint =
-            channelEndpoints[channel.id] ?? DEFAULT_ENDPOINT
+            channelEndpoints[channel.id] || DEFAULT_ENDPOINT
           const endpointType = getEndpointType(currentEndpoint)
 
           const handleTypeChange = (value: string) => {
