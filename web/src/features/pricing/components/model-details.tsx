@@ -565,14 +565,6 @@ function ModelBackendProviderSection(props: { model: PricingModel }) {
     )
   }
 
-  if (model.parameter_count) {
-    cells.push(
-      <CatalogSpecRow key='parameters' label={t('Parameters')}>
-        <CatalogTextValue>{model.parameter_count}</CatalogTextValue>
-      </CatalogSpecRow>
-    )
-  }
-
   if (cells.length === 0) return null
 
   return (
