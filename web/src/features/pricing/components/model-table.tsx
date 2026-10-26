@@ -32,11 +32,15 @@ import { cn } from '@/lib/utils'
 import { DEFAULT_TOKEN_UNIT } from '../constants'
 import {
   formatDynamicUnitPrice,
+  formatTaskUsageUnitPrice,
   getDynamicDisplayGroupRatio,
+  getDynamicPriceUnitLabelKey,
   getDynamicPricingSummary,
+  type DynamicPriceEntry,
 } from '../lib/dynamic-price'
 import { getDisplayGroupRatio } from '../lib/model-helpers'
 import { formatPrice } from '../lib/price'
+import { taskUsageUnitLabel } from '../lib/task-price-display'
 import type {
   Modality,
   ModelCapability,
@@ -144,22 +148,24 @@ function CapabilityIcons(props: {
 function PriceStack(props: {
   list: string
   ours: string
-  unit: string
+  unit?: string
 }) {
   const differs = props.list !== props.ours
   return (
     <div className='leading-tight'>
-      {differs && (
+      {differs && props.list !== '—' && (
         <div className='text-muted-foreground/60 text-[11.5px] line-through tabular-nums'>
           {props.list}
-          <span className='ml-0.5 text-[10px]'>/{props.unit}</span>
+          {props.unit && <span className='ml-0.5 text-[10px]'>/{props.unit}</span>}
         </div>
       )}
       <div className='text-[13px] font-semibold tabular-nums'>
         {props.ours}
-        <span className='text-muted-foreground ml-0.5 text-[10.5px] font-normal'>
-          /{props.unit}
-        </span>
+        {props.unit && props.ours !== '—' && (
+          <span className='text-muted-foreground ml-0.5 text-[10.5px] font-normal'>
+            /{props.unit}
+          </span>
+        )}
       </div>
     </div>
   )
@@ -228,7 +234,7 @@ function ModelStatusCell(props: { perf?: ModelPerfBadgeData }) {
 }
 
 export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const tokenUnit = props.tokenUnit ?? DEFAULT_TOKEN_UNIT
   const tokenUnitLabel = tokenUnit === 'K' ? '1K' : '1M'
 
@@ -330,6 +336,34 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
               })
             }
 
+            // 非 token 计费（按张 / 按秒 / 按视频 / 按次…）：按计量方向落到
+            // 输入列或输出列，并沿用该条目的真实单位，而不是 /1M。
+            const unitEntries = (dynamicSummary?.primaryEntries ?? []).filter(
+              (entry) => entry.unit !== 'token'
+            )
+            const unitEntryFor = (direction: 'input' | 'output') =>
+              unitEntries.find(
+                (entry) => (entry.direction ?? 'output') === direction
+              )
+            const unitEntryPrice = (
+              entry: DynamicPriceEntry,
+              groupRatioMultiplier: number
+            ) =>
+              formatTaskUsageUnitPrice(entry.value, {
+                tokenUnit,
+                priceRate: props.priceRate,
+                usdExchangeRate: props.usdExchangeRate,
+                showRechargePrice: props.showRechargePrice,
+                groupRatioMultiplier,
+                showCurrencySymbol: true,
+              })
+            const unitEntrySuffix = (entry: DynamicPriceEntry) => {
+              const key = getDynamicPriceUnitLabelKey(entry)
+              return taskUsageUnitLabel(entry, i18n.language, key ? t(key) : '')
+            }
+            const inputUnitEntry = unitEntryFor('input')
+            const outputUnitEntry = unitEntryFor('output')
+
             const inputOurs =
               expressionPrice('inputPrice', groupRatioForDisplay) ??
               formatPrice(
@@ -397,18 +431,44 @@ export const ModelTable = memo(function ModelTable(props: ModelTableProps) {
                   </div>
                 </td>
                 <td>
-                  <PriceStack
-                    list={inputList}
-                    ours={inputOurs}
-                    unit={tokenUnitLabel}
-                  />
+                  {inputUnitEntry ? (
+                    <PriceStack
+                      list={unitEntryPrice(inputUnitEntry, 1)}
+                      ours={unitEntryPrice(
+                        inputUnitEntry,
+                        groupRatioForDisplay
+                      )}
+                      unit={unitEntrySuffix(inputUnitEntry)}
+                    />
+                  ) : unitEntries.length > 0 ? (
+                    <span className='text-muted-foreground/50 text-xs'>—</span>
+                  ) : (
+                    <PriceStack
+                      list={inputList}
+                      ours={inputOurs}
+                      unit={tokenUnitLabel}
+                    />
+                  )}
                 </td>
                 <td>
-                  <PriceStack
-                    list={outputList}
-                    ours={outputOurs}
-                    unit={tokenUnitLabel}
-                  />
+                  {outputUnitEntry ? (
+                    <PriceStack
+                      list={unitEntryPrice(outputUnitEntry, 1)}
+                      ours={unitEntryPrice(
+                        outputUnitEntry,
+                        groupRatioForDisplay
+                      )}
+                      unit={unitEntrySuffix(outputUnitEntry)}
+                    />
+                  ) : unitEntries.length > 0 ? (
+                    <span className='text-muted-foreground/50 text-xs'>—</span>
+                  ) : (
+                    <PriceStack
+                      list={outputList}
+                      ours={outputOurs}
+                      unit={tokenUnitLabel}
+                    />
+                  )}
                 </td>
                 <td>
                   {discount > 0 ? (
