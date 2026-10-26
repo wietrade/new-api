@@ -35,6 +35,11 @@ import {
   type ParsedTaskTier,
   type ParsedTier,
 } from './billing-expr'
+import {
+  billingBasisEntryLabels,
+  summarizeFixedUnitPricing,
+} from './billing-basis'
+import { usageFieldDirection, variableDirection } from './billing-direction'
 import { compileBillingExpression } from './billing-expression/parser'
 import { getDisplayGroupRatio } from './model-helpers'
 import { withPluginPricing } from './plugin-pricing'
@@ -67,10 +72,18 @@ export type DynamicPriceEntry = {
   labelKind: DynamicPriceLabelKind
   value: number
   formatted: string
-  formattedRange?: string
   minValue?: number
   maxValue?: number
-  unit: 'token' | BillingUsageUnit | 'request' | 'image'
+  /** 计量方向：输入侧 / 输出侧。多档位时单价只展示最低档。 */
+  direction?: 'input' | 'output'
+  unit:
+    | 'token'
+    | BillingUsageUnit
+    | 'request'
+    | 'image'
+    | 'video'
+    | 'audio'
+    | 'text'
   unitLabel?: string | Record<string, string>
   variable?: BillingVar
   description?: string | Record<string, string>
@@ -129,6 +142,9 @@ export function getDynamicPriceUnitLabelKey(
   if (entry.unit === 'token' && !entry.variable) return '1M token'
   if (entry.unit === 'request') return 'request'
   if (entry.unit === 'image') return 'image'
+  if (entry.unit === 'video') return 'video'
+  if (entry.unit === 'audio') return 'audio'
+  if (entry.unit === 'text') return 'text'
   return null
 }
 
@@ -299,6 +315,7 @@ export function getDynamicPriceEntries(
         value: tier.fixedPrice,
         formatted: formatTaskUsageUnitPrice(tier.fixedPrice, options),
         unit: tier.imageCount ? 'image' : 'request',
+        ...(tier.imageCount ? { direction: 'output' as const } : {}),
       },
     ]
   }
@@ -319,6 +336,7 @@ export function getDynamicPriceEntries(
           value,
           formatted: formatTaskUsageUnitPrice(value, options),
           unit: definition.unit,
+          direction: usageFieldDirection(field),
           unitLabel: definition.unitLabel,
           description: definition.description,
         } satisfies DynamicPriceEntry,
@@ -375,6 +393,7 @@ export function getDynamicPriceEntries(
         value,
         formatted: formatDynamicUnitPrice(value, options),
         unit: 'token' as const,
+        direction: variableDirection(variable.key),
         variable,
       },
     ]
@@ -448,11 +467,8 @@ export function getDynamicPricingSummary(
       value: min,
       minValue: min,
       maxValue: max,
+      // 多档位时只展示最低档单价，区间留在 minValue/maxValue 里供排序使用。
       formatted: formatTaskUsageUnitPrice(min, options),
-      formattedRange:
-        min === max
-          ? undefined
-          : `${formatTaskUsageUnitPrice(min, options)} – ${formatTaskUsageUnitPrice(max, options)}`,
     }))
     const primaryKeys = new Set(
       summaries.flatMap((summary) =>
@@ -577,23 +593,55 @@ export function getDynamicPricingSummary(
       if (!range) return entry
       return {
         ...entry,
+        value: range.min,
         minValue: range.min,
         maxValue: range.max,
-        formattedRange:
-          range.min === range.max
-            ? undefined
-            : `${formatTaskUsageUnitPrice(range.min, options)} – ${formatTaskUsageUnitPrice(range.max, options)}`,
+        formatted: formatTaskUsageUnitPrice(range.min, options),
       }
     })
   }
   const rawExpression = model.billing_expr || ''
+  // 解析器只认长度/时段阶梯，遇到形如
+  // `param("size") == "1024x1024" ? tier("a", fixed(0.07)) * image_count : ...`
+  // 的表达式会退化成「特殊计费表达式」。这类表达式本质仍是按单位固定价，
+  // 能安全提取时按「每张图 / 每次 / 每秒」展示区间，提不出来才暴露源码。
+  let fixedUnit: ReturnType<typeof summarizeFixedUnitPricing> = null
+  if (!isTaskUsage && tiers.length === 0) {
+    fixedUnit = summarizeFixedUnitPricing(model)
+    if (fixedUnit) {
+      const labels = billingBasisEntryLabels(fixedUnit.basis)
+      entries = [
+        {
+          key: 'fixedUnit',
+          field: fixedUnit.basis,
+          label: labels.label,
+          shortLabel: labels.shortLabel,
+          labelKind: 'i18n',
+          value: fixedUnit.min,
+          minValue: fixedUnit.min,
+          maxValue: fixedUnit.max,
+          // 只在最低档口径上报价，区间不出现在列表里。
+          formatted: formatTaskUsageUnitPrice(fixedUnit.min, options),
+          ...(fixedUnit.basis === 'image' || fixedUnit.basis === 'video' ||
+          fixedUnit.basis === 'second' ||
+          fixedUnit.basis === 'audio'
+            ? { direction: 'output' as const }
+            : {}),
+          unit: labels.unit,
+        },
+      ]
+    }
+  }
 
   return {
     tiers,
     tier,
     tierCount: tiers.length,
     hasRequestRules: hasDynamicRequestRules(model),
-    isSpecialExpression: rawExpression.trim().length > 0 && tiers.length === 0,
+    isSpecialExpression:
+      rawExpression.trim().length > 0 &&
+      tiers.length === 0 &&
+      fixedUnit === null,
     rawExpression,
     entries,
     primaryEntries: isTaskUsage
@@ -601,10 +649,7 @@ export function getDynamicPricingSummary(
           (entry) => entry.unit !== 'request' && entry.unit !== 'image'
         )
       : entries.filter(
-          (entry) =>
-            entry.unit === 'request' ||
-            entry.unit === 'image' ||
-            PRIMARY_DYNAMIC_FIELDS.has(entry.field)
+          (entry) => entry.unit !== 'token' || PRIMARY_DYNAMIC_FIELDS.has(entry.field)
         ),
     secondaryEntries: isTaskUsage
       ? entries.filter(
@@ -612,8 +657,7 @@ export function getDynamicPricingSummary(
         )
       : entries.filter(
           (entry) =>
-            entry.unit !== 'request' &&
-            entry.unit !== 'image' &&
+            entry.unit === 'token' &&
             !PRIMARY_DYNAMIC_FIELDS.has(entry.field)
         ),
     isTaskUsage,

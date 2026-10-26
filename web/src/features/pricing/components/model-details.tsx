@@ -65,6 +65,7 @@ import { DEFAULT_TOKEN_UNIT, getProtocolLabel } from '../constants'
 import { useBillingTime } from '../hooks/use-billing-time'
 import { usePricingData } from '../hooks/use-pricing-data'
 import type { ParsedTaskTier } from '../lib/billing-expr'
+import { isDirectionLabel } from '../lib/billing-direction'
 import { getBillingModeLabelKey } from '../lib/billing-mode'
 import { formatBillingCondition } from '../lib/billing-expression/condition-display'
 import {
@@ -130,9 +131,19 @@ function SectionTitleNote(props: { children: React.ReactNode }) {
 
 function DynamicPriceEntryLabel(props: { entry: DynamicPriceEntry }) {
   const { t, i18n } = useTranslation()
+  const direction =
+    props.entry.direction && !isDirectionLabel(props.entry.shortLabel)
+      ? t(props.entry.direction === 'input' ? 'Input side' : 'Output side')
+      : ''
+  const chip = direction ? (
+    <span className='bg-muted mr-1 inline-block rounded px-1 text-[10px] leading-4'>
+      {direction}
+    </span>
+  ) : null
   if (props.entry.labelKind === 'schema') {
     return (
       <span className='break-words whitespace-normal'>
+        {chip}
         {taskPriceLabel(
           props.entry.description,
           props.entry.shortLabel,
@@ -141,7 +152,12 @@ function DynamicPriceEntryLabel(props: { entry: DynamicPriceEntry }) {
       </span>
     )
   }
-  return t(props.entry.shortLabel)
+  return (
+    <span>
+      {chip}
+      {t(props.entry.shortLabel)}
+    </span>
+  )
 }
 
 function UnconfiguredTaskPricingNotice(props: { model: PricingModel }) {
@@ -801,7 +817,7 @@ function PriceSection(props: {
                     <DynamicPriceEntryLabel entry={entry} />
                   </div>
                   <div className='text-foreground mt-1 font-mono text-base font-semibold tabular-nums'>
-                    {entry.formattedRange ?? entry.formatted}
+                    {entry.formatted}
                     <span className='text-muted-foreground/70 ml-1 text-xs font-normal'>
                       / {unitLabel}
                     </span>
@@ -815,6 +831,11 @@ function PriceSection(props: {
             {dynamicSummary.hasUnconfiguredProviders
               ? t('Not configured')
               : t('Dynamic Pricing')}
+          </p>
+        )}
+        {dynamicSummary.tierCount > 1 && !dynamicSummary.isTimePricing && (
+          <p className='text-muted-foreground mt-2 text-xs'>
+            {t('Lowest tier')}
           </p>
         )}
         {dynamicSummary.secondaryEntries.length > 0 && (
@@ -836,7 +857,7 @@ function PriceSection(props: {
                       <DynamicPriceEntryLabel entry={entry} />
                     </span>
                     <span className='text-muted-foreground font-mono text-sm tabular-nums'>
-                      {entry.formattedRange ?? entry.formatted}
+                      {entry.formatted}
                       <span className='text-muted-foreground/70 ml-1 text-xs font-normal'>
                         / {unitLabel}
                       </span>

@@ -36,6 +36,7 @@ import {
   MODEL_TYPES,
 } from '../constants'
 import { useBillingTime } from '../hooks/use-billing-time'
+import { isDirectionLabel } from '../lib/billing-direction'
 import {
   getCardExamplePrice,
   getDynamicDisplayGroupRatio,
@@ -185,6 +186,10 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
                   i18n.language
                 )
               }
+              const directionLabel =
+                entry.direction && !isDirectionLabel(entry.shortLabel)
+                  ? t(entry.direction === 'input' ? 'Input side' : 'Output side')
+                  : ''
               return (
                 <div
                   key={entry.key}
@@ -193,13 +198,18 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
                     dynamicSummary.isTaskUsage && 'col-span-full'
                   )}
                 >
+                  {directionLabel && (
+                    <span className='text-muted-foreground bg-muted w-fit rounded px-1 text-[10px] leading-4'>
+                      {directionLabel}
+                    </span>
+                  )}
                   {label && (
                     <span className='text-muted-foreground text-xs break-words whitespace-normal'>
                       {label}
                     </span>
                   )}
                   <span className='flex flex-wrap items-baseline gap-x-1 font-mono text-sm font-semibold tabular-nums'>
-                    <span>{entry.formattedRange ?? entry.formatted}</span>
+                    <span>{entry.formatted}</span>
                     <span className='text-muted-foreground text-xs font-normal whitespace-nowrap'>
                       {' '}
                       / {unitLabel}
@@ -225,14 +235,16 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           )}
           {dynamicSummary.isTaskUsage &&
             dynamicSummary.tierCount > 1 &&
-            dynamicSummary.tier?.label &&
-            !dynamicSummary.primaryEntries.some(
-              (entry) => entry.formattedRange
-            ) && (
+            dynamicSummary.tier?.label && (
               <span className='text-muted-foreground col-span-full text-xs break-words'>
                 ({dynamicSummary.tier.label})
               </span>
             )}
+          {dynamicSummary.tierCount > 1 && !dynamicSummary.isTimePricing && (
+            <span className='text-muted-foreground col-span-full text-xs'>
+              {t('Lowest tier')}
+            </span>
+          )}
         </>
       )
     } else {

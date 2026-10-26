@@ -630,7 +630,7 @@ it.each([
   }
 )
 
-it('shows task tier ranges in the schema unit and converts site currency only once', async () => {
+it('shows the lowest task tier in the schema unit and converts site currency only once', async () => {
   useSystemConfigStore.getState().setConfig({
     currency: {
       ...DEFAULT_CURRENCY_CONFIG,
@@ -661,7 +661,9 @@ it('shows task tier ranges in the schema unit and converts site currency only on
   const button = screen.getByRole('button', {
     name: 'View pricing for channel-only',
   })
-  expect(button).toHaveTextContent(/2.8.*5.6/)
+  // 只展示最低档：0.4 USD/秒 × 7 = 2.8 CNY/秒
+  expect(button).toHaveTextContent(/2\.8/)
+  expect(button).not.toHaveTextContent(/5\.6/)
   expect(button).toHaveTextContent('/s')
   expect(button).toHaveTextContent('CNY')
   expect(button).not.toHaveTextContent('¥')

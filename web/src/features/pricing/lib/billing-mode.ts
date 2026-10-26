@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { PricingModel } from '../types'
+import { getBillingBasisBadgeLabelKey, getModelBillingBasis } from './billing-basis'
 import { hasTaskUsageSchema, isDynamicPricingModel } from './dynamic-price'
 import { isTokenBasedModel } from './model-helpers'
 
@@ -25,10 +26,20 @@ export type BillingModeLabelKey =
   | 'Dynamic Pricing'
   | 'Token-based'
   | 'Task billing'
+  | 'Billed per image'
+  | 'Billed per second'
+  | 'Billed per video'
+  | 'Billed per credit'
 
 export function getBillingModeLabelKey(
   model: PricingModel
 ): BillingModeLabelKey {
+  // 非 token 计费的模型直接标明口径（按图片 / 按时间 / 按视频 / 按次），
+  // 而不是统一徽标成「动态计费」。
+  const basis = getModelBillingBasis(model)
+  if (basis !== 'token') {
+    return getBillingBasisBadgeLabelKey(basis) as BillingModeLabelKey
+  }
   // Task-usage models badge as one business category; the metering unit
   // ($/1M token, $/credit, $/second) is already carried by the price line.
   if (hasTaskUsageSchema(model)) return 'Task billing'

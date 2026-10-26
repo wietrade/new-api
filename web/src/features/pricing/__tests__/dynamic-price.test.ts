@@ -77,11 +77,6 @@ describe('expression price summaries', () => {
       'request',
     ])
     expect(thousand?.isMixedBilling).toBe(true)
-    expect(
-      thousand?.primaryEntries.every(
-        (entry) => entry.formattedRange === undefined
-      )
-    ).toBe(true)
     const free = getDynamicPricingSummary(
       pricingModel({
         billing_mode: 'tiered_expr',
@@ -139,9 +134,6 @@ describe('expression price summaries', () => {
     expect(summary?.tier?.label).toBe('first')
     expect(summary?.primaryEntries.map((entry) => entry.value)).toEqual([4, 12])
     expect(summary?.hasRequestRules).toBe(true)
-    expect(
-      summary?.primaryEntries.every((entry) => !entry.formattedRange)
-    ).toBe(true)
   })
   test('keeps the first token tier even when a later tier is cheaper', () => {
     const summary = getDynamicPricingSummary(
@@ -154,11 +146,6 @@ describe('expression price summaries', () => {
     )
     expect(summary?.tier?.label).toBe('first')
     expect(summary?.primaryEntries.map((entry) => entry.value)).toEqual([4, 12])
-    expect(
-      summary?.primaryEntries.every(
-        (entry) => entry.formattedRange === undefined
-      )
-    ).toBe(true)
   })
   test('preserves a versioned parenthesized base price and its request rule', () => {
     const summary = getDynamicPricingSummary(
@@ -204,7 +191,7 @@ describe('expression price summaries', () => {
     expect(summary?.secondaryEntries).toEqual([])
   })
 
-  test('includes a free task tier in its range', () => {
+  test('reports the lowest task tier even when another tier is free', () => {
     const summary = getDynamicPricingSummary(
       pricingModel({
         billing_mode: 'tiered_expr',
@@ -218,7 +205,7 @@ describe('expression price summaries', () => {
       { tokenUnit: 'M' }
     )
     expect(summary?.primaryEntries[0]?.value).toBe(0)
-    expect(summary?.primaryEntries[0]?.formattedRange).toBe('$0 – $0.8')
+    expect(summary?.primaryEntries[0]?.maxValue).toBe(0.8)
   })
 })
 
@@ -262,7 +249,7 @@ describe('task dynamic pricing', () => {
     assert.equal(summary.tiers.length, 0)
   })
 
-  test('summarizes different task tier prices as a range while preserving the fallback price', () => {
+  test('shows only the lowest task tier price and keeps the spread in min/max', () => {
     const model = pricingModel({
       billing_mode: 'tiered_expr',
       billing_expr:
@@ -276,13 +263,11 @@ describe('task dynamic pricing', () => {
     const summary = getDynamicPricingSummary(model, summaryOptions)
 
     assert.ok(summary)
-    assert.match(summary.primaryEntries[0]?.formattedRange ?? '', /0[.,]4/)
-    assert.match(summary.primaryEntries[0]?.formattedRange ?? '', /0[.,]8/)
-    assert.match(summary.primaryEntries[0]?.formattedRange ?? '', /\S – \S/)
     assert.match(summary.primaryEntries[0]?.formatted ?? '', /0[.,]4/)
+    assert.equal(summary.primaryEntries[0]?.maxValue, 0.8)
   })
 
-  test('omits a task price range when every tier has the same unit price', () => {
+  test('keeps a single unit price when every tier charges the same', () => {
     const model = pricingModel({
       billing_mode: 'tiered_expr',
       billing_expr: 'tier("base", u("seconds") * 0.4)',
@@ -294,7 +279,8 @@ describe('task dynamic pricing', () => {
     const summary = getDynamicPricingSummary(model, summaryOptions)
 
     assert.ok(summary)
-    assert.equal(summary.primaryEntries[0]?.formattedRange, undefined)
+    assert.match(summary.primaryEntries[0]?.formatted ?? '', /0[.,]4/)
+    assert.equal(summary.primaryEntries[0]?.maxValue, 0.4)
   })
 
   test('identifies unconfigured task usage models without inventing token pricing', () => {
@@ -312,8 +298,9 @@ describe('task dynamic pricing', () => {
     assert.equal(hasTaskUsageSchema(secondsModel), true)
     assert.equal(isUnconfiguredTaskUsageModel(secondsModel), true)
     assert.equal(getDynamicPricingSummary(secondsModel, summaryOptions), null)
-    assert.equal(getBillingModeLabelKey(secondsModel), 'Task billing')
-    assert.equal(getBillingModeLabelKey(countModel), 'Task billing')
+    // 未配置的任务型模型也要说清计量口径。
+    assert.equal(getBillingModeLabelKey(secondsModel), 'Billed per second')
+    assert.equal(getBillingModeLabelKey(countModel), 'Billed per video')
   })
 
   test('does not mark configured task usage pricing as unconfigured', () => {
@@ -423,7 +410,7 @@ describe('task dynamic pricing', () => {
           },
         })
       ),
-      'Task billing'
+      'Billed per second'
     )
     assert.equal(
       getBillingModeLabelKey(
@@ -435,7 +422,7 @@ describe('task dynamic pricing', () => {
           },
         })
       ),
-      'Task billing'
+      'Billed per video'
     )
     assert.equal(
       getBillingModeLabelKey(
@@ -459,7 +446,7 @@ describe('task dynamic pricing', () => {
           },
         })
       ),
-      'Task billing'
+      'Billed per credit'
     )
     assert.equal(
       getBillingModeLabelKey(
@@ -703,7 +690,7 @@ describe('shared plugin price summaries', () => {
       field: 'seconds',
       minValue: 0.4,
       maxValue: 1.2,
-      formattedRange: '$0.4 – $1.2',
+      formatted: '$0.4',
       unit: 'second',
     })
   })
@@ -740,9 +727,6 @@ describe('shared plugin price summaries', () => {
       'second',
       'credit',
     ])
-    expect(
-      summary?.primaryEntries.every((entry) => !entry.formattedRange)
-    ).toBe(true)
     expect(summary?.hasUnconfiguredProviders).toBe(true)
     expect(isUnconfiguredTaskUsageModel(model)).toBe(false)
     const empty = {

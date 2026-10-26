@@ -500,8 +500,10 @@ describe('model cards', () => {
         tokenUnit='K'
       />
     )
-    expect(screen.getByText(/0.4.*0.8/)).toHaveTextContent(/0.4 – \$0.8/)
+    // 多档位只展示最低档单价，单位仍是秒
+    expect(screen.getByText('$0.4')).toBeVisible()
     expect(screen.getByText(/^\/\s*s$/)).toBeVisible()
+    expect(screen.getByText('Lowest tier')).toBeVisible()
     expect(screen.queryByText(/1K|1M/)).not.toBeInTheDocument()
   })
 
@@ -580,9 +582,10 @@ describe('model cards', () => {
         tokenUnit='K'
       />
     )
-    expect(screen.getByText('$42 – $70').parentElement).toHaveTextContent(
-      '$42 – $70 / 1M token'
+    expect(screen.getByText('$42').parentElement).toHaveTextContent(
+      '$42 / 1M token'
     )
+    expect(screen.getByText('Lowest tier')).toBeVisible()
     expect(screen.getByText(/480p · 5s ≈/)).toBeVisible()
   })
 

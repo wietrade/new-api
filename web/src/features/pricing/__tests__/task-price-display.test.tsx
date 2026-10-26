@@ -147,7 +147,9 @@ it('shows nested task conditions and prices in detail and group tables without a
   expect(
     screen.getAllByText(/resolution: 768P · Outside these times:/).length
   ).toBeGreaterThan(0)
-  expect(screen.getByText('$0.072 – $0.15')).toBeVisible()
+  // 多档位只展示最低档单价
+  expect(screen.getAllByText('$0.072').length).toBeGreaterThan(0)
+  expect(screen.queryByText(/0\.072 – /)).not.toBeInTheDocument()
   expect(screen.getAllByText('$0.24').length).toBeGreaterThan(0)
   expect(screen.queryByText('Matched')).not.toBeInTheDocument()
 })
@@ -661,8 +663,9 @@ it('shows provider count, price range and missing-price status in both list and 
   expect(screen.getAllByText(/Not configured for some providers/)).toHaveLength(
     2
   )
-  expect(screen.getByText('0.4 – 0.8/s')).toBeVisible()
-  expect(screen.getByText('$0.4 – $0.8')).toBeVisible()
+  // 多提供商/多档位只报最低价，不再拼区间
+  expect(screen.queryByText(/0\.4 – 0\.8/)).not.toBeInTheDocument()
+  expect(screen.getByText('Lowest tier')).toBeVisible()
 })
 
 it('lists every group price in one table without switching', async () => {

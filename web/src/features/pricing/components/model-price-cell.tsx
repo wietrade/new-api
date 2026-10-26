@@ -30,6 +30,7 @@ import {
   getDynamicPricingSummary,
   isUnconfiguredTaskUsageModel,
 } from '../lib/dynamic-price'
+import { isDirectionLabel } from '../lib/billing-direction'
 import { isTokenBasedModel } from '../lib/model-helpers'
 import { formatPrice, formatRequestPrice } from '../lib/price'
 import { taskUsageUnitLabel } from '../lib/task-price-display'
@@ -83,7 +84,11 @@ export function ModelPriceCell(props: {
       currency,
     ]
   )
-  let metrics: Array<{ label: string; value: string }>
+  let metrics: Array<{
+    label: string
+    value: string
+    direction?: 'input' | 'output'
+  }>
   const providerCaption = dynamic?.providerCount
     ? t('{{count}} providers', { count: dynamic.providerCount })
     : ''
@@ -118,7 +123,7 @@ export function ModelPriceCell(props: {
       )
     }
     const hasRequestPrice = dynamic.primaryEntries.some(
-      (entry) => entry.unit === 'request' || entry.unit === 'image'
+      (entry) => entry.unit !== 'token'
     )
     metrics = dynamic.primaryEntries
       .slice(0, hasRequestPrice ? 3 : 2)
@@ -138,7 +143,11 @@ export function ModelPriceCell(props: {
             entry.labelKind === 'schema'
               ? entry.shortLabel
               : t(entry.shortLabel),
-          value: `${entry.formattedRange ?? entry.formatted}${suffix}`,
+          direction:
+            entry.direction && !isDirectionLabel(entry.shortLabel)
+              ? entry.direction
+              : undefined,
+          value: `${entry.formatted}${suffix}`,
         }
       })
     if (metrics.length === 0) {
@@ -164,8 +173,9 @@ export function ModelPriceCell(props: {
     }
     if (providerCaption) caption += ` · ${providerCaption}`
     if (unconfiguredCaption) caption += ` · ${unconfiguredCaption}`
-    if (dynamic.tierCount > 1) {
-      caption += ` · ${t('{{count}} tiers', { count: dynamic.tierCount })}`
+    // 多档位只报最低档，避免列表里出现跨档区间；时段价本身会按当前时段取值。
+    if (dynamic.tierCount > 1 && !dynamic.isTimePricing) {
+      caption += ` · ${t('Lowest tier')}`
     }
   } else {
     if (isUnconfiguredTaskUsageModel(props.model)) {
@@ -245,10 +255,15 @@ export function ModelPriceCell(props: {
           >
             <span
               data-typo
-              className='text-muted-foreground min-w-0 truncate text-xs font-normal'
+              className='text-muted-foreground flex min-w-0 items-center gap-1 text-xs font-normal'
               title={metric.label}
             >
-              {metric.label}
+              {metric.direction && (
+                <span className='bg-muted shrink-0 rounded px-1 text-[10px] leading-4'>
+                  {t(metric.direction === 'input' ? 'Input side' : 'Output side')}
+                </span>
+              )}
+              <span className='truncate'>{metric.label}</span>
             </span>
             <span
               data-typo
