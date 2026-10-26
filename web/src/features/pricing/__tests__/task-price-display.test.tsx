@@ -173,6 +173,19 @@ it('explains missing task metadata while retaining the original expression', () 
   expect(screen.getByText(unknown)).toBeVisible()
 })
 
+it('summarizes a size-conditioned image expression as a per-image price', () => {
+  const expression =
+    'param("size") == "1024x1024" ? tier("image_2", fixed(0.073529)) * image_count : tier("image", fixed(0.101103)) * image_count'
+  render(<DynamicPricingBreakdown billingExpr={expression} />)
+  expect(
+    screen.queryByText('Special billing expression')
+  ).not.toBeInTheDocument()
+  expect(screen.queryByText(expression)).not.toBeInTheDocument()
+  expect(screen.getByText(/0\.0735/)).toBeVisible()
+  expect(screen.getByText(/0\.1011/)).toBeVisible()
+  expect(screen.getByText('/ image')).toBeVisible()
+})
+
 it('falls back for omitted count labels and preserves canonical units for other quantities', () => {
   expect(taskUsageUnitLabel({ unit: 'count' }, 'zhCN', '次')).toBe('次')
   expect(
