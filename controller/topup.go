@@ -800,5 +800,15 @@ func WxGatewayNotify(c *gin.Context) {
 		return
 	}
 	logger.LogInfo(c.Request.Context(), common.LogText("wxgateway notify handled trade_no=%s already_done=%v paid=%s expected=%s pay_order_no=%s client_ip=%s", payload.TradeNo, alreadyDone, payload.Amount, payload.ExpectedAmount, payload.PayOrderNo, c.ClientIP()))
-	c.JSON(http.StatusOK, gin.H{"ok": true, "already_done": alreadyDone})
+	// 回传入账结果（美元金额 / 汇率 / 额度），供付款页展示
+	resp := gin.H{"ok": true, "already_done": alreadyDone}
+	if topUp := model.GetTopUpByTradeNo(payload.TradeNo); topUp != nil {
+		resp["usd"] = fmt.Sprintf("%.4f", topUp.Money)
+		resp["quota"] = topUp.Amount
+		if paidMoney > 0 && topUp.Money > 0 {
+			resp["rate"] = fmt.Sprintf("%.6f", paidMoney/topUp.Money)
+		}
+		resp["status"] = topUp.Status
+	}
+	c.JSON(http.StatusOK, resp)
 }
