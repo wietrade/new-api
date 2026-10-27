@@ -640,17 +640,26 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 		paymentError(c, common.NewMessage("Payment amount is too low"))
 		return
 	}
+	// 邮箱不再强制：金额已唯一化，网关可仅凭金额匹配订单；邮箱仅作为辅助核对信息下发
 	email, err := model.GetUserEmail(id)
-	if err != nil || strings.TrimSpace(email) == "" {
-		paymentError(c, common.NewMessage("Please bind an email before top-up"))
-		return
+	if err != nil {
+		email = ""
 	}
+	email = strings.TrimSpace(email)
 
 	tradeNo := fmt.Sprintf("USR%dNO%s%d", id, common.GetRandomString(6), time.Now().Unix())
+	// 找付款人填写「邮箱或用户名」用于识别订单；两者都下发
+	username, uerr := model.GetUsernameById(id, false)
+	if uerr != nil {
+		username = ""
+	}
+	username = strings.TrimSpace(username)
+
 	chargeBody := map[string]any{
 		"trade_no": tradeNo,
 		"uid":      id,
 		"email":    email,
+		"username": username,
 		"amount":   strconv.FormatFloat(payMoney, 'f', 2, 64),
 		"name":     fmt.Sprintf("TUC%d", req.Amount),
 		// 收款二维码图片链接由本站后台填写，随下单一起下发给网关
@@ -678,6 +687,7 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 	var chargeResp struct {
 		Ok     bool   `json:"ok"`
 		PayUrl string `json:"pay_url"`
+		Amount string `json:"amount"` // 网关去重后的实收金额（可能比 payMoney 多几分）
 		Error  string `json:"error"`
 	}
 	_ = json.Unmarshal(respBody, &chargeResp)
@@ -691,10 +701,17 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 	if operation_setting.GetQuotaDisplayType() == operation_setting.QuotaDisplayTypeTokens {
 		topUpAmount = decimal.NewFromInt(req.Amount).Div(decimal.NewFromFloat(common.QuotaPerUnit)).IntPart()
 	}
+	// 充值单金额以网关实际要收的金额为准（金额已做唯一化，可能比原计算值多几分）
+	chargeMoney := payMoney
+	if s := strings.TrimSpace(chargeResp.Amount); s != "" {
+		if v, perr := strconv.ParseFloat(s, 64); perr == nil && v > 0 {
+			chargeMoney = v
+		}
+	}
 	topUp := &model.TopUp{
 		UserId:          id,
 		Amount:          topUpAmount,
-		Money:           payMoney,
+		Money:           chargeMoney,
 		TradeNo:         tradeNo,
 		PaymentMethod:   model.PaymentProviderWxGateway,
 		PaymentProvider: model.PaymentProviderWxGateway,
