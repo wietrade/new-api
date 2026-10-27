@@ -653,6 +653,8 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 		"email":    email,
 		"amount":   strconv.FormatFloat(payMoney, 'f', 2, 64),
 		"name":     fmt.Sprintf("TUC%d", req.Amount),
+		// 收款二维码图片链接由本站后台填写，随下单一起下发给网关
+		"qr_url": strings.TrimSpace(operation_setting.WxGatewayQrUrl),
 	}
 	raw, _ := json.Marshal(chargeBody)
 	chargeURL := strings.TrimRight(addr, "/") + "/charge"

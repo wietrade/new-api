@@ -1324,11 +1324,15 @@ export function PaymentSettingsSection({
                       保持一致
                     </li>
                     <li>
-                      二维码上传：打开{' '}
+                      收款二维码：在下方「收款二维码图片地址」填图片直链即可，付款页会直接展示
+                      （网关不再提供二维码上传入口）
+                    </li>
+                    <li>
+                      网关只有授权 KEY：打开{' '}
                       <code className='rounded bg-blue-100 px-1 py-0.5 text-xs dark:bg-blue-900'>
                         {'<网关地址>/admin'}
-                      </code>
-                      ，填入网关密钥后上传收款码图片
+                      </code>{' '}
+                      可查看网关发放的授权 KEY
                     </li>
                     <li>
                       支付方式：在「常规 → 支付方式」里新增一项，类型填{' '}
@@ -1427,7 +1431,7 @@ export function PaymentSettingsSection({
                           />
                         </FormControl>
                         <FormDescription>
-                          留空则使用网关 /admin 上传的二维码
+                          填微信收款码图片的直链，付款页会直接显示；留空则付款页不显示二维码
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
