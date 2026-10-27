@@ -13,6 +13,17 @@ var PayAddress = ""
 var CustomCallbackAddress = ""
 var EpayId = ""
 var EpayKey = ""
+
+// ---- 自有支付网关（微信收款码）----
+// WxGatewayAddress：网关基础地址，例如 https://gw.example.com
+// WxGatewayId：商户标识（网关侧校验）
+// WxGatewayKey：网关 API Key（newapi → 网关）与回调签名密钥
+// WxGatewayQrUrl：收款二维码图片地址（付款页展示）
+var WxGatewayAddress = ""
+var WxGatewayId = ""
+var WxGatewayKey = ""
+var WxGatewayQrUrl = ""
+
 var Price = 7.3
 var MinTopUp = 1
 var USDExchangeRate = 7.3

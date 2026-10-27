@@ -1,12 +1,19 @@
 package controller
 
 import (
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"maps"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -285,6 +292,11 @@ func RequestEpay(c *gin.Context) {
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		paymentError(c, common.NewMessage("Invalid parameters"))
+		return
+	}
+	// 自有微信收款网关渠道：走独立流程（可传邮箱，用于到账匹配）
+	if req.PaymentMethod == model.PaymentProviderWxGateway {
+		requestWxGateway(c, req)
 		return
 	}
 	if req.Amount < getMinTopup() {
@@ -596,4 +608,168 @@ func AdminCompleteTopUp(c *gin.Context) {
 		return
 	}
 	common.ApiSuccess(c, nil)
+}
+
+// ================= 自有微信收款网关渠道 =================
+
+// RequestWxGatewayPay 创建一笔自有网关支付订单，返回付款页地址。
+// 由 RequestEpay 按 payment_method=wxgateway 分流进入。
+func requestWxGateway(c *gin.Context, req EpayRequest) {
+	addr := strings.TrimSpace(operation_setting.WxGatewayAddress)
+	key := strings.TrimSpace(operation_setting.WxGatewayKey)
+	if addr == "" || key == "" {
+		paymentError(c, common.NewMessage("Payment gateway is not configured"))
+		return
+	}
+	id := c.GetInt("id")
+	if req.Amount < getMinTopup() {
+		paymentError(c, common.NewMessage("Top-up amount cannot be less than {{min}}", map[string]any{"min": getMinTopup()}))
+		return
+	}
+	if rejectInvalidTopUpQuota(c, id, req.Amount) {
+		return
+	}
+	group, err := model.GetUserGroup(id, true)
+	if err != nil {
+		paymentError(c, common.NewMessage("Failed to get the user group"))
+		return
+	}
+	payMoney := getPayMoney(req.Amount, group)
+	if payMoney < 0.01 {
+		paymentError(c, common.NewMessage("Payment amount is too low"))
+		return
+	}
+	email, err := model.GetUserEmail(id)
+	if err != nil || strings.TrimSpace(email) == "" {
+		paymentError(c, common.NewMessage("Please bind an email before top-up"))
+		return
+	}
+
+	tradeNo := fmt.Sprintf("USR%dNO%s%d", id, common.GetRandomString(6), time.Now().Unix())
+	chargeBody := map[string]any{
+		"trade_no": tradeNo,
+		"uid":      id,
+		"email":    email,
+		"amount":   strconv.FormatFloat(payMoney, 'f', 2, 64),
+		"name":     fmt.Sprintf("TUC%d", req.Amount),
+	}
+	raw, _ := json.Marshal(chargeBody)
+	chargeURL := strings.TrimRight(addr, "/") + "/charge"
+	httpReq, err := http.NewRequest("POST", chargeURL, bytes.NewReader(raw))
+	if err != nil {
+		paymentError(c, common.NewMessage("Failed to start payment"))
+		return
+	}
+	httpReq.Header.Set("Content-Type", "application/json; charset=utf-8")
+	httpReq.Header.Set("X-Api-Key", key)
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Do(httpReq)
+	if err != nil {
+		logger.LogError(c.Request.Context(), common.LogText("wxgateway charge failed trade_no=%s error=%q", tradeNo, err.Error()))
+		paymentError(c, common.NewMessage("Failed to start payment"))
+		return
+	}
+	defer resp.Body.Close()
+	respBody, _ := io.ReadAll(resp.Body)
+
+	var chargeResp struct {
+		Ok     bool   `json:"ok"`
+		PayUrl string `json:"pay_url"`
+		Error  string `json:"error"`
+	}
+	_ = json.Unmarshal(respBody, &chargeResp)
+	if resp.StatusCode != http.StatusOK || !chargeResp.Ok || chargeResp.PayUrl == "" {
+		logger.LogError(c.Request.Context(), common.LogText("wxgateway charge rejected trade_no=%s status=%d body=%q", tradeNo, resp.StatusCode, string(respBody)))
+		paymentError(c, common.NewMessage("Failed to start payment"))
+		return
+	}
+
+	topUpAmount := req.Amount
+	if operation_setting.GetQuotaDisplayType() == operation_setting.QuotaDisplayTypeTokens {
+		topUpAmount = decimal.NewFromInt(req.Amount).Div(decimal.NewFromFloat(common.QuotaPerUnit)).IntPart()
+	}
+	topUp := &model.TopUp{
+		UserId:          id,
+		Amount:          topUpAmount,
+		Money:           payMoney,
+		TradeNo:         tradeNo,
+		PaymentMethod:   model.PaymentProviderWxGateway,
+		PaymentProvider: model.PaymentProviderWxGateway,
+		CreateTime:      time.Now().Unix(),
+		Status:          common.TopUpStatusPending,
+	}
+	if err := topUp.Insert(); err != nil {
+		logger.LogError(c.Request.Context(), common.LogText("wxgateway failed to create top-up order user_id=%d trade_no=%s error=%q", id, tradeNo, err.Error()))
+		paymentError(c, common.NewMessage("Failed to create order"))
+		return
+	}
+	logger.LogInfo(c.Request.Context(), common.LogText("wxgateway top-up order created user_id=%d trade_no=%s amount=%d money=%.2f email=%s", id, tradeNo, req.Amount, payMoney, email))
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "success",
+		"url":     chargeResp.PayUrl,
+		"data": gin.H{
+			"trade_no": tradeNo,
+			"pay_url":  chargeResp.PayUrl,
+			"email":    email,
+			"qr_url":   operation_setting.WxGatewayQrUrl,
+		},
+	})
+}
+
+// WxGatewayNotify 接收自有网关的到账回调（HMAC-SHA256 签名）。
+// 校验通过后复用与 epay 相同的入账逻辑（RechargeWxGateway）。
+func WxGatewayNotify(c *gin.Context) {
+	raw, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": "read body failed"})
+		return
+	}
+	key := strings.TrimSpace(operation_setting.WxGatewayKey)
+	ts := strings.TrimSpace(c.GetHeader("X-Timestamp"))
+	nonce := strings.TrimSpace(c.GetHeader("X-Nonce"))
+	sign := strings.ToLower(strings.TrimSpace(c.GetHeader("X-Sign")))
+	if key == "" || ts == "" || nonce == "" || sign == "" {
+		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway notify missing auth headers client_ip=%s", c.ClientIP()))
+		c.JSON(http.StatusUnauthorized, gin.H{"ok": false, "error": "missing signature"})
+		return
+	}
+	// 时间窗 5 分钟
+	if ms, perr := strconv.ParseInt(ts, 10, 64); perr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"ok": false, "error": "bad timestamp"})
+		return
+	} else if diff := time.Now().UnixMilli() - ms; diff > 5*60*1000 || diff < -5*60*1000 {
+		c.JSON(http.StatusUnauthorized, gin.H{"ok": false, "error": "timestamp out of window"})
+		return
+	}
+	mac := hmac.New(sha256.New, []byte(key))
+	mac.Write([]byte(ts + "\n" + nonce + "\n" + string(raw)))
+	expect := hex.EncodeToString(mac.Sum(nil))
+	if !hmac.Equal([]byte(sign), []byte(expect)) {
+		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway notify sign mismatch client_ip=%s", c.ClientIP()))
+		c.JSON(http.StatusUnauthorized, gin.H{"ok": false, "error": "sign mismatch"})
+		return
+	}
+
+	var payload struct {
+		TradeNo    string `json:"trade_no"`
+		Amount     string `json:"amount"`
+		PayOrderNo string `json:"pay_order_no"`
+	}
+	if err := json.Unmarshal(raw, &payload); err != nil || payload.TradeNo == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": "bad payload"})
+		return
+	}
+
+	LockOrder(payload.TradeNo)
+	defer UnlockOrder(payload.TradeNo)
+
+	alreadyDone, err := model.RechargeWxGateway(payload.TradeNo, model.PaymentProviderWxGateway, c.ClientIP())
+	if err != nil {
+		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway recharge failed trade_no=%s error=%q", payload.TradeNo, err.Error()))
+		c.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": err.Error()})
+		return
+	}
+	logger.LogInfo(c.Request.Context(), common.LogText("wxgateway notify handled trade_no=%s already_done=%v pay_order_no=%s client_ip=%s", payload.TradeNo, alreadyDone, payload.PayOrderNo, c.ClientIP()))
+	c.JSON(http.StatusOK, gin.H{"ok": true, "already_done": alreadyDone})
 }
