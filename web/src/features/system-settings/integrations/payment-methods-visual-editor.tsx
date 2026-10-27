@@ -48,6 +48,7 @@ const PAYMENT_TYPE_ICON_NAMES: Record<string, string> = {
   stripe: 'SiStripe',
   waffo_pancake: 'LuCreditCard',
   wxpay: 'SiWechat',
+  wxgateway: 'SiWechat',
 }
 
 function getDefaultIconName(type: string) {

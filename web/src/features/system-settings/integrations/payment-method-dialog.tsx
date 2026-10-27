@@ -71,6 +71,7 @@ const PAYMENT_TYPE_ICON_NAMES: Record<string, string> = {
   stripe: 'SiStripe',
   waffo_pancake: 'LuCreditCard',
   wxpay: 'SiWechat',
+  wxgateway: 'SiWechat',
 }
 
 const getDefaultIconName = (type: string) => PAYMENT_TYPE_ICON_NAMES[type] ?? ''
@@ -108,6 +109,12 @@ export function PaymentMethodDialog({
       label: 'Waffo Pancake (waffo_pancake)',
       name: 'Waffo Pancake',
       value: 'waffo_pancake',
+    },
+    {
+      iconName: 'SiWechat',
+      label: '微信收款 (wxgateway)',
+      name: '微信收款',
+      value: 'wxgateway',
     },
   ]
   const getPaymentTypeOption = (value: string) =>
@@ -250,7 +257,8 @@ export function PaymentMethodDialog({
                 <FormDescription className='leading-relaxed'>
                   {t(
                     'Used to decide the payment flow. Built-in keys include stripe for Stripe and waffo_pancake for Waffo Pancake; other values are sent to Epay as the type parameter.'
-                  )}
+                  )}{' '}
+                  wxgateway = 自建微信收款网关
                 </FormDescription>
                 <FormMessage />
               </FormItem>

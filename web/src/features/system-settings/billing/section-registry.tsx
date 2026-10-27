@@ -153,6 +153,10 @@ const BILLING_SECTIONS = [
           CreemWebhookSecret: settings.CreemWebhookSecret,
           CreemTestMode: settings.CreemTestMode,
           CreemProducts: settings.CreemProducts,
+          WxGatewayAddress: settings.WxGatewayAddress ?? '',
+          WxGatewayId: settings.WxGatewayId ?? '',
+          WxGatewayKey: settings.WxGatewayKey ?? '',
+          WxGatewayQrUrl: settings.WxGatewayQrUrl ?? '',
         }}
         waffoDefaultValues={{
           WaffoEnabled: settings.WaffoEnabled ?? false,

@@ -178,6 +178,10 @@ const paymentSchema = z.object({
   WaffoPancakeMerchantID: z.string(),
   WaffoPancakePrivateKey: z.string(),
   WaffoPancakeReturnURL: z.string(),
+  WxGatewayAddress: z.string(),
+  WxGatewayId: z.string(),
+  WxGatewayKey: z.string(),
+  WxGatewayQrUrl: z.string(),
 })
 
 type PaymentFormValues = z.infer<typeof paymentSchema>
@@ -459,6 +463,10 @@ export function PaymentSettingsSection({
       WaffoPancakeReturnURL: removeTrailingSlash(
         values.WaffoPancakeReturnURL.trim()
       ),
+      WxGatewayAddress: removeTrailingSlash(values.WxGatewayAddress.trim()),
+      WxGatewayId: values.WxGatewayId.trim(),
+      WxGatewayKey: values.WxGatewayKey.trim(),
+      WxGatewayQrUrl: values.WxGatewayQrUrl.trim(),
     }
 
     const initial = {
@@ -506,6 +514,12 @@ export function PaymentSettingsSection({
       WaffoPancakeReturnURL: removeTrailingSlash(
         initialRef.current.WaffoPancakeReturnURL.trim()
       ),
+      WxGatewayAddress: removeTrailingSlash(
+        initialRef.current.WxGatewayAddress.trim()
+      ),
+      WxGatewayId: initialRef.current.WxGatewayId.trim(),
+      WxGatewayKey: initialRef.current.WxGatewayKey.trim(),
+      WxGatewayQrUrl: initialRef.current.WxGatewayQrUrl.trim(),
     }
 
     const updates: Array<{ key: string; value: string | number | boolean }> = []
@@ -703,6 +717,25 @@ export function PaymentSettingsSection({
       updates.push({ key: 'WaffoPayMethods', value: sanitized.WaffoPayMethods })
     }
 
+    if (sanitized.WxGatewayAddress !== initial.WxGatewayAddress) {
+      updates.push({
+        key: 'WxGatewayAddress',
+        value: sanitized.WxGatewayAddress,
+      })
+    }
+
+    if (sanitized.WxGatewayId !== initial.WxGatewayId) {
+      updates.push({ key: 'WxGatewayId', value: sanitized.WxGatewayId })
+    }
+
+    if (sanitized.WxGatewayKey && sanitized.WxGatewayKey !== initial.WxGatewayKey) {
+      updates.push({ key: 'WxGatewayKey', value: sanitized.WxGatewayKey })
+    }
+
+    if (sanitized.WxGatewayQrUrl !== initial.WxGatewayQrUrl) {
+      updates.push({ key: 'WxGatewayQrUrl', value: sanitized.WxGatewayQrUrl })
+    }
+
     const hasWaffoPancakeChanges =
       sanitized.WaffoPancakeMerchantID !== initial.WaffoPancakeMerchantID ||
       sanitized.WaffoPancakePrivateKey.length > 0 ||
@@ -882,9 +915,10 @@ export function PaymentSettingsSection({
           />
           <Tabs defaultValue='general' className='min-w-0'>
             <div className='overflow-x-auto pb-1'>
-              <TabsList className='grid min-w-[44rem] grid-cols-6'>
+              <TabsList className='grid min-w-[52rem] grid-cols-7'>
                 <TabsTrigger value='general'>{t('General')}</TabsTrigger>
                 <TabsTrigger value='epay'>Epay</TabsTrigger>
+                <TabsTrigger value='wxgateway'>微信收款</TabsTrigger>
                 <TabsTrigger value='stripe'>{t('Stripe')}</TabsTrigger>
                 <TabsTrigger value='creem'>Creem</TabsTrigger>
                 <TabsTrigger value='waffo-pancake'>Waffo Pancake</TabsTrigger>
@@ -1249,6 +1283,151 @@ export function PaymentSettingsSection({
                         </FormControl>
                         <FormDescription>
                           {t('Leave blank unless rotating the secret')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent
+              value='wxgateway'
+              className={paymentTabContentClassName}
+            >
+              <div className='space-y-4'>
+                <div>
+                  <h3 className='text-lg font-medium'>微信收款网关</h3>
+                  <p className='text-muted-foreground text-sm'>
+                    自建微信收款通道的配置（手机端收款通知 → 网关 → 本站回调入账）
+                  </p>
+                </div>
+
+                <div className='rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-950 dark:text-blue-100'>
+                  <p className='mb-2 font-medium'>回调配置：</p>
+                  <ul className='list-inside list-disc space-y-1'>
+                    <li>
+                      回调 URL：
+                      <code className='rounded bg-blue-100 px-1 py-0.5 text-xs dark:bg-blue-900'>
+                        {'<ServerAddress>/api/user/wxgateway/notify'}
+                      </code>
+                    </li>
+                    <li>
+                      网关密钥：既要填在本页「网关密钥」，也要与网关服务端
+                      <code className='ml-1 rounded bg-blue-100 px-1 py-0.5 text-xs dark:bg-blue-900'>
+                        GATEWAY_API_KEY
+                      </code>
+                      <code className='ml-1 rounded bg-blue-100 px-1 py-0.5 text-xs dark:bg-blue-900'>
+                        WEBHOOK_SECRET
+                      </code>{' '}
+                      保持一致
+                    </li>
+                    <li>
+                      二维码上传：打开{' '}
+                      <code className='rounded bg-blue-100 px-1 py-0.5 text-xs dark:bg-blue-900'>
+                        {'<网关地址>/admin'}
+                      </code>
+                      ，填入网关密钥后上传收款码图片
+                    </li>
+                    <li>
+                      支付方式：在「常规 → 支付方式」里新增一项，类型填{' '}
+                      <code className='rounded bg-blue-100 px-1 py-0.5 text-xs dark:bg-blue-900'>
+                        wxgateway
+                      </code>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className='grid gap-6 md:grid-cols-2'>
+                  <FormField
+                    control={form.control}
+                    name='WxGatewayAddress'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>网关地址</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://paygateway.example.com'
+                            {...field}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          网关服务的基础地址，本站会向该地址发起下单请求
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='WxGatewayId'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>商户标识</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='wxnb'
+                            {...field}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
+                          />
+                        </FormControl>
+                        <FormDescription>网关侧用来识别本站的标识</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className='grid gap-6 md:grid-cols-2'>
+                  <FormField
+                    control={form.control}
+                    name='WxGatewayKey'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>网关密钥</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            placeholder='留空表示不修改'
+                            autoComplete='new-password'
+                            {...field}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          下单用的 API Key，同时用于校验网关回调签名（留空则不修改）
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='WxGatewayQrUrl'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>收款二维码图片地址</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://.../qr.png'
+                            {...field}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          留空则使用网关 /admin 上传的二维码
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

@@ -99,6 +99,26 @@ func isEpayTopUpEnabled() bool {
 	return isEpayWebhookConfigured() && len(operation_setting.PayMethods) > 0
 }
 
+// isWxGatewayTopUpEnabled 判断自建微信收款网关是否可用：
+// 已确认合规 + PayMethods 中存在 wxgateway 类型 + 网关地址与密钥已配置。
+func isWxGatewayTopUpEnabled() bool {
+	if !isPaymentComplianceConfirmed() {
+		return false
+	}
+	found := false
+	for _, method := range operation_setting.PayMethods {
+		if method["type"] == "wxgateway" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return false
+	}
+	return strings.TrimSpace(operation_setting.WxGatewayAddress) != "" &&
+		strings.TrimSpace(operation_setting.WxGatewayKey) != ""
+}
+
 func isEpayWebhookConfigured() bool {
 	return strings.TrimSpace(operation_setting.PayAddress) != "" &&
 		strings.TrimSpace(operation_setting.EpayId) != "" &&
