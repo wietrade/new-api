@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"math"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/logger"
@@ -177,15 +178,16 @@ func UpdatePendingTopUpStatus(tradeNo string, expectedPaymentProvider string, ta
 // alreadyDone=true 表示订单此前已完成，本次为幂等重复回调。
 // 进程内的 LockOrder 只是优化，正确性由本函数的数据库行锁保证。
 func RechargeEpay(tradeNo string, actualPaymentMethod string, callerIp string) (alreadyDone bool, err error) {
-	return rechargeWithProvider(tradeNo, PaymentProviderEpay, actualPaymentMethod, callerIp)
+	return rechargeWithProvider(tradeNo, PaymentProviderEpay, actualPaymentMethod, callerIp, 0)
 }
 
 // RechargeWxGateway 自有微信网关充值：与 RechargeEpay 走完全相同的入账逻辑，仅 provider 不同。
-func RechargeWxGateway(tradeNo string, actualPaymentMethod string, callerIp string) (alreadyDone bool, err error) {
-	return rechargeWithProvider(tradeNo, PaymentProviderWxGateway, actualPaymentMethod, callerIp)
+func RechargeWxGateway(tradeNo string, actualPaymentMethod string, callerIp string, paidMoney float64) (alreadyDone bool, err error) {
+	return rechargeWithProvider(tradeNo, PaymentProviderWxGateway, actualPaymentMethod, callerIp, paidMoney)
 }
 
-func rechargeWithProvider(tradeNo string, expectedProvider string, actualPaymentMethod string, callerIp string) (alreadyDone bool, err error) {
+// paidMoney > 0 时按「实付 / 应付」等比折算额度（付多少给多少）；为 0 则按下单金额。
+func rechargeWithProvider(tradeNo string, expectedProvider string, actualPaymentMethod string, callerIp string, paidMoney float64) (alreadyDone bool, err error) {
 	if tradeNo == "" {
 		return false, errors.New("payment order number not provided")
 	}
@@ -215,9 +217,15 @@ func rechargeWithProvider(tradeNo string, expectedProvider string, actualPayment
 			topUp.PaymentMethod = actualPaymentMethod
 		}
 		var quotaErr error
-		quotaToAdd, quotaErr = common.WalletQuotaFromDecimalStrict(
-			decimal.NewFromInt(topUp.Amount).Mul(decimal.NewFromFloat(common.QuotaPerUnit)),
-		)
+		quotaDecimal := decimal.NewFromInt(int64(topUp.Amount)).Mul(decimal.NewFromFloat(common.QuotaPerUnit))
+		if paidMoney > 0 && topUp.Money > 0 && math.Abs(paidMoney-topUp.Money) >= 0.005 {
+			ratio := decimal.NewFromFloat(paidMoney).Div(decimal.NewFromFloat(topUp.Money))
+			quotaDecimal = quotaDecimal.Mul(ratio)
+			common.SysLog(common.LogText("topup amount adjusted by actual payment trade_no=%s expected=%.2f paid=%.2f", topUp.TradeNo, topUp.Money, paidMoney))
+			topUp.Amount = ratio.Mul(decimal.NewFromInt(topUp.Amount)).Round(0).IntPart()
+			topUp.Money = paidMoney
+		}
+		quotaToAdd, quotaErr = common.WalletQuotaFromDecimalStrict(quotaDecimal)
 		if quotaErr != nil || quotaToAdd <= 0 {
 			return ErrInvalidTopUpQuota
 		}

@@ -755,24 +755,33 @@ func WxGatewayNotify(c *gin.Context) {
 	}
 
 	var payload struct {
-		TradeNo    string `json:"trade_no"`
-		Amount     string `json:"amount"`
-		PayOrderNo string `json:"pay_order_no"`
+		TradeNo        string `json:"trade_no"`
+		Amount         string `json:"amount"`          // 实付金额（网关按真实收款填入）
+		ExpectedAmount string `json:"expected_amount"` // 下单应付金额，仅用于日志
+		PayOrderNo     string `json:"pay_order_no"`
 	}
 	if err := json.Unmarshal(raw, &payload); err != nil || payload.TradeNo == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": "bad payload"})
 		return
 	}
 
+	// 按实付金额入账：付了多少就给多少
+	var paidMoney float64
+	if s := strings.TrimSpace(payload.Amount); s != "" {
+		if v, perr := strconv.ParseFloat(s, 64); perr == nil && v > 0 {
+			paidMoney = v
+		}
+	}
+
 	LockOrder(payload.TradeNo)
 	defer UnlockOrder(payload.TradeNo)
 
-	alreadyDone, err := model.RechargeWxGateway(payload.TradeNo, model.PaymentProviderWxGateway, c.ClientIP())
+	alreadyDone, err := model.RechargeWxGateway(payload.TradeNo, model.PaymentProviderWxGateway, c.ClientIP(), paidMoney)
 	if err != nil {
 		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway recharge failed trade_no=%s error=%q", payload.TradeNo, err.Error()))
 		c.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": err.Error()})
 		return
 	}
-	logger.LogInfo(c.Request.Context(), common.LogText("wxgateway notify handled trade_no=%s already_done=%v pay_order_no=%s client_ip=%s", payload.TradeNo, alreadyDone, payload.PayOrderNo, c.ClientIP()))
+	logger.LogInfo(c.Request.Context(), common.LogText("wxgateway notify handled trade_no=%s already_done=%v paid=%s expected=%s pay_order_no=%s client_ip=%s", payload.TradeNo, alreadyDone, payload.Amount, payload.ExpectedAmount, payload.PayOrderNo, c.ClientIP()))
 	c.JSON(http.StatusOK, gin.H{"ok": true, "already_done": alreadyDone})
 }
