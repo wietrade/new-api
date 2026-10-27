@@ -154,6 +154,9 @@ export function getPaymentIcon(
           />
         </span>
       )
+    case 'wxgateway':
+      // 自有微信收款网关：钱走微信扫码，图标用微信绿
+      return <IconWeChat className={className} style={{ color: '#07C160' }} />
     default:
       return <CreditCard className={className} />
   }

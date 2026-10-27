@@ -91,7 +91,7 @@ export function WxPayDialog({
         <iframe
           src={url}
           title='wx-pay'
-          className='h-[72vh] max-h-[760px] min-h-[560px] w-full rounded-lg border-0'
+          className='h-[72vh] max-h-[760px] min-h-[420px] w-full rounded-lg border-0'
         />
       ) : null}
     </Dialog>
