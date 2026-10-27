@@ -28,6 +28,7 @@ import { AffiliateRewardsCard } from './components/affiliate-rewards-card'
 import { BillingHistoryDialog } from './components/dialogs/billing-history-dialog'
 import { CreemConfirmDialog } from './components/dialogs/creem-confirm-dialog'
 import { PaymentConfirmDialog } from './components/dialogs/payment-confirm-dialog'
+import { WxPayDialog } from './components/dialogs/wx-pay-dialog'
 import { TransferDialog } from './components/dialogs/transfer-dialog'
 import { RechargeFormCard } from './components/recharge-form-card'
 import { SubscriptionPlansCard } from './components/subscription-plans-card'
@@ -96,6 +97,8 @@ export function Wallet(props: WalletProps) {
     processing,
     calculatePaymentAmount,
     processPayment,
+    wxPayUrl,
+    closeWxPay,
   } = usePayment()
   const {
     affiliateLink,
@@ -210,6 +213,16 @@ export function Wallet(props: WalletProps) {
       await fetchUser()
     }
   }
+
+  // 微信网关弹层：钱已到账（网关已完成入账回调）
+  const handleWxPaid = useCallback(async () => {
+    closeWxPay()
+    await fetchUser()
+    // 额度入账是异步的，稍后再刷一次
+    setTimeout(() => {
+      void fetchUser()
+    }, 1500)
+  }, [closeWxPay, fetchUser])
 
   // Handle redemption
   const handleRedeem = async () => {
@@ -384,6 +397,15 @@ export function Wallet(props: WalletProps) {
         onConfirm={handleCreemConfirm}
         product={selectedCreemProduct}
         processing={creemProcessing}
+      />
+
+      <WxPayDialog
+        open={!!wxPayUrl}
+        url={wxPayUrl}
+        onOpenChange={(open) => {
+          if (!open) closeWxPay()
+        }}
+        onPaid={handleWxPaid}
       />
     </>
   )

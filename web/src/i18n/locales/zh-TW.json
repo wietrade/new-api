@@ -7308,7 +7308,7 @@
     "WeChat": "微信",
     "WeChat ID is empty!": "微信 ID 為空！",
     "WeChat login QR code": "微信登入二維碼",
-    "WeChat Pay": "微信支付",
+    "WeChat Pay": "微信扫码支付",
     "WeChat sign in": "微信登入",
     "Week": "本週",
     "Weekday": "星期",
@@ -7438,6 +7438,7 @@
     "Billed Output": "計費輸出",
     "Billed Input": "計費輸入",
     "Force Upstream Stream": "強流式上游",
-    "Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE": "客戶端要單次回應時也向上游發送 stream=true，再把串流分片合并成一個 JSON 返回。適用於只返回 SSE 的上游"
+    "Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE": "客戶端要單次回應時也向上游發送 stream=true，再把串流分片合并成一個 JSON 返回。適用於只返回 SSE 的上游",
+    "Scan the QR code with WeChat. Be sure to fill in your account email when paying.": "请使用微信扫一扫完成支付，付款时请填写你在本站注册的邮箱。"
   }
 }

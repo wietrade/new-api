@@ -7258,7 +7258,7 @@
     "WeChat": "微信",
     "WeChat ID is empty!": "微信 ID 为空！",
     "WeChat login QR code": "微信登录二维码",
-    "WeChat Pay": "微信支付",
+    "WeChat Pay": "微信扫码支付",
     "WeChat sign in": "微信登录",
     "Week": "本周",
     "Weekday": "星期",
@@ -7517,6 +7517,7 @@
     "meta.terms.description": "NowHub API 服务条款，说明服务范围、账号责任、计费与终止条件。",
     "meta.terms.title": "服务条款",
     "{{modality}} input": "{{modality}}输入",
-    "{{modality}} output": "{{modality}}输出"
+    "{{modality}} output": "{{modality}}输出",
+    "Scan the QR code with WeChat. Be sure to fill in your account email when paying.": "请使用微信扫一扫完成支付，付款时请填写你在本站注册的邮箱。"
   }
 }

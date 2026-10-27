@@ -7517,6 +7517,7 @@
     "meta.terms.description": "NowHub API terms of service covering scope, account responsibilities, billing and termination.",
     "meta.terms.title": "Terms of service",
     "{{modality}} input": "{{modality}} input",
-    "{{modality}} output": "{{modality}} output"
+    "{{modality}} output": "{{modality}} output",
+    "Scan the QR code with WeChat. Be sure to fill in your account email when paying.": "Scan the QR code with WeChat. Be sure to fill in your account email when paying."
   }
 }

@@ -43,6 +43,9 @@ import type { AmountRequest, AmountResponse } from '../types'
 // Payment Hook
 // ============================================================================
 
+/** 自有微信收款网关的支付方式标识（newapi 后台「支付网关 → 微信收款」） */
+export const WX_GATEWAY_PAYMENT_TYPE = 'wxgateway'
+
 type AmountCalculator = (request: AmountRequest) => Promise<AmountResponse>
 
 export interface PaymentAmountCalculators {
@@ -85,6 +88,10 @@ export function usePayment() {
   const [amount, setAmount] = useState<number>(0)
   const [calculating, setCalculating] = useState(false)
   const [processing, setProcessing] = useState(false)
+  // 自有微信网关：不走整页跳转，而是弹层内嵌 iframe
+  const [wxPayUrl, setWxPayUrl] = useState<string | null>(null)
+
+  const closeWxPay = useCallback(() => setWxPayUrl(null), [])
 
   // Calculate payment amount
   const calculatePaymentAmount = useCallback(
@@ -140,6 +147,18 @@ export function usePayment() {
 
         // Handle non-Stripe payment
         if (!isStripe && response.data) {
+          // 自有微信网关：在弹层里用 iframe 打开付款页，不再开新标签页
+          if (paymentType === WX_GATEWAY_PAYMENT_TYPE) {
+            const payUrl =
+              (response.data as { pay_url?: string }).pay_url ||
+              (response as unknown as { url?: string }).url
+            if (!payUrl) {
+              return false
+            }
+            const sep = payUrl.includes('?') ? '&' : '?'
+            setWxPayUrl(`${payUrl}${sep}embed=1`)
+            return true
+          }
           const url = (response as unknown as { url?: string }).url
           if (url) {
             submitPaymentForm(url, response.data)
@@ -166,5 +185,7 @@ export function usePayment() {
     calculatePaymentAmount,
     processPayment,
     setAmount,
+    wxPayUrl,
+    closeWxPay,
   }
 }
