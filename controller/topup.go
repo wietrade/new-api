@@ -665,6 +665,10 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 		// 收款二维码图片链接由本站后台填写，随下单一起下发给网关
 		"qr_url": strings.TrimSpace(operation_setting.WxGatewayQrUrl),
 	}
+	// 实时汇率（1 USD = X CNY），供付款页展示
+	if r := common.USDCNYRate(); r > 0 {
+		chargeBody["rate"] = strconv.FormatFloat(r, 'f', 4, 64)
+	}
 	raw, _ := json.Marshal(chargeBody)
 	chargeURL := strings.TrimRight(addr, "/") + "/charge"
 	httpReq, err := http.NewRequest("POST", chargeURL, bytes.NewReader(raw))
