@@ -217,14 +217,19 @@ func rechargeWithProvider(tradeNo string, expectedProvider string, actualPayment
 		}
 		var quotaErr error
 		quotaDecimal := decimal.NewFromInt(topUp.Amount).Mul(decimal.NewFromFloat(common.QuotaPerUnit))
-		// newapi 以美元计费，微信收款是人民币到账：先把「实付人民币」按本单汇率换算成美元再入账。
-		// 汇率 = 本单应付人民币 / 本单美元数量（已含分组倍率），因此实付多少就换多少美元。
+		// newapi 以美元计费，微信收款是人民币到账：用实时汇率把实付人民币换算成美元再入账。
+		// 实时汇率取不到时，回退到本单后台配置的汇率（应付人民币 / 美元数量）。
 		if paidMoney > 0 && topUp.Money > 0 && topUp.Amount > 0 {
-			rate := decimal.NewFromFloat(topUp.Money).Div(decimal.NewFromInt(topUp.Amount)) // 人民币/美元
-			usd := decimal.NewFromFloat(paidMoney).Div(rate)
+			rate := common.USDCNYRate() // 实时汇率：1 USD = rate CNY
+			src := "live"
+			if rate <= 0 {
+				rate = topUp.Money / float64(topUp.Amount)
+				src = "order"
+			}
+			usd := decimal.NewFromFloat(paidMoney).Div(decimal.NewFromFloat(rate))
 			quotaDecimal = usd.Mul(decimal.NewFromFloat(common.QuotaPerUnit))
-			common.SysLog(common.LogText("wxgateway convert CNY to USD trade_no=%s paid_cny=%.2f rate=%.4f usd=%s",
-				topUp.TradeNo, paidMoney, rate.InexactFloat64(), usd.StringFixed(4)))
+			common.SysLog(common.LogText("wxgateway convert CNY to USD trade_no=%s paid_cny=%.2f rate=%.4f(%s) usd=%s",
+				topUp.TradeNo, paidMoney, rate, src, usd.StringFixed(4)))
 			topUp.Money = usd.InexactFloat64() // 入库金额统一为美元
 		}
 		quotaToAdd, quotaErr = common.WalletQuotaFromDecimalStrict(quotaDecimal)
