@@ -7528,6 +7528,8 @@
     "WeChat Order No.": "WeChat Order No.",
     "WeChat Nickname": "WeChat Nickname",
     "Total {{total}} records": "Total {{total}} records",
-    "Topup Records": "Topup Records"
+    "Topup Records": "Topup Records",
+    "WeChat Top-up": "WeChat Top-up",
+    "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.": "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate."
   }
 }

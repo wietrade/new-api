@@ -7449,6 +7449,8 @@
     "WeChat Order No.": "微信订单号",
     "WeChat Nickname": "微信昵称",
     "Total {{total}} records": "共 {{total}} 条",
-    "Topup Records": "充值记录"
+    "Topup Records": "充值记录",
+    "WeChat Top-up": "微信充值",
+    "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.": "本站所有费率以美元计价，充值人民币会按照实时汇率折算成美元入账。"
   }
 }

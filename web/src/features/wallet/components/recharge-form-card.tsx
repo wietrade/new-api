@@ -33,11 +33,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
-import {
-  getPaymentIcon,
-  getMinTopupAmount,
-} from '../lib'
+import { getPaymentIcon, getMinTopupAmount } from '../lib'
 import type {
   PaymentMethod,
   TopupInfo,
@@ -224,7 +222,11 @@ export function RechargeFormCard({
                               ? `${method.name}. ${disabledReason}`
                               : method.name
                           }
-                          className='min-h-14 min-w-0 justify-start gap-2 rounded-lg px-3 py-2 text-left'
+                          className={cn(
+                            'min-h-14 min-w-0 justify-start gap-2 rounded-lg px-3 py-2 text-left',
+                            method.type === 'wxgateway' &&
+                              'border-green-500/70 text-green-600 hover:border-green-500 hover:bg-green-50/60 dark:text-green-500 dark:hover:bg-green-500/10'
+                          )}
                         >
                           {paymentLoading === method.type ? (
                             <Loader2 className='h-4 w-4 animate-spin' />
@@ -238,7 +240,9 @@ export function RechargeFormCard({
                           )}
                           <span className='flex min-w-0 flex-col items-start gap-0.5'>
                             <span className='max-w-full truncate'>
-                              {method.name}
+                              {method.type === 'wxgateway'
+                                ? t('WeChat Top-up')
+                                : method.name}
                             </span>
                             {disabledLabel && (
                               <span className='text-muted-foreground max-w-full truncate text-[11px] leading-4 font-normal'>
@@ -271,6 +275,13 @@ export function RechargeFormCard({
                     </AlertDescription>
                   </Alert>
                 )}
+                {hasStandardPaymentMethods ? (
+                  <p className='text-muted-foreground text-xs leading-relaxed'>
+                    {t(
+                      'All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.'
+                    )}
+                  </p>
+                ) : null}
               </div>
 
               {enableWaffoTopup &&
