@@ -56,6 +56,7 @@ import {
   SettingsSwitchContent,
   SettingsSwitchItem,
 } from '../components/settings-form-layout'
+import { WxGatewayRecords } from './wx-gateway-records'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
@@ -1438,6 +1439,8 @@ export function PaymentSettingsSection({
                     )}
                   />
                 </div>
+
+                <WxGatewayRecords />
               </div>
             </TabsContent>
 

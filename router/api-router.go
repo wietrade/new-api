@@ -29,6 +29,16 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/uptime/status", controller.GetUptimeKumaStatus)
 		apiRouter.GET("/models", middleware.UserAuth(), controller.DashboardListModels)
 		apiRouter.GET("/status/test", middleware.AdminAuth(), controller.TestStatus)
+		// 自有微信收款网关：管理员查看/处理记录（后端代理，KEY 不进前端）
+		wxGwAdminRoute := apiRouter.Group("/wxgateway")
+		wxGwAdminRoute.Use(middleware.AdminAuth())
+		{
+			wxGwAdminRoute.GET("/orders", controller.AdminListWxGatewayOrders)
+			wxGwAdminRoute.GET("/receipts", controller.AdminWxGatewayReceipts)
+			wxGwAdminRoute.GET("/receipt/:id", controller.AdminWxGatewayReceiptImage)
+			wxGwAdminRoute.POST("/orders/:trade_no/confirm", controller.AdminConfirmWxGatewayOrder)
+			wxGwAdminRoute.POST("/orders/:trade_no/reject", controller.AdminRejectWxGatewayOrder)
+		}
 		apiRouter.GET("/notice", controller.GetNotice)
 		apiRouter.GET("/user-agreement", controller.GetUserAgreement)
 		apiRouter.GET("/privacy-policy", controller.GetPrivacyPolicy)
