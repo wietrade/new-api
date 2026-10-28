@@ -7439,15 +7439,6 @@
     "Billed Input": "計費輸入",
     "Force Upstream Stream": "強流式上游",
     "Send stream=true upstream when the client asks for a single response, then merge the frames back into one JSON object. Use for gateways that only return SSE": "客戶端要單次回應時也向上游發送 stream=true，再把串流分片合并成一個 JSON 返回。適用於只返回 SSE 的上游",
-    "Scan the QR code with WeChat. Be sure to fill in your account email when paying.": "请使用微信扫一扫完成支付，付款时请填写你在本站注册的邮箱。",
-    "Transaction Records": "交易记录",
-    "Top-up records with CNY amount, USD credited, exchange rate and WeChat order details": "每笔充值的人民币金额、入账美元、汇率与微信订单明细",
-    "CNY Paid": "人民币实付",
-    "USD Credited": "入账美元",
-    "Rate": "汇率",
-    "Order No.": "订单号",
-    "WeChat Order No.": "微信订单号",
-    "WeChat Nickname": "微信昵称",
-    "Total {{total}} records": "共 {{total}} 条"
+    "Scan the QR code with WeChat. Be sure to fill in your account email when paying.": "请使用微信扫一扫完成支付，付款时请填写你在本站注册的邮箱。"
   }
 }

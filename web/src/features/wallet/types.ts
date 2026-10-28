@@ -271,16 +271,6 @@ export interface TopupRecord {
   complete_time?: number
   /** Payment status */
   status: TopupStatus
-  /** 微信收款：实付人民币 */
-  cny_amount?: number
-  /** 微信收款：入账美元 */
-  usd_amount?: number
-  /** 微信收款：当时使用的汇率（1 USD = X CNY） */
-  fx_rate?: number
-  /** 微信收款：微信订单号 */
-  wx_order_no?: string
-  /** 微信收款：微信昵称（付款人昵称） */
-  wx_nickname?: string
 }
 
 /**

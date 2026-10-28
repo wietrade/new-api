@@ -7518,15 +7518,6 @@
     "meta.terms.title": "Terms of service",
     "{{modality}} input": "{{modality}} input",
     "{{modality}} output": "{{modality}} output",
-    "Scan the QR code with WeChat. Be sure to fill in your account email when paying.": "Scan the QR code with WeChat. Be sure to fill in your account email when paying.",
-    "Transaction Records": "Transaction Records",
-    "Top-up records with CNY amount, USD credited, exchange rate and WeChat order details": "Top-up records with CNY amount, USD credited, exchange rate and WeChat order details",
-    "CNY Paid": "CNY Paid",
-    "USD Credited": "USD Credited",
-    "Rate": "Rate",
-    "Order No.": "Order No.",
-    "WeChat Order No.": "WeChat Order No.",
-    "WeChat Nickname": "WeChat Nickname",
-    "Total {{total}} records": "Total {{total}} records"
+    "Scan the QR code with WeChat. Be sure to fill in your account email when paying.": "Scan the QR code with WeChat. Be sure to fill in your account email when paying."
   }
 }
