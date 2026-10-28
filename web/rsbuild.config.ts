@@ -71,7 +71,8 @@ export default defineConfig(({ envMode }) => {
     },
     html: {
       template: './index.html',
-      favicon: './public/favicon.ico',
+      // 不再让 rsbuild 注入 favicon：它会拼上 assetPrefix（OSS 域名）导致 404，
+      // 图标统一写在 index.html 里（支持 svg + png + ico 多格式）。
     },
     server: {
       host: '0.0.0.0',
