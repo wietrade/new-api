@@ -623,12 +623,16 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 		return
 	}
 	id := c.GetInt("id")
-	if req.Amount < getMinTopup() {
-		paymentError(c, common.NewMessage("Top-up amount cannot be less than {{min}}", map[string]any{"min": getMinTopup()}))
-		return
-	}
-	if rejectInvalidTopUpQuota(c, id, req.Amount) {
-		return
+	// amount <= 0 = 金额自填：扫码后在微信支付页自己填金额，付多少到账多少
+	selfAmount := req.Amount <= 0
+	if !selfAmount {
+		if req.Amount < getMinTopup() {
+			paymentError(c, common.NewMessage("Top-up amount cannot be less than {{min}}", map[string]any{"min": getMinTopup()}))
+			return
+		}
+		if rejectInvalidTopUpQuota(c, id, req.Amount) {
+			return
+		}
 	}
 	group, err := model.GetUserGroup(id, true)
 	if err != nil {
@@ -636,7 +640,9 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 		return
 	}
 	payMoney := getPayMoney(req.Amount, group)
-	if payMoney < 0.01 {
+	if selfAmount {
+		payMoney = 0
+	} else if payMoney < 0.01 {
 		paymentError(c, common.NewMessage("Payment amount is too low"))
 		return
 	}
@@ -660,6 +666,7 @@ func requestWxGateway(c *gin.Context, req EpayRequest) {
 		"uid":      id,
 		"email":    email,
 		"username": username,
+		"self_amount": selfAmount,
 		"amount":   strconv.FormatFloat(payMoney, 'f', 2, 64),
 		"name":     fmt.Sprintf("TUC%d", req.Amount),
 		// 收款二维码图片链接由本站后台填写，随下单一起下发给网关

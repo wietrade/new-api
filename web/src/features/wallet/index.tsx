@@ -28,7 +28,6 @@ import { AffiliateRewardsCard } from './components/affiliate-rewards-card'
 import { CreemConfirmDialog } from './components/dialogs/creem-confirm-dialog'
 import { PaymentConfirmDialog } from './components/dialogs/payment-confirm-dialog'
 import { WxPayDialog } from './components/dialogs/wx-pay-dialog'
-import { TransactionListCard } from './components/transaction-list-card'
 import { TransferDialog } from './components/dialogs/transfer-dialog'
 import { RechargeFormCard } from './components/recharge-form-card'
 import { SubscriptionPlansCard } from './components/subscription-plans-card'
@@ -51,7 +50,6 @@ import {
 import type {
   UserWalletData,
   PaymentMethod,
-  PresetAmount,
   CreemProduct,
   WaffoPayMethod,
 } from './types'
@@ -65,7 +63,6 @@ export function Wallet(props: WalletProps) {
   const [user, setUser] = useState<UserWalletData | null>(null)
   const [userLoading, setUserLoading] = useState(true)
   const [topupAmount, setTopupAmount] = useState(0)
-  const [selectedPreset, setSelectedPreset] = useState<number | null>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod>()
   const [selectedWaffoMethodIndex, setSelectedWaffoMethodIndex] = useState<
@@ -82,7 +79,7 @@ export function Wallet(props: WalletProps) {
 
   const { status } = useStatus()
   const { currency } = useSystemConfig()
-  const { topupInfo, presetAmounts, loading: topupLoading } = useTopupInfo()
+  const { topupInfo, loading: topupLoading } = useTopupInfo()
 
   // Calculate effective exchange rate - when display type is USD, use rate of 1
   const effectiveUsdExchangeRate = useMemo(() => {
@@ -152,25 +149,6 @@ export function Wallet(props: WalletProps) {
     }
   }, [topupInfo, calculatePaymentAmount])
 
-  // Get current payment type (selected or default)
-  const getCurrentPaymentType = useCallback(() => {
-    return selectedPaymentMethod?.type || getDefaultPaymentType(topupInfo)
-  }, [selectedPaymentMethod, topupInfo])
-
-  // Handle preset selection
-  const handleSelectPreset = (preset: PresetAmount) => {
-    setTopupAmount(preset.value)
-    setSelectedPreset(preset.value)
-    calculatePaymentAmount(preset.value, getCurrentPaymentType())
-  }
-
-  // Handle topup amount change
-  const handleTopupAmountChange = (amount: number) => {
-    setTopupAmount(amount)
-    setSelectedPreset(null)
-    calculatePaymentAmount(amount, getCurrentPaymentType())
-  }
-
   // Handle payment method selection
   const handlePaymentMethodSelect = async (method: PaymentMethod) => {
     setSelectedPaymentMethod(method)
@@ -178,6 +156,12 @@ export function Wallet(props: WalletProps) {
     setPaymentLoading(method.type)
 
     try {
+      // 微信收款：金额由用户在微信支付页自己填，本站不选金额、不走金额确认弹层
+      if (method.type === 'wxgateway') {
+        await processPayment(0, method.type)
+        return
+      }
+
       // Validate minimum topup
       const minTopup = getMinTopupAmount(topupInfo)
       if (topupAmount < minTopup) {
@@ -312,13 +296,7 @@ export function Wallet(props: WalletProps) {
               <div id='wallet-add-funds' className='scroll-mt-4'>
                 <RechargeFormCard
                   topupInfo={topupInfo}
-                  presetAmounts={presetAmounts}
-                  selectedPreset={selectedPreset}
-                  onSelectPreset={handleSelectPreset}
                   topupAmount={topupAmount}
-                  onTopupAmountChange={handleTopupAmountChange}
-                  paymentAmount={paymentAmount}
-                  calculating={calculating}
                   onPaymentMethodSelect={handlePaymentMethodSelect}
                   paymentLoading={paymentLoading}
                   redemptionCode={redemptionCode}
@@ -327,8 +305,6 @@ export function Wallet(props: WalletProps) {
                   redeeming={redeeming}
                   topupLink={topupInfo?.topup_link}
                   loading={topupLoading}
-                  priceRatio={(status?.price as number) || 1}
-                  usdExchangeRate={effectiveUsdExchangeRate}
                   creemProducts={topupInfo?.creem_products}
                   enableCreemTopup={topupInfo?.enable_creem_topup}
                   onCreemProductSelect={handleCreemProductSelect}
@@ -349,8 +325,6 @@ export function Wallet(props: WalletProps) {
                 onPurchaseSuccess={fetchUser}
               />
             </div>
-
-            <TransactionListCard />
 
             <AffiliateRewardsCard
               user={user}

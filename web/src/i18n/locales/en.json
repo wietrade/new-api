@@ -7527,6 +7527,7 @@
     "Order No.": "Order No.",
     "WeChat Order No.": "WeChat Order No.",
     "WeChat Nickname": "WeChat Nickname",
-    "Total {{total}} records": "Total {{total}} records"
+    "Total {{total}} records": "Total {{total}} records",
+    "Topup Records": "Topup Records"
   }
 }

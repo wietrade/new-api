@@ -7448,6 +7448,7 @@
     "Order No.": "订单号",
     "WeChat Order No.": "微信订单号",
     "WeChat Nickname": "微信昵称",
-    "Total {{total}} records": "共 {{total}} 条"
+    "Total {{total}} records": "共 {{total}} 条",
+    "Topup Records": "充值记录"
   }
 }
