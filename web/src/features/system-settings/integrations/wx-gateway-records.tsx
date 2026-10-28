@@ -54,6 +54,10 @@ interface GwHealth {
   ok?: boolean
   last_push_at?: string | null
   seconds_since_push?: number | null
+  heartbeat_at?: string | null
+  seconds_since_heartbeat?: number | null
+  device?: string | null
+  device_battery?: number | null
   today_count?: number
   today_cny?: number
   stale_pending?: number
@@ -267,9 +271,24 @@ export function WxGatewayRecords() {
 
       <div className='flex flex-wrap items-center gap-2 text-xs'>
         <span className='bg-muted rounded px-2 py-1'>
-          手机最后上报：
-          <b>{agoText(health?.seconds_since_push)}</b>
+          手机在线：
+          <b>
+            {agoText(
+              health?.seconds_since_heartbeat ?? health?.seconds_since_push
+            )}
+          </b>
+          {health?.seconds_since_heartbeat === null ||
+          health?.seconds_since_heartbeat === undefined
+            ? '（按最后收款推算）'
+            : ''}
         </span>
+        {health?.device_battery !== null &&
+        health?.device_battery !== undefined &&
+        health.device_battery >= 0 ? (
+          <span className='bg-muted rounded px-2 py-1'>
+            手机电量：{health.device_battery}%
+          </span>
+        ) : null}
         <span className='bg-muted rounded px-2 py-1'>
           今日收款：{health?.today_count ?? 0} 笔 · ￥{health?.today_cny ?? 0}
         </span>
