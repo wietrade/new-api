@@ -803,9 +803,10 @@ func WxGatewayNotify(c *gin.Context) {
 		Amount         string `json:"amount"`          // 实付金额（网关按真实收款填入）
 		ExpectedAmount string `json:"expected_amount"` // 下单应付金额，仅用于日志
 		PayOrderNo     string `json:"pay_order_no"`
-		Payer          string `json:"payer"`       // 昵称（网关从收款明细里识别出来的）
-		CustomerNo     string `json:"customer_no"` // 顺序号
-		PayRemark      string `json:"pay_remark"`  // 备注
+		Payer          string `json:"payer"`         // 昵称（网关从收款明细里识别出来的）
+		CustomerNo     string `json:"customer_no"`   // 顺序号
+		PayRemark      string `json:"pay_remark"`    // 备注
+		ConsumeTimes   int    `json:"consume_times"` // 通知原文的「第 N 次消费」
 	}
 	if err := json.Unmarshal(raw, &payload); err != nil || payload.TradeNo == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": "bad payload"})
@@ -830,6 +831,7 @@ func WxGatewayNotify(c *gin.Context) {
 			WxNickname: strings.TrimSpace(payload.Payer),
 			CustomerNo: strings.TrimSpace(payload.CustomerNo),
 			PayRemark:  strings.TrimSpace(payload.PayRemark),
+			ConsumeTimes: payload.ConsumeTimes,
 		})
 	if err != nil {
 		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway recharge failed trade_no=%s error=%q", payload.TradeNo, err.Error()))

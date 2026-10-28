@@ -31,6 +31,8 @@ type TopUp struct {
 	WxNickname string  `json:"wx_nickname" gorm:"type:varchar(128);default:''"`
 	CustomerNo string  `json:"customer_no" gorm:"type:varchar(32);default:''"`
 	PayRemark  string  `json:"pay_remark" gorm:"type:varchar(255);default:''"`
+	// 通知原文里的「第 N 次消费」（仅管理员核对用，不在用户侧展示）
+	ConsumeTimes int `json:"consume_times" gorm:"default:0"`
 }
 
 const (
@@ -190,11 +192,12 @@ func RechargeEpay(tradeNo string, actualPaymentMethod string, callerIp string) (
 
 // WxGatewayDetail 自有微信网关的到账明细（人民币实付 / 微信订单号 / 微信昵称）
 type WxGatewayDetail struct {
-	PaidCny    float64
-	WxOrderNo  string
-	WxNickname string
-	CustomerNo string
-	PayRemark  string
+	PaidCny      float64
+	WxOrderNo    string
+	WxNickname   string
+	CustomerNo   string
+	PayRemark    string
+	ConsumeTimes int
 }
 
 // RechargeWxGateway 自有微信网关充值：与 RechargeEpay 走完全相同的入账逻辑，仅 provider 不同。
@@ -272,6 +275,9 @@ func rechargeWithProvider(tradeNo string, expectedProvider string, actualPayment
 			}
 			if wxd.PayRemark != "" {
 				topUp.PayRemark = wxd.PayRemark
+			}
+			if wxd.ConsumeTimes > 0 {
+				topUp.ConsumeTimes = wxd.ConsumeTimes
 			}
 		}
 		quotaToAdd, quotaErr = common.WalletQuotaFromDecimalStrict(quotaDecimal)

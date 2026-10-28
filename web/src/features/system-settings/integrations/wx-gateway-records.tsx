@@ -40,6 +40,7 @@ interface GwOrder {
   customer_no?: string | null
   pay_remark?: string | null
   pay_time?: string | null
+  consume_times?: number | null
   paid_usd?: number | null
   fx_rate?: number | null
   receipt_count?: number
@@ -376,6 +377,9 @@ export function WxGatewayRecords() {
                 备注
               </th>
               <th className='px-2 py-2 text-left font-medium whitespace-nowrap'>
+                消费次数
+              </th>
+              <th className='px-2 py-2 text-left font-medium whitespace-nowrap'>
                 本站订单号
               </th>
               <th className='px-2 py-2 text-left font-medium whitespace-nowrap'>
@@ -389,13 +393,13 @@ export function WxGatewayRecords() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={11} className='text-muted-foreground px-2 py-6 text-center'>
+                <td colSpan={12} className='text-muted-foreground px-2 py-6 text-center'>
                   加载中…
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={11} className='text-muted-foreground px-2 py-6 text-center'>
+                <td colSpan={12} className='text-muted-foreground px-2 py-6 text-center'>
                   没有记录
                 </td>
               </tr>
@@ -436,6 +440,11 @@ export function WxGatewayRecords() {
                       title={o.pay_remark || ''}
                     >
                       {o.pay_remark || '—'}
+                    </td>
+                    <td className='text-muted-foreground px-2 py-2 whitespace-nowrap tabular-nums'>
+                      {o.consume_times && o.consume_times > 0
+                        ? `第 ${o.consume_times} 次`
+                        : '—'}
                     </td>
                     <td className='px-2 py-2 font-mono whitespace-nowrap'>
                       {o.trade_no}
