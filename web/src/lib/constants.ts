@@ -22,7 +22,10 @@ For commercial licensing, please contact support@quantumnous.com
 
 // System Configuration Defaults
 export const DEFAULT_SYSTEM_NAME = 'New API'
-export const DEFAULT_LOGO = '/brand/nowhub-logo.png'
+// 页头/页脚是 24~28px 的方形容器，必须用方形 icon（横版 logo 会被压扁）
+export const DEFAULT_LOGO = '/brand/nowhub-icon.png'
+// 宽容器（登录页、邮件、文档）可用横版 logo
+export const WIDE_LOGO = '/brand/nowhub-logo-wide.png'
 
 // LocalStorage Keys
 export const STORAGE_KEYS = {

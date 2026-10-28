@@ -42,7 +42,8 @@ export function HeaderLogo({
       src={src}
       alt={alt}
       className={cn(
-        'h-6 w-6 rounded-full transition-opacity duration-200',
+        // 容器是正方形，图片需 object-contain 保持比例；圆角与品牌 icon 一致
+        'h-6 w-6 rounded-md object-contain transition-opacity duration-200',
         !loading && logoLoaded ? 'opacity-100' : 'opacity-0',
         className
       )}

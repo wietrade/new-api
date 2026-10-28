@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSystemConfig } from '@/hooks/use-system-config'
+import { DEFAULT_LOGO, WIDE_LOGO } from '@/lib/constants'
 
 type AuthLayoutProps = {
   children: React.ReactNode
@@ -25,6 +26,9 @@ type AuthLayoutProps = {
 
 export function AuthLayout({ children }: AuthLayoutProps) {
   const { systemName, logo, loading } = useSystemConfig()
+  // 登录页是宽容器（max-h-40px / max-w-220px），横版 logo 才好看；
+  // 页头/页脚是 24~28px 正方形，用的是方形 icon。
+  const displayLogo = logo === DEFAULT_LOGO ? WIDE_LOGO : logo
 
   return (
     /* [改造-仿bifrost] 居中卡片：448px、space-y-6、p-8，圆角跟随主题 --radius */
@@ -36,7 +40,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
               <Skeleton className='h-10 w-40' />
             ) : (
               <img
-                src={logo}
+                src={displayLogo}
                 alt={systemName}
                 className='max-h-[40px] w-auto max-w-[220px] object-contain'
               />
