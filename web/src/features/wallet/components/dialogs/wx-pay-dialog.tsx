@@ -78,9 +78,12 @@ export function WxPayDialog({
         case 'paid':
           onPaid()
           break
+        case 'close':
+          // 用户点「返回钱包」：此时可能已完成入账，一并刷新余额与订单列表
+          onPaid()
+          break
         case 'expired':
         case 'review':
-        case 'close':
           onOpenChange(false)
           break
         default:

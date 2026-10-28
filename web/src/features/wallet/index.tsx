@@ -201,9 +201,14 @@ export function Wallet(props: WalletProps) {
   const handleWxPaid = useCallback(async () => {
     closeWxPay()
     await fetchUser()
+    // 充值记录列表与余额要一起刷新，否则用户只看到金额变了、订单列表还是旧的
+    const refreshLists = () =>
+      window.dispatchEvent(new Event('nowhub:topup-refresh'))
+    refreshLists()
     // 额度入账是异步的，稍后再刷一次
     setTimeout(() => {
       void fetchUser()
+      refreshLists()
     }, 1500)
   }, [closeWxPay, fetchUser])
 

@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { StatusBadge } from '@/components/status-badge'
@@ -65,7 +65,15 @@ export function TopupRecordsList() {
     pageSize,
     loading,
     handlePageChange,
+    refresh,
   } = useBillingHistory({ initialPageSize: 5 })
+
+  // 微信网关入账完成后（弹层关闭/支付成功）立刻重新拉一次，避免只刷新余额、订单列表还是旧的
+  useEffect(() => {
+    const onRefresh = () => void refresh()
+    window.addEventListener('nowhub:topup-refresh', onRefresh)
+    return () => window.removeEventListener('nowhub:topup-refresh', onRefresh)
+  }, [refresh])
   const { copyToClipboard, copiedText } = useCopyToClipboard({ notify: false })
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
