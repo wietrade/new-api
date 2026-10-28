@@ -82,6 +82,9 @@ export function TopupRecordsList() {
     </Button>
   )
 
+  const th = 'whitespace-nowrap px-2 py-2 text-left font-medium'
+  const td = 'whitespace-nowrap px-2 py-2'
+
   return (
     <div className='space-y-2.5 sm:space-y-3'>
       <div className='flex items-center justify-between'>
@@ -118,7 +121,7 @@ export function TopupRecordsList() {
       {loading ? (
         <div className='space-y-2'>
           {['a', 'b', 'c'].map((k) => (
-            <Skeleton key={k} className='h-14 w-full rounded-lg' />
+            <Skeleton key={k} className='h-8 w-full' />
           ))}
         </div>
       ) : records.length === 0 ? (
@@ -126,56 +129,67 @@ export function TopupRecordsList() {
           {t('Your transaction history will appear here')}
         </div>
       ) : (
-        <div className='divide-y overflow-hidden rounded-lg border'>
-          {records.map((record) => {
-            const statusConfig = getStatusConfig(record.status)
-            return (
-              <div key={record.id} className='space-y-1 px-3 py-2.5'>
-                <div className='flex items-center justify-between gap-2'>
-                  <div className='flex min-w-0 items-baseline gap-2'>
-                    <span className='text-sm font-semibold'>
-                      {cnyOf(record)}
-                    </span>
-                    <span className='text-muted-foreground text-xs'>
-                      → {usdOf(record)}
-                    </span>
-                    <span className='text-muted-foreground text-[11px]'>
-                      {t('Rate')} {rateOf(record)}
-                    </span>
-                  </div>
-                  <StatusBadge
-                    label={t(statusConfig.label)}
-                    variant={statusConfig.variant}
-                    showDot
-                    copyable={false}
-                  />
-                </div>
-                <div className='text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px]'>
-                  <span>{formatTimestamp(record.create_time)}</span>
-                  <span className='flex items-center gap-1'>
-                    <code className='max-w-[150px] truncate font-mono'>
-                      {record.trade_no}
-                    </code>
-                    {copyBtn(record.trade_no)}
-                  </span>
-                  {record.wx_order_no ? (
-                    <span className='flex items-center gap-1'>
-                      <span>{t('WeChat Order No.')}</span>
-                      <code className='max-w-[150px] truncate font-mono'>
-                        {record.wx_order_no}
-                      </code>
-                      {copyBtn(record.wx_order_no)}
-                    </span>
-                  ) : null}
-                  {record.wx_nickname ? (
-                    <span>
-                      {t('WeChat Nickname')} {record.wx_nickname}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-            )
-          })}
+        <div className='overflow-x-auto rounded-lg border'>
+          <table className='w-full border-collapse text-xs'>
+            <thead className='bg-muted/40 text-muted-foreground'>
+              <tr>
+                <th className={th}>{t('Time')}</th>
+                <th className={th}>{t('CNY Paid')}</th>
+                <th className={th}>{t('USD Credited')}</th>
+                <th className={th}>{t('Rate')}</th>
+                <th className={th}>{t('Order No.')}</th>
+                <th className={th}>{t('WeChat Order No.')}</th>
+                <th className={th}>{t('WeChat Nickname')}</th>
+                <th className={th}>{t('Status')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {records.map((record) => {
+                const statusConfig = getStatusConfig(record.status)
+                return (
+                  <tr key={record.id} className='border-t'>
+                    <td className={`${td} text-muted-foreground`}>
+                      {formatTimestamp(record.create_time)}
+                    </td>
+                    <td className={`${td} font-semibold`}>{cnyOf(record)}</td>
+                    <td className={`${td} font-semibold`}>{usdOf(record)}</td>
+                    <td className={`${td} text-muted-foreground`}>
+                      {rateOf(record)}
+                    </td>
+                    <td className={td}>
+                      <div className='flex items-center gap-1'>
+                        <code className='max-w-[150px] truncate font-mono'>
+                          {record.trade_no}
+                        </code>
+                        {copyBtn(record.trade_no)}
+                      </div>
+                    </td>
+                    <td className={td}>
+                      <div className='flex items-center gap-1'>
+                        <code className='max-w-[150px] truncate font-mono'>
+                          {record.wx_order_no || '—'}
+                        </code>
+                        {record.wx_order_no
+                          ? copyBtn(record.wx_order_no)
+                          : null}
+                      </div>
+                    </td>
+                    <td className={`${td} max-w-[120px] truncate`}>
+                      {record.wx_nickname || '—'}
+                    </td>
+                    <td className={td}>
+                      <StatusBadge
+                        label={t(statusConfig.label)}
+                        variant={statusConfig.variant}
+                        showDot
+                        copyable={false}
+                      />
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
