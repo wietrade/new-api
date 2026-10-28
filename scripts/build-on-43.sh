@@ -89,6 +89,21 @@ if [ -n "${ASSET_PREFIX:-}" ] && [ -n "${OSS_BUCKET:-}" ]; then
   OSS_BUCKET="$OSS_BUCKET" \
     OSS_ENDPOINT="${OSS_ENDPOINT:-oss-cn-beijing.aliyuncs.com}" \
     bash "$SRC_DIR/scripts/upload-static-to-oss.sh"
+
+  # 品牌图标（favicon/apple-touch/logo）在 dist 根目录，不在 static/ 下，
+  # 但 index.html 里 rsbuild 会把 favicon 拼成 <assetPrefix>/favicon.ico，
+  # 所以这些文件也要同步到桶根，否则浏览器 404。
+  log "上传根目录图标 -> oss://$OSS_BUCKET/"
+  for f in favicon.ico favicon.svg favicon-16x16.png favicon-32x32.png \
+           apple-touch-icon.png android-chrome-192x192.png android-chrome-512x512.png \
+           logo.png site.webmanifest manifest.json; do
+    if [ -f "web/dist/$f" ]; then
+      ossutil cp "web/dist/$f" "oss://$OSS_BUCKET/$f" \
+        --endpoint "${OSS_ENDPOINT:-oss-cn-beijing.aliyuncs.com}" -f -u \
+        --meta "Cache-Control:public, max-age=3600" >/dev/null &&
+        ok "  ✓ $f"
+    fi
+  done
 fi
 
 log "编译二进制"
