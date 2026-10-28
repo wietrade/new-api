@@ -16,10 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Dialog } from '@/components/dialog'
+import { useTheme } from '@/context/theme-provider'
 
 /**
  * 微信扫码支付弹层。
@@ -50,6 +51,22 @@ export function WxPayDialog({
   onPaid,
 }: WxPayDialogProps) {
   const { t } = useTranslation()
+  const { resolvedTheme } = useTheme()
+
+  // 把全站主题（深/浅）和实际字体传给网关页面，保持视觉一致
+  const src = useMemo(() => {
+    if (!url) return ''
+    try {
+      const u = new URL(url)
+      u.searchParams.set('embed', '1')
+      u.searchParams.set('theme', resolvedTheme)
+      const font = window.getComputedStyle(document.body).fontFamily
+      if (font) u.searchParams.set('font', font)
+      return u.toString()
+    } catch {
+      return url
+    }
+  }, [url, resolvedTheme])
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
@@ -87,9 +104,9 @@ export function WxPayDialog({
       contentHeight='auto'
       bodyClassName='p-0'
     >
-      {url ? (
+      {src ? (
         <iframe
-          src={url}
+          src={src}
           title='wx-pay'
           className='h-[72vh] max-h-[760px] min-h-[420px] w-full rounded-lg border-0'
         />
