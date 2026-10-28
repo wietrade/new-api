@@ -23,6 +23,12 @@ type TopUp struct {
 	CreateTime      int64   `json:"create_time"`
 	CompleteTime    int64   `json:"complete_time"`
 	Status          string  `json:"status"`
+	// 自有微信收款网关的到账明细（其他渠道留空）
+	CnyAmount  float64 `json:"cny_amount" gorm:"default:0"`
+	UsdAmount  float64 `json:"usd_amount" gorm:"default:0"`
+	FxRate     float64 `json:"fx_rate" gorm:"default:0"`
+	WxOrderNo  string  `json:"wx_order_no" gorm:"type:varchar(128);default:''"`
+	WxNickname string  `json:"wx_nickname" gorm:"type:varchar(128);default:''"`
 }
 
 const (
@@ -177,16 +183,23 @@ func UpdatePendingTopUpStatus(tradeNo string, expectedPaymentProvider string, ta
 // alreadyDone=true 表示订单此前已完成，本次为幂等重复回调。
 // 进程内的 LockOrder 只是优化，正确性由本函数的数据库行锁保证。
 func RechargeEpay(tradeNo string, actualPaymentMethod string, callerIp string) (alreadyDone bool, err error) {
-	return rechargeWithProvider(tradeNo, PaymentProviderEpay, actualPaymentMethod, callerIp, 0)
+	return rechargeWithProvider(tradeNo, PaymentProviderEpay, actualPaymentMethod, callerIp, 0, nil)
+}
+
+// WxGatewayDetail 自有微信网关的到账明细（人民币实付 / 微信订单号 / 微信昵称）
+type WxGatewayDetail struct {
+	PaidCny    float64
+	WxOrderNo  string
+	WxNickname string
 }
 
 // RechargeWxGateway 自有微信网关充值：与 RechargeEpay 走完全相同的入账逻辑，仅 provider 不同。
-func RechargeWxGateway(tradeNo string, actualPaymentMethod string, callerIp string, paidMoney float64) (alreadyDone bool, err error) {
-	return rechargeWithProvider(tradeNo, PaymentProviderWxGateway, actualPaymentMethod, callerIp, paidMoney)
+func RechargeWxGateway(tradeNo string, actualPaymentMethod string, callerIp string, paidMoney float64, detail *WxGatewayDetail) (alreadyDone bool, err error) {
+	return rechargeWithProvider(tradeNo, PaymentProviderWxGateway, actualPaymentMethod, callerIp, paidMoney, detail)
 }
 
 // paidMoney > 0 时按「实付 / 应付」等比折算额度（付多少给多少）；为 0 则按下单金额。
-func rechargeWithProvider(tradeNo string, expectedProvider string, actualPaymentMethod string, callerIp string, paidMoney float64) (alreadyDone bool, err error) {
+func rechargeWithProvider(tradeNo string, expectedProvider string, actualPaymentMethod string, callerIp string, paidMoney float64, wxd *WxGatewayDetail) (alreadyDone bool, err error) {
 	if tradeNo == "" {
 		return false, errors.New("payment order number not provided")
 	}
@@ -219,18 +232,37 @@ func rechargeWithProvider(tradeNo string, expectedProvider string, actualPayment
 		quotaDecimal := decimal.NewFromInt(topUp.Amount).Mul(decimal.NewFromFloat(common.QuotaPerUnit))
 		// newapi 以美元计费，微信收款是人民币到账：用实时汇率把实付人民币换算成美元再入账。
 		// 实时汇率取不到时，回退到本单后台配置的汇率（应付人民币 / 美元数量）。
-		if paidMoney > 0 && topUp.Money > 0 && topUp.Amount > 0 {
+		if paidMoney > 0 {
 			rate := common.USDCNYRate() // 实时汇率：1 USD = rate CNY
 			src := "live"
-			if rate <= 0 {
+			if rate <= 0 && topUp.Money > 0 && topUp.Amount > 0 {
 				rate = topUp.Money / float64(topUp.Amount)
 				src = "order"
+			}
+			if rate <= 0 {
+				common.SysError(common.LogText("wxgateway fx rate unavailable trade_no=%s paid_cny=%.2f", topUp.TradeNo, paidMoney))
+				return ErrInvalidTopUpQuota
 			}
 			usd := decimal.NewFromFloat(paidMoney).Div(decimal.NewFromFloat(rate))
 			quotaDecimal = usd.Mul(decimal.NewFromFloat(common.QuotaPerUnit))
 			common.SysLog(common.LogText("wxgateway convert CNY to USD trade_no=%s paid_cny=%.2f rate=%.4f(%s) usd=%s",
 				topUp.TradeNo, paidMoney, rate, src, usd.StringFixed(4)))
 			topUp.Money = usd.InexactFloat64() // 入库金额统一为美元
+			topUp.CnyAmount = paidMoney
+			topUp.UsdAmount = usd.InexactFloat64()
+			topUp.FxRate = rate
+		}
+		// 微信收款明细：微信订单号 / 微信昵称（用户后台的交易记录要用）
+		if wxd != nil {
+			if wxd.PaidCny > 0 {
+				topUp.CnyAmount = wxd.PaidCny
+			}
+			if wxd.WxOrderNo != "" {
+				topUp.WxOrderNo = wxd.WxOrderNo
+			}
+			if wxd.WxNickname != "" {
+				topUp.WxNickname = wxd.WxNickname
+			}
 		}
 		quotaToAdd, quotaErr = common.WalletQuotaFromDecimalStrict(quotaDecimal)
 		if quotaErr != nil || quotaToAdd <= 0 {
