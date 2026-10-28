@@ -34,6 +34,7 @@ func SetApiRouter(router *gin.Engine) {
 		wxGwAdminRoute.Use(middleware.AdminAuth())
 		{
 			wxGwAdminRoute.GET("/orders", controller.AdminListWxGatewayOrders)
+			wxGwAdminRoute.GET("/status", controller.AdminWxGatewayStatus)
 			wxGwAdminRoute.GET("/receipts", controller.AdminWxGatewayReceipts)
 			wxGwAdminRoute.GET("/receipt/:id", controller.AdminWxGatewayReceiptImage)
 			wxGwAdminRoute.POST("/orders/:trade_no/confirm", controller.AdminConfirmWxGatewayOrder)

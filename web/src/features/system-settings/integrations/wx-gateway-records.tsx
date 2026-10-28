@@ -50,6 +50,28 @@ interface GwReceipt {
   content_type?: string
 }
 
+interface GwHealth {
+  ok?: boolean
+  last_push_at?: string | null
+  seconds_since_push?: number | null
+  today_count?: number
+  today_cny?: number
+  stale_pending?: number
+  expired_unpaid_24h?: number
+  unnotified_paid?: number
+  retrying_paid?: number
+  pending_ttl?: number
+  warnings?: string[]
+}
+
+function agoText(sec?: number | null): string {
+  if (sec === null || sec === undefined) return '从未上报'
+  if (sec < 60) return `${sec} 秒前`
+  if (sec < 3600) return `${Math.floor(sec / 60)} 分钟前`
+  if (sec < 86400) return `${Math.floor(sec / 3600)} 小时前`
+  return `${Math.floor(sec / 86400)} 天前`
+}
+
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
   rejected: {
     text: '待人工核对',
@@ -89,6 +111,7 @@ export function WxGatewayRecords() {
   const [loading, setLoading] = useState(false)
   const [acting, setActing] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [health, setHealth] = useState<GwHealth | null>(null)
 
   const [receiptOpen, setReceiptOpen] = useState(false)
   const [receipts, setReceipts] = useState<GwReceipt[]>([])
@@ -129,6 +152,26 @@ export function WxGatewayRecords() {
   useEffect(() => {
     void load()
   }, [load])
+
+  // 健康状态：每 60 秒拉一次（手机是否还在上报、是否有积压）
+  useEffect(() => {
+    let alive = true
+    const tick = async () => {
+      try {
+        const res = await api.get('/api/wxgateway/status')
+        const d = res.data as GwHealth
+        if (alive && d?.ok) setHealth(d)
+      } catch {
+        /* 网关不可达时保留上一次结果 */
+      }
+    }
+    void tick()
+    const timer = window.setInterval(tick, 60000)
+    return () => {
+      alive = false
+      window.clearInterval(timer)
+    }
+  }, [])
 
   const act = async (order: GwOrder, kind: 'confirm' | 'reject') => {
     if (!order) return
@@ -221,6 +264,40 @@ export function WxGatewayRecords() {
           刷新
         </Button>
       </div>
+
+      <div className='flex flex-wrap items-center gap-2 text-xs'>
+        <span className='bg-muted rounded px-2 py-1'>
+          手机最后上报：
+          <b>{agoText(health?.seconds_since_push)}</b>
+        </span>
+        <span className='bg-muted rounded px-2 py-1'>
+          今日收款：{health?.today_count ?? 0} 笔 · ￥{health?.today_cny ?? 0}
+        </span>
+        {health?.expired_unpaid_24h ? (
+          <span className='bg-muted rounded px-2 py-1'>
+            过期待核对（24h）：{health.expired_unpaid_24h} 笔
+          </span>
+        ) : null}
+        {health?.stale_pending ? (
+          <span className='rounded bg-amber-100 px-2 py-1 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'>
+            超时未收尾：{health.stale_pending} 笔
+          </span>
+        ) : null}
+        {health?.unnotified_paid ? (
+          <span className='rounded bg-rose-100 px-2 py-1 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'>
+            已付款未入账：{health.unnotified_paid} 笔
+            {health.retrying_paid ? `（重试中 ${health.retrying_paid}）` : ''}
+          </span>
+        ) : null}
+      </div>
+
+      {health?.warnings?.length ? (
+        <ul className='space-y-1 rounded-md border border-amber-300/60 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200'>
+          {health.warnings.map((w, i) => (
+            <li key={i}>⚠ {w}</li>
+          ))}
+        </ul>
+      ) : null}
 
       <div className='flex flex-wrap items-center gap-2'>
         {chip('rejected', '待人工核对')}

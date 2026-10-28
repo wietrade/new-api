@@ -70,6 +70,17 @@ func AdminListWxGatewayOrders(c *gin.Context) {
 	c.Data(code, "application/json; charset=utf-8", raw)
 }
 
+// AdminWxGatewayStatus 网关健康状态（手机最后上报时间、积压订单、告警）
+func AdminWxGatewayStatus(c *gin.Context) {
+	code, raw, err := wxGatewayAdminCall(http.MethodGet, "/adminapi/status", nil)
+	if err != nil {
+		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway admin status failed: %s", err.Error()))
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	c.Data(code, "application/json; charset=utf-8", raw)
+}
+
 // AdminWxGatewayReceipts 某单（或全部）上传的付款截图
 func AdminWxGatewayReceipts(c *gin.Context) {
 	path := "/receipts"
