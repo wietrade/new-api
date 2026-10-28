@@ -95,6 +95,8 @@ func InitOptionMap() {
 	common.OptionMap["WxGatewayAddress"] = ""
 	common.OptionMap["WxGatewayId"] = ""
 	common.OptionMap["WxGatewayKey"] = ""
+	common.OptionMap["WxGatewayNotifyKey"] = ""
+	common.OptionMap["WxGatewayNotifyIPAllow"] = operation_setting.WxGatewayNotifyIPAllow
 	common.OptionMap["WxGatewayQrUrl"] = ""
 	common.OptionMap["Price"] = strconv.FormatFloat(operation_setting.Price, 'f', -1, 64)
 	common.OptionMap["USDExchangeRate"] = strconv.FormatFloat(operation_setting.USDExchangeRate, 'f', -1, 64)
@@ -544,6 +546,10 @@ func updateOptionMap(key string, value string) (err error) {
 		operation_setting.WxGatewayId = value
 	case "WxGatewayKey":
 		operation_setting.WxGatewayKey = value
+	case "WxGatewayNotifyKey":
+		operation_setting.WxGatewayNotifyKey = value
+	case "WxGatewayNotifyIPAllow":
+		operation_setting.WxGatewayNotifyIPAllow = value
 	case "WxGatewayQrUrl":
 		operation_setting.WxGatewayQrUrl = value
 	case "Price":

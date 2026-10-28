@@ -756,7 +756,17 @@ func WxGatewayNotify(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": "read body failed"})
 		return
 	}
-	key := strings.TrimSpace(operation_setting.WxGatewayKey)
+	// 回调只允许来自白名单 IP（网关与本站同机部署时默认仅 127.0.0.1）
+	if !wxClientIPAllowed(c.ClientIP(), operation_setting.WxGatewayNotifyIPAllow) {
+		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway notify ip blocked client_ip=%s allow=%q", c.ClientIP(), operation_setting.WxGatewayNotifyIPAllow))
+		c.JSON(http.StatusForbidden, gin.H{"ok": false, "error": "ip not allowed"})
+		return
+	}
+	// 回调签名密钥与下单密钥分离；未单独配置时回退到旧的同一把
+	key := strings.TrimSpace(operation_setting.WxGatewayNotifyKey)
+	if key == "" {
+		key = strings.TrimSpace(operation_setting.WxGatewayKey)
+	}
 	ts := strings.TrimSpace(c.GetHeader("X-Timestamp"))
 	nonce := strings.TrimSpace(c.GetHeader("X-Nonce"))
 	sign := strings.ToLower(strings.TrimSpace(c.GetHeader("X-Sign")))
@@ -779,6 +789,12 @@ func WxGatewayNotify(c *gin.Context) {
 	if !hmac.Equal([]byte(sign), []byte(expect)) {
 		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway notify sign mismatch client_ip=%s", c.ClientIP()))
 		c.JSON(http.StatusUnauthorized, gin.H{"ok": false, "error": "sign mismatch"})
+		return
+	}
+	// 防重放：同一 nonce 在 TTL 内只接受一次
+	if !wxNonceAccept(nonce) {
+		logger.LogWarn(c.Request.Context(), common.LogText("wxgateway notify nonce replayed client_ip=%s", c.ClientIP()))
+		c.JSON(http.StatusUnauthorized, gin.H{"ok": false, "error": "nonce reused"})
 		return
 	}
 

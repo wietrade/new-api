@@ -17,11 +17,15 @@ var EpayKey = ""
 // ---- 自有支付网关（微信收款码）----
 // WxGatewayAddress：网关基础地址，例如 https://gw.example.com
 // WxGatewayId：商户标识（网关侧校验）
-// WxGatewayKey：网关 API Key（newapi → 网关）与回调签名密钥
+// WxGatewayKey：网关 API Key（newapi → 网关：下单、管理接口）
+// WxGatewayNotifyKey：回调签名密钥（网关 → newapi），与上面分开，留空则回退用 WxGatewayKey
+// WxGatewayNotifyIPAllow：回调来源 IP 白名单（逗号分隔），留空表示不限制
 // WxGatewayQrUrl：收款二维码图片地址（付款页展示）
 var WxGatewayAddress = ""
 var WxGatewayId = ""
 var WxGatewayKey = ""
+var WxGatewayNotifyKey = ""
+var WxGatewayNotifyIPAllow = ""
 var WxGatewayQrUrl = ""
 
 var Price = 7.3

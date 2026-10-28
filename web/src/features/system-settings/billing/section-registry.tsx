@@ -156,6 +156,8 @@ const BILLING_SECTIONS = [
           WxGatewayAddress: settings.WxGatewayAddress ?? '',
           WxGatewayId: settings.WxGatewayId ?? '',
           WxGatewayKey: settings.WxGatewayKey ?? '',
+          WxGatewayNotifyKey: settings.WxGatewayNotifyKey ?? '',
+          WxGatewayNotifyIPAllow: settings.WxGatewayNotifyIPAllow ?? '',
           WxGatewayQrUrl: settings.WxGatewayQrUrl ?? '',
         }}
         waffoDefaultValues={{

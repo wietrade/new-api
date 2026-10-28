@@ -107,6 +107,8 @@ const defaultBillingSettings: BillingSettings = {
   WxGatewayAddress: '',
   WxGatewayId: '',
   WxGatewayKey: '',
+  WxGatewayNotifyKey: '',
+  WxGatewayNotifyIPAllow: '',
   WxGatewayQrUrl: '',
   'checkin_setting.enabled': false,
   'checkin_setting.min_quota': 1000,

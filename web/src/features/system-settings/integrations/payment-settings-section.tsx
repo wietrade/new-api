@@ -182,6 +182,8 @@ const paymentSchema = z.object({
   WxGatewayAddress: z.string(),
   WxGatewayId: z.string(),
   WxGatewayKey: z.string(),
+  WxGatewayNotifyKey: z.string(),
+  WxGatewayNotifyIPAllow: z.string(),
   WxGatewayQrUrl: z.string(),
 })
 
@@ -467,6 +469,8 @@ export function PaymentSettingsSection({
       WxGatewayAddress: removeTrailingSlash(values.WxGatewayAddress.trim()),
       WxGatewayId: values.WxGatewayId.trim(),
       WxGatewayKey: values.WxGatewayKey.trim(),
+      WxGatewayNotifyKey: values.WxGatewayNotifyKey.trim(),
+      WxGatewayNotifyIPAllow: values.WxGatewayNotifyIPAllow.trim(),
       WxGatewayQrUrl: values.WxGatewayQrUrl.trim(),
     }
 
@@ -520,6 +524,9 @@ export function PaymentSettingsSection({
       ),
       WxGatewayId: initialRef.current.WxGatewayId.trim(),
       WxGatewayKey: initialRef.current.WxGatewayKey.trim(),
+      WxGatewayNotifyKey: initialRef.current.WxGatewayNotifyKey.trim(),
+      WxGatewayNotifyIPAllow:
+        initialRef.current.WxGatewayNotifyIPAllow.trim(),
       WxGatewayQrUrl: initialRef.current.WxGatewayQrUrl.trim(),
     }
 
@@ -731,6 +738,23 @@ export function PaymentSettingsSection({
 
     if (sanitized.WxGatewayKey && sanitized.WxGatewayKey !== initial.WxGatewayKey) {
       updates.push({ key: 'WxGatewayKey', value: sanitized.WxGatewayKey })
+    }
+
+    if (
+      sanitized.WxGatewayNotifyKey &&
+      sanitized.WxGatewayNotifyKey !== initial.WxGatewayNotifyKey
+    ) {
+      updates.push({
+        key: 'WxGatewayNotifyKey',
+        value: sanitized.WxGatewayNotifyKey,
+      })
+    }
+
+    if (sanitized.WxGatewayNotifyIPAllow !== initial.WxGatewayNotifyIPAllow) {
+      updates.push({
+        key: 'WxGatewayNotifyIPAllow',
+        value: sanitized.WxGatewayNotifyIPAllow,
+      })
     }
 
     if (sanitized.WxGatewayQrUrl !== initial.WxGatewayQrUrl) {
@@ -1433,6 +1457,56 @@ export function PaymentSettingsSection({
                         </FormControl>
                         <FormDescription>
                           填微信收款码图片的直链，付款页会直接显示；留空则付款页不显示二维码
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className='grid gap-6 md:grid-cols-2'>
+                  <FormField
+                    control={form.control}
+                    name='WxGatewayNotifyKey'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>回调签名密钥</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            placeholder='留空则沿用上面的网关密钥'
+                            autoComplete='new-password'
+                            {...field}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          网关 → 本站 回调专用密钥，建议与网关密钥不同（留空则不修改、并沿用网关密钥）
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='WxGatewayNotifyIPAllow'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>回调 IP 白名单</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='127.0.0.1,172.17.0.1'
+                            {...field}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          逗号分隔，只允许这些 IP 回调；留空表示不限制。同机部署填 127.0.0.1 即可
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

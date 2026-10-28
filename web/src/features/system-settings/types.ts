@@ -356,6 +356,8 @@ export type BillingSettings = {
   WxGatewayAddress: string
   WxGatewayId: string
   WxGatewayKey: string
+  WxGatewayNotifyKey: string
+  WxGatewayNotifyIPAllow: string
   WxGatewayQrUrl: string
   'checkin_setting.enabled': boolean
   'checkin_setting.min_quota': number
