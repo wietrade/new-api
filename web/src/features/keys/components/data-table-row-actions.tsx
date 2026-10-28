@@ -269,7 +269,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
         {hasChatPresets && (
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>{t('Chat')}</DropdownMenuSubTrigger>
+            <DropdownMenuSubTrigger>{t('Launch App')}</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               {chatPresets.map((preset) => (
                 <DropdownMenuItem
