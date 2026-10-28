@@ -150,6 +150,20 @@ function normalizeApiKey(apiKey: string): string {
   return trimmed.startsWith('sk-') ? trimmed : `sk-${trimmed}`
 }
 
+/**
+ * 只转义会在 query 里截断/破坏参数的字符，保留 :// 原样。
+ *
+ * 这些模板把 {address}/{key} 放在 JSON 片段或自定义协议的参数里
+ * （如 Lobe 的 `"baseURL":"{address}/v1"`），如果整体 encodeURIComponent，
+ * 客户端会拿到 `https%3A%2F%2Fwww.example.com/v1` 而连接失败。
+ */
+function escapeQueryHostile(value: string): string {
+  return value
+    .replace(/#/g, '%23')
+    .replace(/\?/g, '%3F')
+    .replace(/&/g, '%26')
+}
+
 export function resolveChatUrl({
   template,
   apiKey,
@@ -201,12 +215,11 @@ export function resolveChatUrl({
   }
 
   if (safeServerAddress) {
-    const encodedAddress = encodeURIComponent(safeServerAddress)
-    url = replaceToken(url, '{address}', encodedAddress)
+    url = replaceToken(url, '{address}', escapeQueryHostile(safeServerAddress))
   }
 
   if (safeApiKey) {
-    url = replaceToken(url, '{key}', safeApiKey)
+    url = replaceToken(url, '{key}', escapeQueryHostile(safeApiKey))
   }
 
   return url
