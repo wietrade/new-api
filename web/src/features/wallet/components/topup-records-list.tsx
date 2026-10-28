@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { StatusBadge } from '@/components/status-badge'
@@ -28,11 +29,32 @@ import { useBillingHistory } from '../hooks/use-billing-history'
 import { formatTimestamp, getStatusConfig } from '../lib/billing'
 import type { TopupRecord } from '../types'
 
+/** 长单号：默认后四位，点一下展开完整 */
+function ExpandableCode({ value }: { value?: string | null }) {
+  const [open, setOpen] = useState(false)
+  if (!value) return <span className='text-muted-foreground'>—</span>
+  const short = value.length > 6 ? `…${value.slice(-4)}` : value
+  return (
+    <span
+      role='button'
+      tabIndex={0}
+      title={open ? '点击收起' : '点击查看完整'}
+      className='cursor-pointer font-mono underline decoration-dotted underline-offset-2'
+      onClick={() => setOpen((v) => !v)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') setOpen((v) => !v)
+      }}
+    >
+      {open ? value : short}
+    </span>
+  )
+}
+
 /**
  * 充值记录（直接嵌在「添加资金」卡片里，不需要再点按钮开弹层）
  *
- * 每行：时间 / 人民币实付 / 入账美元 / 付款当时汇率 / 状态
- *       订单号(newapi) + 微信订单号 + 微信昵称
+ * 列名与 App「历史记录」保持一致：金额 / 昵称 / 顺序号 / 单号 / 订单时间 / 备注
+ * 长单号默认只显示后四位，点击展开完整。
  */
 export function TopupRecordsList() {
   const { t } = useTranslation()
@@ -134,12 +156,14 @@ export function TopupRecordsList() {
             <thead className='bg-muted/40 text-muted-foreground'>
               <tr>
                 <th className={th}>{t('Time')}</th>
-                <th className={th}>{t('CNY Paid')}</th>
+                <th className={th}>{t('Amount')}</th>
                 <th className={th}>{t('USD Credited')}</th>
                 <th className={th}>{t('Rate')}</th>
+                <th className={th}>{t('Nickname')}</th>
+                <th className={th}>{t('Customer No.')}</th>
                 <th className={th}>{t('Order No.')}</th>
-                <th className={th}>{t('WeChat Order No.')}</th>
-                <th className={th}>{t('WeChat Nickname')}</th>
+                <th className={th}>{t('Remark')}</th>
+                <th className={th}>{t('Site Order No.')}</th>
                 <th className={th}>{t('Status')}</th>
               </tr>
             </thead>
@@ -156,26 +180,31 @@ export function TopupRecordsList() {
                     <td className={`${td} text-muted-foreground`}>
                       {rateOf(record)}
                     </td>
-                    <td className={td}>
-                      <div className='flex items-center gap-1'>
-                        <code className='max-w-[150px] truncate font-mono'>
-                          {record.trade_no}
-                        </code>
-                        {copyBtn(record.trade_no)}
-                      </div>
+                    <td className={`${td} max-w-[90px] truncate`}>
+                      {record.wx_nickname || '—'}
+                    </td>
+                    <td className={`${td} text-muted-foreground tabular-nums`}>
+                      {record.customer_no ? `#${record.customer_no}` : '—'}
                     </td>
                     <td className={td}>
                       <div className='flex items-center gap-1'>
-                        <code className='max-w-[150px] truncate font-mono'>
-                          {record.wx_order_no || '—'}
-                        </code>
+                        <ExpandableCode value={record.wx_order_no} />
                         {record.wx_order_no
                           ? copyBtn(record.wx_order_no)
                           : null}
                       </div>
                     </td>
-                    <td className={`${td} max-w-[120px] truncate`}>
-                      {record.wx_nickname || '—'}
+                    <td
+                      className={`${td} text-muted-foreground max-w-[120px] truncate`}
+                      title={record.pay_remark || ''}
+                    >
+                      {record.pay_remark || '—'}
+                    </td>
+                    <td className={`${td} text-muted-foreground`}>
+                      <div className='flex items-center gap-1'>
+                        <ExpandableCode value={record.trade_no} />
+                        {copyBtn(record.trade_no)}
+                      </div>
                     </td>
                     <td className={td}>
                       <StatusBadge

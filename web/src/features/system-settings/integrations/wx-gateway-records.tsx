@@ -37,6 +37,9 @@ interface GwOrder {
   pay_order_no?: string | null
   wx_order_no?: string | null
   payer?: string | null
+  customer_no?: string | null
+  pay_remark?: string | null
+  pay_time?: string | null
   paid_usd?: number | null
   fx_rate?: number | null
   receipt_count?: number
@@ -364,7 +367,13 @@ export function WxGatewayRecords() {
                 微信昵称
               </th>
               <th className='px-2 py-2 text-left font-medium whitespace-nowrap'>
-                微信订单号
+                顺序号
+              </th>
+              <th className='px-2 py-2 text-left font-medium whitespace-nowrap'>
+                单号
+              </th>
+              <th className='px-2 py-2 text-left font-medium whitespace-nowrap'>
+                备注
               </th>
               <th className='px-2 py-2 text-left font-medium whitespace-nowrap'>
                 本站订单号
@@ -380,13 +389,13 @@ export function WxGatewayRecords() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={9} className='text-muted-foreground px-2 py-6 text-center'>
+                <td colSpan={11} className='text-muted-foreground px-2 py-6 text-center'>
                   加载中…
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={9} className='text-muted-foreground px-2 py-6 text-center'>
+                <td colSpan={11} className='text-muted-foreground px-2 py-6 text-center'>
                   没有记录
                 </td>
               </tr>
@@ -409,8 +418,24 @@ export function WxGatewayRecords() {
                       {o.paid_usd ? `$${Number(o.paid_usd).toFixed(4)}` : '—'}
                     </td>
                     <td className='px-2 py-2 whitespace-nowrap'>{o.payer || '—'}</td>
-                    <td className='px-2 py-2 font-mono whitespace-nowrap'>
-                      {o.wx_order_no || '—'}
+                    <td className='px-2 py-2 whitespace-nowrap tabular-nums'>
+                      {o.customer_no ? `#${o.customer_no}` : '—'}
+                    </td>
+                    <td
+                      className='px-2 py-2 font-mono whitespace-nowrap'
+                      title={o.wx_order_no || ''}
+                    >
+                      {o.wx_order_no
+                        ? o.wx_order_no.length > 6
+                          ? `…${o.wx_order_no.slice(-4)}`
+                          : o.wx_order_no
+                        : '—'}
+                    </td>
+                    <td
+                      className='text-muted-foreground max-w-[120px] truncate px-2 py-2'
+                      title={o.pay_remark || ''}
+                    >
+                      {o.pay_remark || '—'}
                     </td>
                     <td className='px-2 py-2 font-mono whitespace-nowrap'>
                       {o.trade_no}

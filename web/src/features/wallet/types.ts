@@ -277,10 +277,14 @@ export interface TopupRecord {
   usd_amount?: number
   /** 微信收款：当时使用的汇率（1 USD = X CNY） */
   fx_rate?: number
-  /** 微信收款：微信订单号 */
+  /** 微信收款：微信订单号（单号） */
   wx_order_no?: string
-  /** 微信收款：微信昵称（付款人昵称） */
+  /** 微信收款：昵称（付款人） */
   wx_nickname?: string
+  /** 微信收款：顺序号 */
+  customer_no?: string
+  /** 微信收款：备注 */
+  pay_remark?: string
 }
 
 /**

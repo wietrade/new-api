@@ -7451,6 +7451,9 @@
     "Total {{total}} records": "共 {{total}} 条",
     "Topup Records": "充值记录",
     "WeChat Top-up": "微信充值",
-    "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.": "本站所有费率以美元计价，充值人民币会按照实时汇率折算成美元入账。"
+    "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.": "本站所有费率以美元计价，充值人民币会按照实时汇率折算成美元入账。",
+    "Nickname": "昵称",
+    "Customer No.": "顺序号",
+    "Site Order No.": "本站订单号"
   }
 }

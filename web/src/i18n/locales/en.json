@@ -7530,6 +7530,9 @@
     "Total {{total}} records": "Total {{total}} records",
     "Topup Records": "Topup Records",
     "WeChat Top-up": "WeChat Top-up",
-    "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.": "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate."
+    "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.": "All rates on this site are priced in USD. CNY top-ups are converted to USD at the live exchange rate.",
+    "Nickname": "Nickname",
+    "Customer No.": "Customer No.",
+    "Site Order No.": "Site Order No."
   }
 }
