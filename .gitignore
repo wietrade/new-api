@@ -47,3 +47,7 @@ go.work
 go.work.sum
 __pycache__/
 *.pyc
+
+# 手工放置的本地目录（不属于本仓库；含凭据，禁止误提交）
+model-data-private/
+favicon-package/
